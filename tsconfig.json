@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "baseUrl": "./",
+
+    // ✅ Pfad-Aliasstruktur
+    "paths": {
+      "@/*": ["*"],
+
+      "@database/*": ["database/*"],
+      "@config/*": ["config/*"],
+      "@services/*": ["bot/services/*"],
+      "@utils/*": ["bot/utils/*"],
+      "@commands/*": ["bot/commands/*"],
+      "@modules/*": ["bot/modules/*"],
+      "@api/*": ["bot/api/*"],
+      "@loader/*": ["bot/loader/*"],
+      "@lib/*": ["lib/gpt/*"],
+      "@style/*": ["bot/utils/style/*"]
+    },
+
+    // ✅ Unterstützt native Node.js-Typen
+    "types": ["node"]
+  },
+
+  // ✅ Enthält alles Relevante für das Projekt
+  "include": [
+    "bot",
+    "web",
+    "config",
+    "database",
+    "types"
+  ],
+
+  // ✅ Schließt Build-Ziele und Dependencies aus
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "meat-bot",
+  "version": "1.0.0",
+  "description": "M.E.A.T. – Modular Enhanced Assistant Technology",
+  "type": "module",
+  "main": "run-dev.ts",
+  "scripts": {
+    "dev": "tsx --require tsconfig-paths/register run-dev.ts",
+    "build": "tsc",
+    "deploy": "tsx bot/loader/deploySlashCommands.ts",
+    "generate": "prisma generate --schema=database/schema.prisma",
+    "migrate": "prisma migrate dev --name init --schema=database/schema.prisma",
+    "studio": "prisma studio --schema=database/schema.prisma",
+    "seed": "ts-node database/seed.ts",
+    "db:reset": "prisma migrate reset --schema=database/schema.prisma --force"
+  },
+  "prisma": {
+    "schema": "database/schema.prisma",
+    "seed": "tsx database/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.12.0",
+    "axios": "^1.9.0",
+    "discord.js": "^14.18.0",
+    "dotenv": "^16.5.0",
+    "openai": "^4.96.0"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.9.36",
+    "prisma": "^5.12.0",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.3.3"
+  }
+}

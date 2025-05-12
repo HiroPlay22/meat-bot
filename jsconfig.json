@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@config/*": ["config/*"],
+      "@services/*": ["bot/services/*"],
+      "@utils/*": ["bot/utils/*"],
+      "@commands/*": ["bot/commands/*"],
+      "@modules/*": ["bot/modules/*"],
+      "@loader/*": ["bot/loader/*"]
+    }
+  },
+  "exclude": ["node_modules"]
+}

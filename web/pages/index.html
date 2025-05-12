@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>M.E.A.T. HQ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+  <style>
+    :root {
+      --theme-orange: #f97316;
+    }
+    .theme-orange {
+      --tw-prose-bullets: var(--theme-orange);
+      --tw-text-opacity: 1;
+      color: rgb(249 115 22 / var(--tw-text-opacity));
+    }
+  </style>
+</head>
+<body class="bg-zinc-900 text-white font-sans min-h-screen">
+  <nav class="bg-zinc-800 px-6 py-4 flex justify-between items-center shadow-md">
+    <img src="/assets/img/meat_logo1.png" alt="Profil" class="w-10 h-10" />
+    <div class="flex items-center space-x-6">
+      <a href="#" class="text-white bg-blue-500 hover:bg-orange-600 px-4 py-2 rounded-md text-sm font-medium">
+        <i class="fa-brands fa-discord mr-1"></i>Login
+      </a>
+      <div class="relative">
+        <button id="profileToggle" class="flex items-center space-x-2 focus:outline-none">
+          <img src="/assets/img/profilbild.webp" alt="Profil" class="w-10 h-10 rounded-full border-2 border-zinc-900" />
+          <i class="fa-solid fa-chevron-down text-xs"></i>
+        </button>
+        <div id="profileMenu" class="absolute right-0 mt-2 w-64 bg-zinc-800 rounded shadow-lg z-10 border-2 border-zinc-950">
+          <div class="border-b border-zinc-700 px-4 py-3 text-sm text-gray-300 flex items-center space-x-2 bg-zinc-900 rounded-t">
+            <img src="/assets/img/profilbild.webp" alt="Server" class="w-6 h-6 rounded-full bg-zinc-500" />
+            <span id="currentUser" class="text-sm font-bold px-2 py-1 rounded bg-zinc-800" style="color: #ff002f;">
+              @Hiro
+            </span>
+          </div>
+          <div class="border-b border-zinc-700 px-4 py-3 text-sm text-gray-300 flex items-center space-x-2 bg-zinc-950 rounded-t">
+            <img src="/assets/img/Gaming-Friends-Profilbild.png" alt="Server" class="w-6 h-6 rounded-full bg-zinc-700" />
+            <span id="currentServer">GamingFriends</span>
+          </div>
+          <div class="px-4 pt-3 pb-1 text-xs text-gray-400 uppercase tracking-wide">Server</div>
+          <div class="px-2 pb-2">
+            <div id="serverList" class="border border-zinc-700 rounded overflow-hidden">
+              <button onclick="selectServer('GamingFriends')" class="w-full text-left px-4 py-2 text-sm hover:bg-zinc-700 flex items-center gap-2">
+                <img src="/assets/img/Gaming-Friends-Profilbild.png" alt="Server" class="w-4 h-4 rounded-full bg-zinc-950" />
+                GamingFriends
+                <span class="ml-auto text-green-500 text-xs">●</span>
+              </button>
+              <button onclick="selectServer('MEAT')" class="w-full text-left px-4 py-2 text-sm hover:bg-zinc-700 flex items-center gap-2">
+                <img src="/assets/img/meat_bot.png" class="w-4 h-4 rounded-full bg-zinc-950" alt="MEAT-Central 42" />
+                MEAT
+              </button>
+            </div>
+          </div>
+          <a href="#" class="block px-4 py-2 text-sm hover:bg-zinc-700">
+            <i class="fa-solid fa-gear mr-2"></i> Einstellungen
+          </a>
+          <a href="#" class="block px-4 py-2 text-sm hover:bg-zinc-700">
+            <i class="fa-solid fa-right-from-bracket mr-2"></i> Abmelden
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-6xl mx-auto px-6 py-12">
+    <header class="text-center mb-16">
+        <div class="flex items-center gap-1 text-white text-xl font-bold">
+            <img src="/assets/img/meat_logo2.png" alt="M" class="w-10 h-10" style="margin-right: :0" title="M.E.A.T."/><span class="tracking-widest">.E.A.T.</span><span class="text-gray-600">HQ</span> 
+</div>
+    </header>
+
+    <main class="grid md:grid-cols-2 gap-10 items-center">
+      <div>
+        <h2 class="text-3xl font-semibold mb-4">Willkommen, Commander.</h2>
+        <p class="mb-2 text-gray-300">Steuere deine Server, analysiere Stats,<br />und verleihe deinem Discord-Bot neuen Schub.</p>
+        <p class="mb-6 text-gray-400">Aktiviere verborgene Routinen, schalte Module frei<br />und erhalte Zugriff auf das volle Potenzial deiner Crew.</p>
+        <a href="https://discord.com/api/oauth2/authorize?client_id=DEIN_CLIENT_ID&redirect_uri=DEINE_REDIRECT_URI&response_type=code&scope=identify%20guilds" class="inline-block bg-blue-500 hover:bg-orange-600 text-white font-medium px-5 py-3 rounded-xl shadow transition">
+          <i class="fa-brands fa-discord mr-2"></i>Login mit Discord
+        </a>
+        <div class="mt-8 text-sm text-gray-400">
+          <p><i class="fa-solid fa-check text-green-400 mr-1"></i>Bot muss auf deinem Server aktiv sein</p>
+          <p><i class="fa-solid fa-user-shield text-green-400 mr-1"></i>Du brauchst ausreichende Rechte (z. B. Admin)</p>
+          <p class="text-red-400 mt-2"><i class="fa-solid fa-lock mr-1"></i>Ohne passende Rechte → kein Zugriff auf Commands oder Stats</p>
+        </div>
+      </div>
+      <div class="flex justify-center">
+        <div class="bg-zinc-800 rounded-2xl p-6 text-center shadow-xl w-full max-w-sm">
+          <img src="/assets/img/meat_bot.png" alt="M.E.A.T. Avatar" class="mx-auto rounded-full mb-4" />
+          <h3 class="text-xl font-bold text-orange-400">M.E.A.T. System</h3>
+          <p class="mt-4 text-xs text-gray-600">meat-bot.de</p>
+        </div>
+      </div>
+    </main>
+
+    <section class="mt-20">
+      <h3 class="text-2xl font-semibold text-orange-400 mb-6"><i class="fa-solid fa-chart-bar mr-2"></i>Vorschau auf Funktionen (nach Login):</h3>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-zinc-800 p-6 rounded-xl shadow">
+          <h4 class="text-lg font-semibold text-white mb-2"><i class="fa-solid fa-brain mr-2"></i>M.E.A.T.-Aktivität</h4>
+          <ul class="text-gray-400 text-sm space-y-1">
+            <li>Server: <span class="text-white">2</span></li>
+            <li>Status: <span class="text-green-400">Online</span></li>
+            <li>Reaktionszeit: <span class="text-white">2ms</span></li>
+            <li>Modulstatus: <span class="text-white">Alle Systeme bereit</span></li>
+          </ul>
+        </div>
+        <div class="bg-zinc-800 p-6 rounded-xl shadow">
+          <h4 class="text-lg font-semibold text-white mb-2"><i class="fa-solid fa-terminal mr-2"></i>Command-Nutzung</h4>
+          <canvas id="commandChart" class="w-full h-40"></canvas>
+        </div>
+        <div class="bg-zinc-800 p-6 rounded-xl shadow">
+          <h4 class="text-lg font-semibold text-white mb-2">
+            <i class="fa-solid fa-radar mr-2"></i>User-Aktivität
+          </h4>
+          <canvas id="userRadarChart" class="w-full max-w-sm h-48 mx-auto"></canvas>
+          <p class="text-xs text-green-400 mt-4 text-center">
+            <i class="fa-solid fa-arrow-trend-up mr-1"></i>
+            Trending up by 5.2% this month<br />
+            <span class="text-zinc-500">January – June 2024</span>
+          </p>
+        </div>
+        <div class="bg-zinc-800 p-6 rounded-xl shadow">
+          <h4 class="text-lg font-semibold text-white mb-2"><i class="fa-solid fa-clipboard-list mr-2"></i>System-Log</h4>
+          <ul class="text-xs text-gray-500 mt-3 space-y-1">
+              <li>[12:03] Beigetreten: GamingFriends-Server</li>
+              <li>[12:14] Warnung: Reaktionszeit über 500ms</li>
+              <li>[12:25] Command /poll gestartet</li>
+              <li>[12:30] Update Voting-Modul → /poll montag</li>
+              <li>[12:32] API-Sync erfolgreich abgeschlossen</li>
+              <li>[12:40] Logging aktiviert für Channel #logbot</li>
+              <li>[12:45] Modul „feedback“ deployed</li>
+              <li>[12:47] Sicherheitscheck abgeschlossen (0 Warnungen)</li>
+              <li>[12:50] Interner Cronjob: Tagesstatistik aktualisiert</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <footer class="mt-24 text-center text-sm text-gray-600">
+      <p><i class="fa-solid fa-shoe-prints mr-1"></i> <a href="#" class="underline hover:text-white">Impressum</a> | <a href="#" class="underline hover:text-white">Datenschutz</a> | <a href="#" class="underline hover:text-white">GitHub</a> | <a href="#" class="underline hover:text-white">API</a></p>
+    </footer>
+  </div>
+
+  <script>
+    const profileToggle = document.getElementById('profileToggle');
+    const profileMenu = document.getElementById('profileMenu');
+    const currentServer = document.getElementById('currentServer');
+
+    profileToggle.addEventListener('click', () => {
+      profileMenu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!profileMenu.contains(e.target) && !profileToggle.contains(e.target)) {
+        profileMenu.classList.add('hidden');
+      }
+    });
+
+    function selectServer(name) {
+      currentServer.textContent = name;
+      // Liste bleibt geöffnet
+    }
+  </script>
+  <script>
+  const ctx1 = document.getElementById('commandChart').getContext('2d');
+  new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: ['!clip', '!event', '!poll', '!stats', '!feedback'],
+      datasets: [{
+        label: 'Verwendung',
+        data: [42, 31, 58, 25, 12],
+        backgroundColor: '#f97316'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+
+  const ctxRadar = document.getElementById('userRadarChart').getContext('2d');
+
+  new Chart(ctxRadar, {
+    type: 'radar',
+    data: {
+      labels: [
+        '🗳️ Votings',
+        '📅 Events',
+        '💬 Feedback',
+        '🎮 Game Interaktionen',
+        '📈 Reaktionen'
+      ],
+      datasets: [
+        {
+          label: 'Total Uses',
+          data: [85, 62, 44, 97, 88],
+          fill: true,
+          backgroundColor: 'rgba(56,189,248,0.2)',
+          borderColor: '#38bdf8',
+          pointBackgroundColor: '#38bdf8',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: '#38bdf8'
+        },
+        {
+          label: 'Unique Users',
+          data: [30, 26, 19, 40, 38],
+          fill: true,
+          backgroundColor: 'rgba(167,139,250,0.2)',
+          borderColor: '#a78bfa',
+          pointBackgroundColor: '#a78bfa',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: '#a78bfa'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      elements: {
+        line: { borderWidth: 2 }
+      },
+      scales: {
+        r: {
+          angleLines: { color: '#444' },
+          grid: { color: '#333' },
+          pointLabels: {
+            color: '#ccc',
+            font: { size: 11 }
+          },
+          ticks: {
+            color: '#999',
+            backdropColor: 'transparent',
+            stepSize: 20
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: { color: '#ccc' }
+        }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
