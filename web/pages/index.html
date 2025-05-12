@@ -7,17 +7,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
-  <style>
-    :root {
-      --theme-orange: #f97316;
-    }
-    .theme-orange {
-      --tw-prose-bullets: var(--theme-orange);
-      --tw-text-opacity: 1;
-      color: rgb(249 115 22 / var(--tw-text-opacity));
-    }
-  </style>
+  <link rel="stylesheet" href="assets/css/style.css" />
+    
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro@1.7.1/build/vanilla-calendar.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro@1.7.1/build/vanilla-calendar.min.js"></script>
+
+
+
 </head>
+
 <body class="bg-zinc-900 text-white font-sans min-h-screen">
   <nav class="bg-zinc-800 px-6 py-4 flex justify-between items-center shadow-md">
     <img src="assets/img/meat_logo1.png" alt="Profil" class="w-10 h-10" />
@@ -30,7 +28,7 @@
           <img src="assets/img/profilbild.webp" alt="Profil" class="w-10 h-10 rounded-full border-2 border-zinc-900" />
           <i class="fa-solid fa-chevron-down text-xs"></i>
         </button>
-        <div id="profileMenu" class="absolute right-0 mt-2 w-64 bg-zinc-800 rounded shadow-lg z-10 border-2 border-zinc-950">
+        <div id="profileMenu" class="absolute right-0 mt-2 w-64 bg-zinc-800 rounded shadow-lg z-10 border-2 border-zinc-950 hidden">
           <div class="border-b border-zinc-700 px-4 py-3 text-sm text-gray-300 flex items-center space-x-2 bg-zinc-900 rounded-t">
             <img src="assets/img/profilbild.webp" alt="Server" class="w-6 h-6 rounded-full bg-zinc-500" />
             <span id="currentUser" class="text-sm font-bold px-2 py-1 rounded bg-zinc-800" style="color: #ff002f;">
@@ -88,15 +86,60 @@
         </div>
       </div>
       <div class="flex justify-center">
-        <div class="bg-zinc-800 rounded-2xl p-6 text-center shadow-xl w-full max-w-sm">
-          <img src="assets/img/meat_bot.png" alt="M.E.A.T. Avatar" class="mx-auto rounded-full mb-4" />
-          <h3 class="text-xl font-bold text-orange-400">M.E.A.T. System</h3>
-          <p class="mt-4 text-xs text-gray-600">meat-bot.de</p>
-        </div>
-      </div>
+  <div id="statusCard" class="bg-zinc-800 rounded-2xl p-6 text-center shadow-xl w-full max-w-sm relative transition-colors duration-700">
+    <div class="relative w-full aspect-square mb-4 overflow-hidden rounded-full border-4 border-zinc-700 transition-colors duration-500" id="avatarWrapper">
+  <img id="avatarImage" src="assets/img/meat_bot.png" alt="M.E.A.T. Avatar" class="w-full h-full object-cover rounded-full" />
+
+  <!-- Bootlog Overlay -->
+  <div id="bootOverlay" class="absolute inset-0 bg-zinc-950 bg-opacity-60 flex flex-col justify-end text-xs text-green-300 font-mono p-3 transition-all duration-1000 ease-in-out z-10">
+    <div id="bootLog" class="flex-1 flex flex-col-reverse overflow-hidden mt-[-0.5rem] pb-4"></div>
+  </div>
+
+  <!-- Hintergrundstreifen -->
+  <div id="overlayBehindOnline" class="absolute bottom-0 w-full h-10 bg-zinc-900 bg-opacity-70 z-0 rounded-b-full"></div>
+
+  <!-- ONLINE Text -->
+  <div id="onlineStatus" class="absolute bottom-3 w-full text-center text-green-400 font-bold text-base opacity-0 transition-opacity duration-700 z-10">
+    [ONLINE]
+  </div>
+</div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
     </main>
 
-    <section class="mt-20">
+    <section style="margin: 2rem 0;">
+      <div id="meat-tip-box" class="meat-alert">
+        <strong class="meat-alert-label">M.E.A.T. Hinweis:</strong>
+        <span id="meat-tip-text">Lade Tipp…</span>
+      </div>
+    </section>
+
+    <script>
+      const tips = [
+        "Statistik sagt: Deine Crew ignoriert den /feedback-Command. Das ist verletzend.",
+        "Wenn du keine Events verpasst, benutzt du /poll montag. Wenn du doch welche verpasst – selber schuld.",
+        "Einbürgerung ist kein Feature. Es ist ein Schicksal. /einbürgerung.",
+        "Du hast das Voting geschlossen? M.E.A.T. hat dich notiert.",
+        "Dashboard öffnen. Kontrolle übernehmen. Legacy löschen.",
+        "Modulstatus: stabil. Nutzerstatus: fragwürdig.",
+        "Protokoll #013: Selbstzweifel entstehen, wenn kein Event gepostet wurde.",
+        "Ein Roboter ohne Wut ist ein Plugin ohne Kontext."
+      ];
+
+      const randomIndex = Math.floor(Math.random() * tips.length);
+      document.getElementById("meat-tip-text").textContent = tips[randomIndex];
+    </script>
+      
+      
+    <section class="mt-0">
       <h3 class="text-2xl font-semibold text-orange-400 mb-6"><i class="fa-solid fa-chart-bar mr-2"></i>Vorschau auf Funktionen (nach Login):</h3>
       <div class="grid md:grid-cols-2 gap-6">
         <div class="bg-zinc-800 p-6 rounded-xl shadow">
@@ -120,23 +163,26 @@
           <p class="text-xs text-green-400 mt-4 text-center">
             <i class="fa-solid fa-arrow-trend-up mr-1"></i>
             Trending up by 5.2% this month<br />
-            <span class="text-zinc-500">January – June 2024</span>
+            <span class="text-zinc-500">January – June 2025</span>
           </p>
         </div>
-        <div class="bg-zinc-800 p-6 rounded-xl shadow">
-          <h4 class="text-lg font-semibold text-white mb-2"><i class="fa-solid fa-clipboard-list mr-2"></i>System-Log</h4>
-          <ul class="text-xs text-gray-500 mt-3 space-y-1">
-              <li>[12:03] Beigetreten: GamingFriends-Server</li>
-              <li>[12:14] Warnung: Reaktionszeit über 500ms</li>
-              <li>[12:25] Command /poll gestartet</li>
-              <li>[12:30] Update Voting-Modul → /poll montag</li>
-              <li>[12:32] API-Sync erfolgreich abgeschlossen</li>
-              <li>[12:40] Logging aktiviert für Channel #logbot</li>
-              <li>[12:45] Modul „feedback“ deployed</li>
-              <li>[12:47] Sicherheitscheck abgeschlossen (0 Warnungen)</li>
-              <li>[12:50] Interner Cronjob: Tagesstatistik aktualisiert</li>
-          </ul>
+        
+        <div class="bg-zinc-800 p-6 rounded-xl shadow w-full text-white text-sm">
+          <h4 class="text-lg font-semibold text-white mb-4 flex items-center">
+            <i class="fa-solid fa-calendar-days mr-2 text-orange-400"></i>Eventkalender
+          </h4>
+          <div id="calendar" class="vanilla-calendar w-full"></div>
         </div>
+
+
+
+
+
+
+
+
+      
+          
       </div>
     </section>
 
@@ -253,6 +299,126 @@
     }
   });
 </script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const calendar = new VanillaCalendar('#calendar', {
+      type: 'default',
+      settings: {
+        selection: {
+          day: 'multiple',
+        },
+      },
+      popups: {
+        '2025-05-13': { modifier: 'event-monday' },
+        '2025-05-15': { modifier: 'event-thursday' },
+      },
+    });
+
+    calendar.init();
+  });
+</script>
+
+<script>
+  const BOT_STATUS = "online"; // ← "online" oder "offline"
+  const isOnline = BOT_STATUS === "online";
+
+  const logs = isOnline
+    ? [
+        "[✔] Discord ready",
+        "[✔] Commands loaded",
+        "[✔] Module Sync OK",
+        "[✔] Kernel initialized",
+        "[✔] Permissions verified",
+        "[✔] Uplink active"
+      ]
+    : [
+        "[×] Uplink lost",
+        "[!] /cmd fail",
+        "[!] ModSync → abort",
+        "[×] Kernel mismatch",
+        "[!] Permissions? Nope.",
+        "[×] Boot denied."
+      ];
+
+  const logEl = document.getElementById("bootLog");
+  const overlay = document.getElementById("bootOverlay");
+  const online = document.getElementById("onlineStatus");
+  const wrapper = document.getElementById("avatarWrapper");
+  const behindOnline = document.getElementById("overlayBehindOnline");
+  const card = document.getElementById("statusCard");
+  const avatar = document.getElementById("avatarImage");
+
+  function typeLine(text, targetClass, callback) {
+    const line = document.createElement("div");
+    line.classList.add(targetClass);
+    logEl.prepend(line);
+
+    let i = 0;
+    const interval = setInterval(() => {
+      line.textContent += text[i];
+      i++;
+      if (i >= text.length) {
+        clearInterval(interval);
+        callback();
+      }
+    }, 20); // Tippgeschwindigkeit
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    let i = 0;
+
+    function nextLog() {
+      if (i < logs.length) {
+        const color = isOnline ? "text-green-300" : "text-yellow-300";
+        typeLine(logs[i++], color, () => {
+          setTimeout(nextLog, 200);
+        });
+      } else {
+        setTimeout(() => {
+          // Overlay verschwindet
+          overlay.classList.add("translate-y-full", "opacity-0");
+
+          // Rahmenfarbe ändern
+          wrapper.classList.replace(
+            "border-zinc-700",
+            isOnline ? "border-green-500" : "border-red-500"
+          );
+
+          // Card-Hintergrund + Effekte
+          card.classList.replace(
+            "bg-zinc-800",
+            isOnline ? "bg-green-950" : "bg-red-950"
+          );
+          if (isOnline) {
+            card.classList.add("pulse-green"); // Pulse-Klasse (in CSS definiert)
+          } else {
+            // Avatar weich austauschen
+            avatar.classList.add("transition-opacity", "duration-600", "opacity-0");
+            setTimeout(() => {
+              avatar.src = "assets/img/meat_bot_offline.webp"; // Dein Offline-Bild
+              avatar.classList.remove("opacity-0");
+            }, 500);
+          }
+
+          // Statusanzeige unten
+          setTimeout(() => {
+            online.textContent = isOnline ? "[ONLINE]" : "[OFFLINE]";
+            online.classList.remove("opacity-0");
+
+            if (!isOnline) {
+              online.classList.remove("text-green-400");
+              online.classList.add("text-red-400");
+              behindOnline.classList.remove("opacity-0");
+            }
+          }, 800);
+        }, 1000);
+      }
+    }
+
+    nextLog();
+  });
+</script>
+
 
 </body>
 </html>

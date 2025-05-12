@@ -1,0 +1,63 @@
+:root {
+      --theme-orange: #f97316;
+    }
+    .theme-orange {
+      --tw-prose-bullets: var(--theme-orange);
+      --tw-text-opacity: 1;
+      color: rgb(249 115 22 / var(--tw-text-opacity));
+    }
+
+  .vanilla-calendar {
+    --vc-bg-color: #1f2937;
+    --vc-text-color: #e5e7eb;
+    --vc-accent-color: #f97316;
+    --vc-hover-bg-color: #374151;
+    border-radius: 0.75rem;
+  }
+
+  .event-monday {
+    background-color: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+  }
+
+  .event-thursday {
+    background-color: rgba(244, 114, 182, 0.15);
+    color: #f472b6;
+  }
+
+
+  @keyframes pulse-green {
+    0%, 100% { background-color: #052e16; }
+    50% { background-color: #065f46; }
+  }
+
+  .pulse-green {
+    animation: pulse-green 2s ease-in-out infinite;
+  }
+
+
+  .meat-alert {
+    background-color: #FEF3C7;
+    border-left: 4px solid #D97706;
+    color: #78350F;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    font-family: monospace;
+    font-size: 0.9rem;
+  }
+
+  .meat-alert-label {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: bold;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .meat-alert {
+      background-color: #101317; /* dark gray */
+      border-left: 4px solid #6500ff; /* amber-500 */
+      color: #7540ff; /* yellow-300 */
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+  }
