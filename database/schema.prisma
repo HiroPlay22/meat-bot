@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // Alternativ: "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  discordId String   @unique
+  name      String?
+  optIn     Boolean  @default(false)
+  joinedAt  DateTime @default(now())
+}
+
+model CommandStat {
+  command   String   @id
+  count     Int      @default(0)
+  updatedAt DateTime @updatedAt
+}
+
+model Feedback {
+  id          String   @id @default(cuid())
+  protocolNo  Int      @unique
+  userId      String
+  username    String
+  serverId    String
+  title       String
+  description String
+  category    String
+  importance  String
+  module      String?
+  fileUrl     String?
+  createdAt   DateTime @default(now())
+}
+
+model DinoName {
+  id        Int      @id @default(autoincrement())
+  dinoName  String   // z. B. "T-Rex"
+  style     String   // z. B. "Trashig", "Mutiert", etc.
+  color     String   // z. B. "blau", "rot", etc.
+  traits    String   // z. B. "episch", "süß"
+  name      String   // z. B. "BiteByte"
+}
+
+model DinoUserStat {
+  id            Int       @id @default(autoincrement())
+  userId        String    // Discord User ID
+  totalRolls    Int       @default(0)
+  totalFavorites Int      @default(0)
+  lastRolled    DateTime  @default(now())
+}
+
+model DinoFavorite {
+  id         Int      @id @default(autoincrement())
+  userId     String   // Discord User ID
+  name       String
+  dinoName   String
+  style      String
+  color      String
+  createdAt  DateTime @default(now())
+}
+
+model DinoColorStat {
+  id        Int      @id @default(autoincrement())
+  color     String   // Farbe: rot, blau, etc.
+  selected  Int      @default(0) // Wie oft diese Farbe gewählt wurde
+}
