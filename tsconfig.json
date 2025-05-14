@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["*"],
+      "@database/*": ["database/*"],
+      "@services/*": ["bot/services/*"],
+      "@config/*": ["config/*"],
+      "@modules/*": ["bot/modules/*"],
+      "@utils/*": ["bot/utils/*"],
+      "@commands/*": ["bot/commands/*"]
+    },
+    "types": ["node", "discord.js"]  // Füge discord.js zu den Typen hinzu
+  },
+  "include": ["bot", "web", "config", "database", "types"],
+  "exclude": ["node_modules", "dist"]
+}

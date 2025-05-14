@@ -1,0 +1,74 @@
+:root {
+      --theme-orange: #ff002f;
+    }
+    .theme-orange {
+      --tw-prose-bullets: var(--theme-orange);
+      --tw-text-opacity: 1;
+      color: rgb(249 115 22 / var(--tw-text-opacity));
+    }
+
+  .vanilla-calendar {
+    --vc-bg-color: #1f2937;
+    --vc-text-color: #e5e7eb;
+    --vc-accent-color: #ff002f;
+    --vc-hover-bg-color: #374151;
+    border-radius: 0.75rem;
+  }
+
+  .event-monday {
+    background-color: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+  }
+
+  .event-thursday {
+    background-color: rgba(244, 114, 182, 0.15);
+    color: #f472b6;
+  }
+
+  @keyframes pulse-green {
+    0%, 100% { background-color: #044533; }
+    50% { background-color: #065f46; }
+  }
+
+  .pulse-green {
+    animation: pulse-green 2s ease-in-out infinite;
+  }
+
+  .meat-alert {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    font-family: monospace;
+    font-size: 0.9rem;
+  }
+
+  .meat-alert-label {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: bold;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .meat-alert {
+      background-color: #101317; /* dark gray */
+      border-left: 4px solid #6500ff; /* amber-500 */
+      color: #7540ff; /* yellow-300 */
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+  }
+
+/* Ergänzung: Offline-Modus für .meat-alert */
+.meat-alert--offline {
+  background-color: #FEE2E2;        /* hellrot */
+  border-left-color: #DC2626;       /* intensives Rot */
+  color: #7F1D1D;                   /* dunkles Rot */
+}
+
+@media (prefers-color-scheme: dark) {
+  .meat-alert--offline {
+    background-color: #1f1b1b;      /* dunkles Rotgrau */
+    border-left-color: #b91c1c;     /* dunkles Rot */
+    color: #fca5a5;                 /* weiches Rot (Text) */
+  }
+}
+
