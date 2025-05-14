@@ -1,5 +1,5 @@
 :root {
-      --theme-orange: #f97316;
+      --theme-orange: #ff002f;
     }
     .theme-orange {
       --tw-prose-bullets: var(--theme-orange);
@@ -10,7 +10,7 @@
   .vanilla-calendar {
     --vc-bg-color: #1f2937;
     --vc-text-color: #e5e7eb;
-    --vc-accent-color: #f97316;
+    --vc-accent-color: #ff002f;
     --vc-hover-bg-color: #374151;
     border-radius: 0.75rem;
   }
@@ -25,9 +25,8 @@
     color: #f472b6;
   }
 
-
   @keyframes pulse-green {
-    0%, 100% { background-color: #052e16; }
+    0%, 100% { background-color: #044533; }
     50% { background-color: #065f46; }
   }
 
@@ -35,11 +34,7 @@
     animation: pulse-green 2s ease-in-out infinite;
   }
 
-
   .meat-alert {
-    background-color: #FEF3C7;
-    border-left: 4px solid #D97706;
-    color: #78350F;
     padding: 1rem;
     border-radius: 0.5rem;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -61,3 +56,19 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.6);
     }
   }
+
+/* Ergänzung: Offline-Modus für .meat-alert */
+.meat-alert--offline {
+  background-color: #FEE2E2;        /* hellrot */
+  border-left-color: #DC2626;       /* intensives Rot */
+  color: #7F1D1D;                   /* dunkles Rot */
+}
+
+@media (prefers-color-scheme: dark) {
+  .meat-alert--offline {
+    background-color: #1f1b1b;      /* dunkles Rotgrau */
+    border-left-color: #b91c1c;     /* dunkles Rot */
+    color: #fca5a5;                 /* weiches Rot (Text) */
+  }
+}
+
