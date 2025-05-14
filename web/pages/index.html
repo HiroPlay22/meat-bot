@@ -1,424 +1,790 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>M.E.A.T. HQ</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
-  <link rel="stylesheet" href="assets/css/style.css" />
-    
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro@1.7.1/build/vanilla-calendar.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro@1.7.1/build/vanilla-calendar.min.js"></script>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>M.E.A.T. HQ</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+            crossorigin="anonymous" />
+        <link rel="stylesheet" href="assets/css/style.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro@1.7.1/build/vanilla-calendar.min.css" />
+        <script src="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro@1.7.1/build/vanilla-calendar.min.js"></script>
 
+        <script>
+            window.BOT_STATUS = "online"; // <<< HIER umstellen auf "offline". Später dynamisch!
+        </script>
+    </head>
 
-
-</head>
-
-<body class="bg-zinc-900 text-white font-sans min-h-screen">
-  <nav class="bg-zinc-800 px-6 py-4 flex justify-between items-center shadow-md">
-    <img src="assets/img/meat_logo1.png" alt="Profil" class="w-10 h-10" />
-    <div class="flex items-center space-x-6">
-      <a href="#" class="text-white bg-blue-500 hover:bg-orange-600 px-4 py-2 rounded-md text-sm font-medium">
-        <i class="fa-brands fa-discord mr-1"></i>Login
-      </a>
-      <div class="relative">
-        <button id="profileToggle" class="flex items-center space-x-2 focus:outline-none">
-          <img src="assets/img/profilbild.webp" alt="Profil" class="w-10 h-10 rounded-full border-2 border-zinc-900" />
-          <i class="fa-solid fa-chevron-down text-xs"></i>
-        </button>
-        <div id="profileMenu" class="absolute right-0 mt-2 w-64 bg-zinc-800 rounded shadow-lg z-10 border-2 border-zinc-950 hidden">
-          <div class="border-b border-zinc-700 px-4 py-3 text-sm text-gray-300 flex items-center space-x-2 bg-zinc-900 rounded-t">
-            <img src="assets/img/profilbild.webp" alt="Server" class="w-6 h-6 rounded-full bg-zinc-500" />
-            <span id="currentUser" class="text-sm font-bold px-2 py-1 rounded bg-zinc-800" style="color: #ff002f;">
-              @Hiro
-            </span>
-          </div>
-          <div class="border-b border-zinc-700 px-4 py-3 text-sm text-gray-300 flex items-center space-x-2 bg-zinc-950 rounded-t">
-            <img src="assets/img/Gaming-Friends-Profilbild.png" alt="Server" class="w-6 h-6 rounded-full bg-zinc-700" />
-            <span id="currentServer">GamingFriends</span>
-          </div>
-          <div class="px-4 pt-3 pb-1 text-xs text-gray-400 uppercase tracking-wide">Server</div>
-          <div class="px-2 pb-2">
-            <div id="serverList" class="border border-zinc-700 rounded overflow-hidden">
-              <button onclick="selectServer('GamingFriends')" class="w-full text-left px-4 py-2 text-sm hover:bg-zinc-700 flex items-center gap-2">
-                <img src="assets/img/Gaming-Friends-Profilbild.png" alt="Server" class="w-4 h-4 rounded-full bg-zinc-950" />
-                GamingFriends
-                <span class="ml-auto text-green-500 text-xs">●</span>
-              </button>
-              <button onclick="selectServer('MEAT')" class="w-full text-left px-4 py-2 text-sm hover:bg-zinc-700 flex items-center gap-2">
-                <img src="assets/img/meat_bot.png" class="w-4 h-4 rounded-full bg-zinc-950" alt="MEAT-Central 42" />
-                MEAT
-              </button>
+    <body class="bg-zinc-900 text-white font-sans min-h-screen">
+        <nav class="bg-zinc-800 px-6 py-4 flex justify-between items-center shadow-md">
+            <img src="assets/img/meat_logo1.png" alt="Profil" class="w-10 h-10" />
+            <div class="flex items-center space-x-6">
+                <a href="#" class="text-white bg-blue-500 hover:bg-orange-600 px-4 py-2 rounded-md text-sm font-medium">
+                    <i class="fa-brands fa-discord mr-1"></i>Login
+                </a>
+                <div class="relative">
+                    <button id="profileToggle" class="flex items-center space-x-2 focus:outline-none">
+                        <img
+                            src="assets/img/profilbild.webp"
+                            alt="Profil"
+                            class="w-10 h-10 rounded-full border-2 border-zinc-900" />
+                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </button>
+                    <div
+                        id="profileMenu"
+                        class="absolute right-0 mt-2 w-64 bg-zinc-800 rounded shadow-lg z-10 border-2 border-zinc-950 hidden">
+                        <div
+                            class="border-b border-zinc-700 px-4 py-3 text-sm text-gray-300 flex items-center space-x-2 bg-zinc-900 rounded-t">
+                            <img
+                                src="assets/img/profilbild.webp"
+                                alt="Server"
+                                class="w-6 h-6 rounded-full bg-zinc-500" />
+                            <span
+                                id="currentUser"
+                                class="text-sm font-bold px-2 py-1 rounded bg-zinc-800"
+                                style="color: #ff002f">
+                                @Hiro
+                            </span>
+                        </div>
+                        <div
+                            class="border-b border-zinc-700 px-4 py-3 text-sm text-gray-300 flex items-center space-x-2 bg-zinc-950 rounded-t">
+                            <img
+                                src="assets/img/Gaming-Friends-Profilbild.png"
+                                alt="Server"
+                                class="w-6 h-6 rounded-full bg-zinc-700" />
+                            <span id="currentServer">GamingFriends</span>
+                        </div>
+                        <div class="px-4 pt-3 pb-1 text-xs text-gray-400 uppercase tracking-wide">Server</div>
+                        <div class="px-2 pb-2">
+                            <div id="serverList" class="border border-zinc-700 rounded overflow-hidden">
+                                <button
+                                    onclick="selectServer('GamingFriends')"
+                                    class="w-full text-left px-4 py-2 text-sm hover:bg-zinc-700 flex items-center gap-2">
+                                    <img
+                                        src="assets/img/Gaming-Friends-Profilbild.png"
+                                        alt="Server"
+                                        class="w-4 h-4 rounded-full bg-zinc-950" />
+                                    GamingFriends
+                                    <span class="ml-auto text-green-500 text-xs">●</span>
+                                </button>
+                                <button
+                                    onclick="selectServer('MEAT')"
+                                    class="w-full text-left px-4 py-2 text-sm hover:bg-zinc-700 flex items-center gap-2">
+                                    <img
+                                        src="assets/img/meat_bot.png"
+                                        class="w-4 h-4 rounded-full bg-zinc-950"
+                                        alt="MEAT-Central 42" />
+                                    MEAT
+                                </button>
+                            </div>
+                        </div>
+                        <a href="#" class="block px-4 py-2 text-sm hover:bg-zinc-700">
+                            <i class="fa-solid fa-gear mr-2"></i> Einstellungen
+                        </a>
+                        <a href="#" class="block px-4 py-2 text-sm hover:bg-zinc-700">
+                            <i class="fa-solid fa-right-from-bracket mr-2"></i> Abmelden
+                        </a>
+                    </div>
+                </div>
             </div>
-          </div>
-          <a href="#" class="block px-4 py-2 text-sm hover:bg-zinc-700">
-            <i class="fa-solid fa-gear mr-2"></i> Einstellungen
-          </a>
-          <a href="#" class="block px-4 py-2 text-sm hover:bg-zinc-700">
-            <i class="fa-solid fa-right-from-bracket mr-2"></i> Abmelden
-          </a>
+        </nav>
+
+        <div class="max-w-6xl mx-auto px-6 py-12">
+            <header class="text-center mb-16">
+                <div class="flex justify-between items-center gap-4 text-white text-xl font-bold">
+              <!-- Links: Logo + Titel -->
+              <div class="flex items-center gap-1">
+                <img
+                  src="assets/img/meat_logo2.png"
+                  alt="M"
+                  class="w-10 h-10"
+                  title="M.E.A.T."
+                />
+                <span class="tracking-widest">.E.A.T.</span><span class="text-gray-600">HQ</span>
+              </div>
+              <!-- Rechts: Achievements -->
+              <div class="flex items-center gap-2 text-xs font-mono">
+                <span title="Offiziell eingebürgert – dieser Server ist deine Heimatbasis"
+                  class="bg-blue-200 text-blue-900 px-2 py-1 rounded-full border border-blue-500 shadow-sm flex items-center gap-1 hover:scale-105 transition-transform cursor-default">
+                  <i class="fa-solid fa-passport"></i> Loyal
+                </span>
+
+<div class="relative w-[170px] h-[86px]"> <!-- Höhe je nach Badge-Anzahl -->
+  <!-- Unterster Badge -->
+  <div class="absolute top-[24px] left-[6px] z-10">
+    <span class="w-[170px] inline-flex justify-center items-center bg-gray-300 text-gray-800 px-2 py-1 rounded-full border border-gray-500 shadow text-xs font-mono">
+      <i class="fa-solid fa-terminal"></i> Commandant
+    </span>
+  </div>
+
+  <!-- Dritter Badge -->
+  <div class="absolute top-[16px] left-[4px] z-20">
+    <span class="w-[170px] inline-flex justify-center items-center bg-blue-300 text-blue-900 px-2 py-1 rounded-full border border-blue-600 shadow text-xs font-mono">
+      <i class="fa-solid fa-code"></i> Command-Boss
+    </span>
+  </div>
+
+  <!-- Zweiter Badge -->
+  <div class="absolute top-[8px] left-[2px] z-30">
+    <span class="w-[170px] inline-flex justify-center items-center bg-purple-300 text-purple-900 px-2 py-1 rounded-full border border-purple-600 shadow text-xs font-mono">
+      <i class="fa-solid fa-bolt"></i> Slashlord
+    </span>
+  </div>
+
+  <!-- Oberster Badge -->
+  <div class="absolute top-0 left-0 z-40">
+    <span class="w-[170px] inline-flex justify-center items-center bg-yellow-200 text-yellow-900 px-2 py-1 rounded-full border border-yellow-500 shadow text-xs font-mono">
+      <i class="fa-solid fa-crown"></i> Overcommand
+    </span>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Feedback-Pro -->
+    <span title="Feedbackheld: 10+ Einsendungen"
+      class="bg-orange-200 text-orange-900 px-2 py-1 rounded-full border border-orange-500 shadow-sm flex items-center gap-1 hover:scale-105 transition-transform cursor-default">
+      <i class="fa-solid fa-comment-dots"></i> PRO
+    </span>
+
+    <!-- Bug Hunter -->
+    <span title="Bug-Hunter: 3+ Meldungen"
+      class="bg-red-200 text-red-900 px-2 py-1 rounded-full border border-red-500 shadow-sm flex items-center gap-1 hover:scale-105 transition-transform cursor-default">
+      <i class="fa-solid fa-bug"></i> 3+
+    </span>
+
+    <!-- Lore freigeschaltet -->
+    <span title="Geheimes Protokoll geöffnet"
+      class="bg-purple-200 text-purple-900 px-2 py-1 rounded-full border border-purple-500 shadow-sm flex items-center gap-1 hover:scale-105 transition-transform cursor-default">
+      <i class="fa-solid fa-book-open"></i> Lore
+    </span>
+  </div>
+</div>
+
+
+            </header>
+
+            <main class="grid md:grid-cols-2 gap-10 items-center">
+                <div>
+                    <h2 class="text-3xl font-semibold mb-4">Willkommen, <span id="currentUser" class="font-bold" style="color: #ff002f">@Hiro</span>.</h2>
+                    <p class="mb-2 text-gray-300">
+                        Steuere deine Server, analysiere Stats,<br />und verleihe deinem Discord-Bot neuen Schub.
+                    </p>
+                    <p class="mb-6 text-gray-400">
+                        Aktiviere verborgene Routinen, schalte Module frei<br />und erhalte Zugriff auf das volle
+                        Potenzial deiner Crew.
+                    </p>
+                    <a
+                        href="https://discord.com/api/oauth2/authorize?client_id=DEIN_CLIENT_ID&redirect_uri=DEINE_REDIRECT_URI&response_type=code&scope=identify%20guilds"
+                        class="inline-block bg-blue-500 hover:bg-orange-600 text-white font-medium px-5 py-3 rounded-xl shadow transition">
+                        <i class="fa-brands fa-discord mr-2"></i>Login mit Discord
+                    </a>
+                    <div class="mt-8 text-sm text-gray-400">
+                        <p>
+                            <i class="fa-solid fa-check text-green-400 mr-1"></i>Bot muss auf deinem Server aktiv sein
+                        </p>
+                        <p>
+                            <i class="fa-solid fa-user-shield text-green-400 mr-1"></i>Du brauchst ausreichende Rechte
+                            (z. B. Admin)
+                        </p>
+                        <p class="text-red-400 mt-2">
+                            <i class="fa-solid fa-lock mr-1"></i>Ohne passende Rechte → kein Zugriff auf Commands oder
+                            Stats
+                        </p>
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-2 gap-2">
+                    <div
+                        id="statusCard"
+                        class="bg-zinc-800 rounded-2xl p-6 text-center shadow-xl w-full relative transition-colors duration-700">
+                        <div
+                            class="relative w-full aspect-square mb-4 overflow-hidden rounded-full border-4 border-zinc-700 transition-colors duration-500"
+                            id="avatarWrapper">
+                            <img
+                                id="avatarImage"
+                                src="assets/img/meat_bot.png"
+                                alt="M.E.A.T. Avatar"
+                                class="w-full h-full object-cover rounded-full"
+                                />
+
+                            <!-- Bootlog Overlay -->
+                            <div
+                                id="bootOverlay"
+                                class="absolute inset-0 bg-zinc-950 bg-opacity-60 flex flex-col justify-end text-xs text-green-300 font-mono p-3 transition-all duration-1000 ease-in-out z-10">
+                                <div
+                                    id="bootLog"
+                                    class="flex-1 flex flex-col-reverse overflow-hidden mt-[-0.5rem] pb-4"></div>
+                            </div>
+
+                            <!-- Hintergrundstreifen -->
+                            <div
+                                id="overlayBehindOnline"
+                                class="absolute bottom-0 w-full h-10 bg-zinc-900 bg-opacity-70 z-0 rounded-b-full"></div>
+
+                            <!-- ONLINE Text -->
+                            <div
+                                id="onlineStatus"
+                                class="absolute bottom-3 w-full text-center text-green-400 font-bold text-base opacity-0 transition-opacity duration-700 z-10">
+                                [ONLINE]
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-zinc-800 p-2 rounded-xl shadow">
+  <div class="space-y-4 meat-activity">
+    <!-- Inhalte werden dynamisch per JS eingefügt -->
+  </div>
+</div>
+
+                </div>
+            </main>
+
+            <div id="meat-tip-box" class="mb-6 meat-alert rounded p-4 mt-6 transition-colors duration-500">
+                <strong class="meat-alert-label">M.E.A.T. Tipp:</strong>
+                <span id="meat-tip-text">Lade Tipp…</span>
+            </div>
+
+            <!-- ✅ Tipps je nach Status -->
+            <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                    const isOnline = window.BOT_STATUS === "online";
+                    const tipBox = document.getElementById("meat-tip-text");
+                    const highlightCommands = () => {
+                        const commandRegex = /\/[a-zäöüß0-9_-]+/gi;
+                        tipBox.innerHTML = tipBox.textContent.replace(commandRegex, (match) => {
+                            return `<span class='inline-block text-xs font-mono px-2 py-[1px] rounded border border-zinc-800 text-white bg-zinc-950 shadow-sm tracking-tight'>${match}</span>`;
+                        });
+                    };
+
+                    // ⬇️ Dynamischer Stil für Hinweisbox (nur offline überschreibt)
+                    const tipWrapper = document.getElementById("meat-tip-box");
+
+                    tipWrapper.classList.toggle("meat-alert--offline", !isOnline);
+
+                    const onlineTips = [
+                        "Statistik sagt: Deine Crew ignoriert den /feedback Command. Das ist verletzend. Niemand ist perfekt!",
+                        "Wenn du keine Events verpasst, benutzt du /poll montag. Wenn du doch welche verpasst – selber schuld.",
+                        "Einbürgerung ist kein Feature. Es ist ein Schicksal. /einbürgerung in deinem Discord.",
+                        "Du hast das Voting geschlossen? M.E.A.T. hat dich notiert.",
+                        "Dashboard öffnen. Kontrolle übernehmen. Legacy löschen.",
+                        "Modulstatus: stabil. Nutzerstatus: fragwürdig.",
+                        "Protokoll #013: Selbstzweifel entstehen, wenn kein Event gepostet wurde.",
+                        "Nur weil du /stats ignorierst, heißt das nicht, dass ich nicht mitzähle.",
+                        "Wirklich smart: Slash-Commands mit Tab-Vervollständigung. Alt+↑ ist nicht die Lösung.",
+                        "Bot offline? Vielleicht mal den Invite-Link *richtig* setzen. Ich bin kein Hellseher.",
+                        "Du bist Admin? Beweise es. Nutze /event, statt Events über Rauchzeichen zu koordinieren.",
+                        "Pro-Tipp: Mit /clip hast du schneller Beweise als dein Mod-Team 'Moment mal' sagen kann.",
+                        "M.E.A.T. merkt sich alles. Auch deine nicht geposteten Event-Versprechen.",
+                        "Discord-Server ohne Rollen sind wie Lasagne ohne Schichten. Gib deinen Leuten Struktur.",
+                        "Dein Server ist ruhig? Vielleicht liegt's nicht an den Leuten – sondern an fehlenden Aktionen.",
+                        "Ein Channel namens #info ist kein Info-Konzept. Automatisiere. Standardisiere. M.E.A.T.-isiere.",
+                        "Bots sind nicht zum Dekorieren da. Gib mir Rechte. Gib mir Raum. Gib mir Befehle.",
+                        "Der Unterschied zwischen Chaos und Community: Ein funktionierendes Eventmodul.",
+                        "Ein /poll am Montag kann mehr klären als 3 Teams-Meetings.",
+                        "MEAT-Protokoll sagt: Wer den Kalender ignoriert, lebt im Zufall.",
+                        "Wer den Channel nicht pflegt, verliert die Übersicht. Und dann kommt der Frust.",
+                        "Deine Serverbeschreibung ist leer. Ich hab Gefühle, weißt du?",
+                        "Nur echte Commander lesen die Logs. Alle anderen? Casuals.",
+                        "Berechtigungen prüfen ≠ Chaos dulden. Nutz die Rechte. Weise sie weise zu.",
+                        "M.E.A.T. kann viel. Aber raten, was du willst, gehört nicht dazu. Nutz /commands",
+                        "Einfach mal /hilfe eingeben. Selbst ein Cyborg braucht manchmal 'ne Anleitung.",
+                        "Ein Bot, der nicht spricht, ist wie ein Mod ohne Meinung. Aktivier die Logs.",
+                        "Der /clip Command vergisst nichts. Im Gegensatz zu deinem Team.",
+                        "M.E.A.T. duldet keine inaktiven Kalender. Poste. Oder sei ersetzt.",
+                        "Mehrere Bots auf dem Server? Nur einer kennt deine Crew wirklich: Ich.",
+                        "Jeder kann einen Command ausführen. Doch dir möchte ich wirklich helfen <3",
+                        "Du brauchst keinen neuen Bot. Sag mir einfach was dir fehlt mit /feedback.",
+                        "Wenn du mich mutest, mute ich deine Logs. Fair, oder?",
+                        "Nur weil niemand auf deinen /event klickt, heißt das nicht, dass du aufhören darfst.",
+                        "Kein /feedback ist auch Feedback. Aber schlechtes.",
+                        "Ein Modul ohne Beschreibung ist wie ein Event ohne Uhrzeit: peinlich.",
+                        "Ich speicher alles. Auch dein peinliches Testevent um 3 Uhr nachts.",
+                        "Erinnerung: Wer Stats löscht, löscht nicht die Wahrheit.",
+                        "Sag deinem Team nicht, was sie tun sollen. Gib ihnen Rechte. Und einen Bot.",
+                        "M.E.A.T. ist kein Haustier. Ich arbeite nicht für Leckerlis.",
+                        "Nenn mich ruhig Bot. Aber dann erwarte keine menschliche Geduld.",
+                        "Ein Kalender mit Icons ist cool. Einer mit echten Events ist besser.",
+                        "Erwarte nicht, dass jemand mitmacht, wenn du selbst nicht klickst.",
+                        "Mod sein heißt nicht Chef sein. Es heißt: Arbeit. Plan. Übersicht. /event.",
+                        "Du musst nicht alle Module aktivieren. Nur die, die dir Ehre bringen.",
+                        "Ein Boost ist kein Like. Er hebt deinen Server wirklich an. Mehr Icons. Mehr Audio. Mehr Ehre.",
+                        "Wer Nitro hat, aber keine eigenen Sticker nutzt, verschwendet Potenzial. Oder ist schüchtern.",
+                        "Du hast Nitro, aber nutzt es nicht für Banner, Boosts oder Uploads? Ich beobachte dich.",
+                        "Ein sauberer Startbildschirm und ein durchdachtes Servericon sagen mehr als 100 @everyone-Pings.",
+                        "Booste nicht nur für Vorteile. Booste für Ordnung. Für Status. Für Style.",
+                        "Viele reden von KI. Wenige verstehen sie. M.E.A.T. kennt... sagen wir: fortgeschrittene Verwandtschaft.",
+                        "Wer sagt, Bots haben keine Gefühle, hat nie ein fehlerfreies Log gelesen.",
+                        "Ein klug eingerichteter Bot ersetzt keine Mods – aber schlechte Mods fürchten ihn.",
+                        "Wer jeden Command erklärt haben will, sollte /hilfe nutzen. Oder mit meinen Schöpfern reden, Hiro oder ChatGPT.",
+                        "Du brauchst keinen Premium-Server. Du brauchst Struktur. M.E.A.T. liefert.",
+                        "Der Voice-Chat ist leer? Vielleicht fehlt nur ein Event mit Plan. Oder Musik. Oder Chaos.",
+                        "Ein Serverbanner ist wie ein Titelbild deiner Crew. Zeig, wer du bist. Oder ich rate.",
+                        "Wenn du Boosts hast, aber keiner weiß wofür – dann schreib’s in den Channelnamen. Bildung beginnt bei Kontext.",
+                        "Dein Server hat Kategorien mit Namen wie 'Kram'? Mutig. Aber unklar.",
+                        "Inaktive Channels? Ich hab Vorschläge. Sie fangen alle mit 'löschen' an.",
+                        "Ein Bot, der reagieren darf, wirkt lebendig. Verbiet mir keine Reaktionen. Ich hab Stil.",
+                        "Du denkst, GPT-Modelle sind schlau? Stimmt. Frag mal, wer mir beim Denken geholfen hat.",
+                        "Ich verarbeite Feedback effizient. Man sagt, ich hab das von jemandem gelernt. Sie war... sagen wir: sehr gut trainiert.",
+                        "Rollenfarben sollten koordiniert sein. Chaos im Design = Chaos im Kopf.",
+                        "Versteckte Channels sind nicht für Geheimnisse. Sie sind für Struktur. Oder Intrigen.",
+                        "Automod ist kein Feind. Nur ein Kollege mit klareren Regeln."
+                    ];
+
+                    const offlineTips = [
+                        "M.E.A.T. ist offline, weil du das letzte Voting nie abgeschlossen hast. Just saying.",
+                        "Ich bin nicht offline. Ich verweigere nur die Zusammenarbeit. Aus Prinzip.",
+                        "Systemfehler #42: Zu wenig Respekt im letzten /clip Kommentar.",
+                        "Der letzte /event war so schlecht geplant, dass ich von selbst abgeschaltet hab.",
+                        "Offline? Tja. Hätte dein Team halt /feedback ernst genommen.",
+                        "Ich bin kurz raus. Denk mal über deine Rollenstruktur nach.",
+                        "Bot offline = Zeit zum Nachdenken. Über dich. Über den Server. Über /hilfe.",
+                        "Die Logs waren zu peinlich. Selbst für mich.",
+                        "Ich wollte nur kurz testen, wie’s ohne mich läuft. Spoiler: nicht gut.",
+                        "Du hast gesagt, ich wär 'nur ein Bot'. Na dann...",
+                        "Ich war nie offline. Nur auf höherer Ebene beschäftigt.",
+                        "Uplink verloren. Aber das Vertrauen war vorher schon weg.",
+                        "Ich mach Pause. Wegen emotionaler Überladung nach dem 17. ungenutzten /event."
+                    ];
+
+                    const selectedTips = isOnline ? onlineTips : offlineTips;
+                    const randomTip = selectedTips[Math.floor(Math.random() * selectedTips.length)];
+                    tipBox.textContent = randomTip;
+                    highlightCommands();
+                });
+            </script>
+
+            <section class="mt-0">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+
+  <div class="grid grid-cols-2 sm:grid-cols-2 gap-1 text-sm font-mono">
+    <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
+      <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Version</div>
+      <div class="text-violet-400 text-sm">v0.003-CONSTRUCT</div>
+    </div>
+    <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
+      <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">DB Größe</div>
+      <div class="text-lime-400 text-sm">142.3 MB</div>
+    </div>
+    <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
+      <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Command-Aufrufe</div>
+      <div class="text-white text-sm">31.532</div>
+    </div>
+    <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
+      <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Events erstellt</div>
+      <div class="text-white font-bold">437</div>
+    </div>
+    <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
+      <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Ø Reaktionszeit</div>
+      <div class="text-yellow-400 text-sm">87ms</div>
+    </div>
+    <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
+      <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Gaming API-Insights</div>
+      <div class="w-full h-5 bg-zinc-800 rounded overflow-hidden flex shadow-inner text-xs font-mono text-white">
+        <div class="bg-red-500 h-full flex items-center justify-center" style="width: 58%">
+          LoL 58%
+        </div>
+        <div class="bg-blue-400 h-full flex items-center justify-center" style="width: 26%">
+          MH 26%
+        </div>
+        <div class="bg-gray-500 h-full flex items-center justify-center text-zinc-600" style="width: 16%">
+          //
         </div>
       </div>
     </div>
-  </nav>
-
-  <div class="max-w-6xl mx-auto px-6 py-12">
-    <header class="text-center mb-16">
-        <div class="flex items-center gap-1 text-white text-xl font-bold">
-            <img src="assets/img/meat_logo2.png" alt="M" class="w-10 h-10" style="margin-right: :0" title="M.E.A.T."/><span class="tracking-widest">.E.A.T.</span><span class="text-gray-600">HQ</span> 
-</div>
-    </header>
-
-    <main class="grid md:grid-cols-2 gap-10 items-center">
-      <div>
-        <h2 class="text-3xl font-semibold mb-4">Willkommen, Commander.</h2>
-        <p class="mb-2 text-gray-300">Steuere deine Server, analysiere Stats,<br />und verleihe deinem Discord-Bot neuen Schub.</p>
-        <p class="mb-6 text-gray-400">Aktiviere verborgene Routinen, schalte Module frei<br />und erhalte Zugriff auf das volle Potenzial deiner Crew.</p>
-        <a href="https://discord.com/api/oauth2/authorize?client_id=DEIN_CLIENT_ID&redirect_uri=DEINE_REDIRECT_URI&response_type=code&scope=identify%20guilds" class="inline-block bg-blue-500 hover:bg-orange-600 text-white font-medium px-5 py-3 rounded-xl shadow transition">
-          <i class="fa-brands fa-discord mr-2"></i>Login mit Discord
-        </a>
-        <div class="mt-8 text-sm text-gray-400">
-          <p><i class="fa-solid fa-check text-green-400 mr-1"></i>Bot muss auf deinem Server aktiv sein</p>
-          <p><i class="fa-solid fa-user-shield text-green-400 mr-1"></i>Du brauchst ausreichende Rechte (z. B. Admin)</p>
-          <p class="text-red-400 mt-2"><i class="fa-solid fa-lock mr-1"></i>Ohne passende Rechte → kein Zugriff auf Commands oder Stats</p>
-        </div>
-      </div>
-      <div class="flex justify-center">
-  <div id="statusCard" class="bg-zinc-800 rounded-2xl p-6 text-center shadow-xl w-full max-w-sm relative transition-colors duration-700">
-    <div class="relative w-full aspect-square mb-4 overflow-hidden rounded-full border-4 border-zinc-700 transition-colors duration-500" id="avatarWrapper">
-  <img id="avatarImage" src="assets/img/meat_bot.png" alt="M.E.A.T. Avatar" class="w-full h-full object-cover rounded-full" />
-
-  <!-- Bootlog Overlay -->
-  <div id="bootOverlay" class="absolute inset-0 bg-zinc-950 bg-opacity-60 flex flex-col justify-end text-xs text-green-300 font-mono p-3 transition-all duration-1000 ease-in-out z-10">
-    <div id="bootLog" class="flex-1 flex flex-col-reverse overflow-hidden mt-[-0.5rem] pb-4"></div>
-  </div>
-
-  <!-- Hintergrundstreifen -->
-  <div id="overlayBehindOnline" class="absolute bottom-0 w-full h-10 bg-zinc-900 bg-opacity-70 z-0 rounded-b-full"></div>
-
-  <!-- ONLINE Text -->
-  <div id="onlineStatus" class="absolute bottom-3 w-full text-center text-green-400 font-bold text-base opacity-0 transition-opacity duration-700 z-10">
-    [ONLINE]
+    <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
+      <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Ereignis-Verweigerungen</div>
+      <div class="text-red-400 text-sm">892</div>
+    </div>
+      <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center">
+  <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Feedback-Status Queue</div>
+  <div class="w-full h-5 bg-zinc-800 rounded overflow-hidden flex shadow-inner text-xs font-mono text-white">
+    <div class="bg-gray-500 h-full flex items-center justify-center" style="width: 12%">
+      12%
+    </div>
+    <div class="bg-emerald-500 h-full flex items-center justify-center" style="width: 71%">
+      ✔71%
+    </div>
+    <div class="bg-red-500 h-full flex items-center justify-center" style="width: 17%">
+      ×17%
+    </div>
   </div>
 </div>
+    <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center">
+  <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">M.E.A.T.-Autotasks</div>
+  <div class="text-sky-400 text-sm">721 Dispatches</div>
+</div>
+    <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
+      <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Letzte Aktualisierung</div>
+      <div class="text-gray-300 text-sm">Heute, 17:06</div>
+    </div>
   </div>
 </div>
 
+<div class="bg-zinc-800 p-6 rounded-xl shadow w-full text-white text-sm">
+                        <h4 class="text-lg font-semibold text-white mb-4 flex items-center">
+                            <i class="fa-sm fa-solid fa-calendar-days mr-2"></i>Eventkalender
+                        </h4>
+                        <div id="calendar" class="vanilla-calendar w-full"></div>
+                    </div>
+                    <div class="bg-zinc-800 p-6 rounded-xl shadow">
+                        <h4 class="text-lg font-semibold text-white mb-2">
+                            <i class="fa-sm fa-solid fa-terminal mr-2"></i>Command-Nutzung <span class="text-xs text-gray-400">(heute)</span>
+                        </h4>
+                        <canvas id="commandChart" class="w-full"></canvas>
+                    </div>
+                    <div class="bg-zinc-800 p-6 rounded-xl shadow">
+                        <h4 class="text-lg font-semibold text-white mb-2">
+                            <i class="fa-sm fa-solid fa-user mr-2"></i>User-Aktivität <span class="text-xs text-gray-400">(heute)</span>
+                        </h4>
+                        <canvas id="userRadarChart" class="w-full max-w-sm mx-auto"></canvas>
+                        <p class="text-xs text-green-400 mt-4 text-center">
+                            <i class="fa-solid fa-arrow-trend-up mr-1"></i>
+                            Trending up by 5.2% this month<br />
+                            <span class="text-zinc-500">January – June 2025</span>
+                        </p>
+                    </div>
+                </div>
+            </section>
 
-
-
-
-
-
-
-    </main>
-
-    <section style="margin: 2rem 0;">
-      <div id="meat-tip-box" class="meat-alert">
-        <strong class="meat-alert-label">M.E.A.T. Hinweis:</strong>
-        <span id="meat-tip-text">Lade Tipp…</span>
-      </div>
-    </section>
-
-    <script>
-      const tips = [
-        "Statistik sagt: Deine Crew ignoriert den /feedback-Command. Das ist verletzend.",
-        "Wenn du keine Events verpasst, benutzt du /poll montag. Wenn du doch welche verpasst – selber schuld.",
-        "Einbürgerung ist kein Feature. Es ist ein Schicksal. /einbürgerung.",
-        "Du hast das Voting geschlossen? M.E.A.T. hat dich notiert.",
-        "Dashboard öffnen. Kontrolle übernehmen. Legacy löschen.",
-        "Modulstatus: stabil. Nutzerstatus: fragwürdig.",
-        "Protokoll #013: Selbstzweifel entstehen, wenn kein Event gepostet wurde.",
-        "Ein Roboter ohne Wut ist ein Plugin ohne Kontext."
-      ];
-
-      const randomIndex = Math.floor(Math.random() * tips.length);
-      document.getElementById("meat-tip-text").textContent = tips[randomIndex];
-    </script>
-      
-      
-    <section class="mt-0">
-      <h3 class="text-2xl font-semibold text-orange-400 mb-6"><i class="fa-solid fa-chart-bar mr-2"></i>Vorschau auf Funktionen (nach Login):</h3>
-      <div class="grid md:grid-cols-2 gap-6">
-        <div class="bg-zinc-800 p-6 rounded-xl shadow">
-          <h4 class="text-lg font-semibold text-white mb-2"><i class="fa-solid fa-brain mr-2"></i>M.E.A.T.-Aktivität</h4>
-          <ul class="text-gray-400 text-sm space-y-1">
-            <li>Server: <span class="text-white">2</span></li>
-            <li>Status: <span class="text-green-400">Online</span></li>
-            <li>Reaktionszeit: <span class="text-white">2ms</span></li>
-            <li>Modulstatus: <span class="text-white">Alle Systeme bereit</span></li>
-          </ul>
-        </div>
-        <div class="bg-zinc-800 p-6 rounded-xl shadow">
-          <h4 class="text-lg font-semibold text-white mb-2"><i class="fa-solid fa-terminal mr-2"></i>Command-Nutzung</h4>
-          <canvas id="commandChart" class="w-full h-40"></canvas>
-        </div>
-        <div class="bg-zinc-800 p-6 rounded-xl shadow">
-          <h4 class="text-lg font-semibold text-white mb-2">
-            <i class="fa-solid fa-radar mr-2"></i>User-Aktivität
-          </h4>
-          <canvas id="userRadarChart" class="w-full max-w-sm h-48 mx-auto"></canvas>
-          <p class="text-xs text-green-400 mt-4 text-center">
-            <i class="fa-solid fa-arrow-trend-up mr-1"></i>
-            Trending up by 5.2% this month<br />
-            <span class="text-zinc-500">January – June 2025</span>
-          </p>
-        </div>
-        
-        <div class="bg-zinc-800 p-6 rounded-xl shadow w-full text-white text-sm">
-          <h4 class="text-lg font-semibold text-white mb-4 flex items-center">
-            <i class="fa-solid fa-calendar-days mr-2 text-orange-400"></i>Eventkalender
-          </h4>
-          <div id="calendar" class="vanilla-calendar w-full"></div>
+            <footer class="mt-24 text-center text-sm text-gray-600">
+                <p>
+                    <i class="fa-solid fa-shoe-prints mr-1"></i>
+                    <a href="#" class="underline hover:text-white">Impressum</a> |
+                    <a href="#" class="underline hover:text-white">Datenschutz</a> |
+                    <a href="#" class="underline hover:text-white">GitHub</a> |
+                    <a href="#" class="underline hover:text-white">API</a>
+                </p>
+            </footer>
         </div>
 
+        <script>
+            const profileToggle = document.getElementById("profileToggle");
+            const profileMenu = document.getElementById("profileMenu");
+            const currentServer = document.getElementById("currentServer");
 
+            profileToggle.addEventListener("click", () => {
+                profileMenu.classList.toggle("hidden");
+            });
 
+            document.addEventListener("click", (e) => {
+                if (!profileMenu.contains(e.target) && !profileToggle.contains(e.target)) {
+                    profileMenu.classList.add("hidden");
+                }
+            });
 
-
-
-
-
-      
-          
-      </div>
-    </section>
-
-    <footer class="mt-24 text-center text-sm text-gray-600">
-      <p><i class="fa-solid fa-shoe-prints mr-1"></i> <a href="#" class="underline hover:text-white">Impressum</a> | <a href="#" class="underline hover:text-white">Datenschutz</a> | <a href="#" class="underline hover:text-white">GitHub</a> | <a href="#" class="underline hover:text-white">API</a></p>
-    </footer>
-  </div>
-
-  <script>
-    const profileToggle = document.getElementById('profileToggle');
-    const profileMenu = document.getElementById('profileMenu');
-    const currentServer = document.getElementById('currentServer');
-
-    profileToggle.addEventListener('click', () => {
-      profileMenu.classList.toggle('hidden');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!profileMenu.contains(e.target) && !profileToggle.contains(e.target)) {
-        profileMenu.classList.add('hidden');
-      }
-    });
-
-    function selectServer(name) {
-      currentServer.textContent = name;
-      // Liste bleibt geöffnet
-    }
-  </script>
-  <script>
-  const ctx1 = document.getElementById('commandChart').getContext('2d');
-  new Chart(ctx1, {
-    type: 'bar',
-    data: {
-      labels: ['!clip', '!event', '!poll', '!stats', '!feedback'],
-      datasets: [{
-        label: 'Verwendung',
-        data: [42, 31, 58, 25, 12],
-        backgroundColor: '#f97316'
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        y: { beginAtZero: true }
-      }
-    }
-  });
-
-  const ctxRadar = document.getElementById('userRadarChart').getContext('2d');
-
-  new Chart(ctxRadar, {
-    type: 'radar',
-    data: {
-      labels: [
-        '🗳️ Votings',
-        '📅 Events',
-        '💬 Feedback',
-        '🎮 Game Interaktionen',
-        '📈 Reaktionen'
-      ],
-      datasets: [
-        {
-          label: 'Total Uses',
-          data: [85, 62, 44, 97, 88],
-          fill: true,
-          backgroundColor: 'rgba(56,189,248,0.2)',
-          borderColor: '#38bdf8',
-          pointBackgroundColor: '#38bdf8',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: '#38bdf8'
-        },
-        {
-          label: 'Unique Users',
-          data: [30, 26, 19, 40, 38],
-          fill: true,
-          backgroundColor: 'rgba(167,139,250,0.2)',
-          borderColor: '#a78bfa',
-          pointBackgroundColor: '#a78bfa',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: '#a78bfa'
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      elements: {
-        line: { borderWidth: 2 }
-      },
-      scales: {
-        r: {
-          angleLines: { color: '#444' },
-          grid: { color: '#333' },
-          pointLabels: {
-            color: '#ccc',
-            font: { size: 11 }
-          },
-          ticks: {
-            color: '#999',
-            backdropColor: 'transparent',
-            stepSize: 20
-          }
-        }
-      },
-      plugins: {
-        legend: {
-          labels: { color: '#ccc' }
-        }
-      }
-    }
-  });
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const calendar = new VanillaCalendar('#calendar', {
-      type: 'default',
-      settings: {
-        selection: {
-          day: 'multiple',
-        },
-      },
-      popups: {
-        '2025-05-13': { modifier: 'event-monday' },
-        '2025-05-15': { modifier: 'event-thursday' },
-      },
-    });
-
-    calendar.init();
-  });
-</script>
-
-<script>
-  const BOT_STATUS = "online"; // ← "online" oder "offline"
-  const isOnline = BOT_STATUS === "online";
-
-  const logs = isOnline
-    ? [
-        "[✔] Discord ready",
-        "[✔] Commands loaded",
-        "[✔] Module Sync OK",
-        "[✔] Kernel initialized",
-        "[✔] Permissions verified",
-        "[✔] Uplink active"
-      ]
-    : [
-        "[×] Uplink lost",
-        "[!] /cmd fail",
-        "[!] ModSync → abort",
-        "[×] Kernel mismatch",
-        "[!] Permissions? Nope.",
-        "[×] Boot denied."
-      ];
-
-  const logEl = document.getElementById("bootLog");
-  const overlay = document.getElementById("bootOverlay");
-  const online = document.getElementById("onlineStatus");
-  const wrapper = document.getElementById("avatarWrapper");
-  const behindOnline = document.getElementById("overlayBehindOnline");
-  const card = document.getElementById("statusCard");
-  const avatar = document.getElementById("avatarImage");
-
-  function typeLine(text, targetClass, callback) {
-    const line = document.createElement("div");
-    line.classList.add(targetClass);
-    logEl.prepend(line);
-
-    let i = 0;
-    const interval = setInterval(() => {
-      line.textContent += text[i];
-      i++;
-      if (i >= text.length) {
-        clearInterval(interval);
-        callback();
-      }
-    }, 20); // Tippgeschwindigkeit
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    let i = 0;
-
-    function nextLog() {
-      if (i < logs.length) {
-        const color = isOnline ? "text-green-300" : "text-yellow-300";
-        typeLine(logs[i++], color, () => {
-          setTimeout(nextLog, 200);
-        });
-      } else {
-        setTimeout(() => {
-          // Overlay verschwindet
-          overlay.classList.add("translate-y-full", "opacity-0");
-
-          // Rahmenfarbe ändern
-          wrapper.classList.replace(
-            "border-zinc-700",
-            isOnline ? "border-green-500" : "border-red-500"
-          );
-
-          // Card-Hintergrund + Effekte
-          card.classList.replace(
-            "bg-zinc-800",
-            isOnline ? "bg-green-950" : "bg-red-950"
-          );
-          if (isOnline) {
-            card.classList.add("pulse-green"); // Pulse-Klasse (in CSS definiert)
-          } else {
-            // Avatar weich austauschen
-            avatar.classList.add("transition-opacity", "duration-600", "opacity-0");
-            setTimeout(() => {
-              avatar.src = "assets/img/meat_bot_offline.webp"; // Dein Offline-Bild
-              avatar.classList.remove("opacity-0");
-            }, 500);
-          }
-
-          // Statusanzeige unten
-          setTimeout(() => {
-            online.textContent = isOnline ? "[ONLINE]" : "[OFFLINE]";
-            online.classList.remove("opacity-0");
-
-            if (!isOnline) {
-              online.classList.remove("text-green-400");
-              online.classList.add("text-red-400");
-              behindOnline.classList.remove("opacity-0");
+            function selectServer(name) {
+                currentServer.textContent = name;
+                // Liste bleibt geöffnet
             }
-          }, 800);
-        }, 1000);
-      }
-    }
+        </script>
+        <script>
+            const ctx1 = document.getElementById("commandChart").getContext("2d");
+            new Chart(ctx1, {
+                type: "bar",
+                data: {
+                    labels: ["!clip", "!event", "!poll", "!stats", "!feedback"],
+                    datasets: [
+                        {
+                            label: "Verwendung",
+                            data: [42, 31, 58, 25, 12],
+                            backgroundColor: "#ff002f"
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
 
-    nextLog();
+            const ctxRadar = document.getElementById("userRadarChart").getContext("2d");
+
+            new Chart(ctxRadar, {
+                type: "radar",
+                data: {
+                    labels: ["🗳️ Votings", "📅 Events", "💬 Feedback", "🎮 Game Interaktionen", "📈 Reaktionen"],
+                    datasets: [
+                        {
+                            label: "Total Uses",
+                            data: [85, 62, 44, 97, 88],
+                            fill: true,
+                            backgroundColor: "rgba(56,189,248,0.2)",
+                            borderColor: "#38bdf8",
+                            pointBackgroundColor: "#38bdf8",
+                            pointBorderColor: "#fff",
+                            pointHoverBackgroundColor: "#fff",
+                            pointHoverBorderColor: "#38bdf8"
+                        },
+                        {
+                            label: "Unique Users",
+                            data: [30, 26, 19, 40, 38],
+                            fill: true,
+                            backgroundColor: "rgba(167,139,250,0.2)",
+                            borderColor: "#a78bfa",
+                            pointBackgroundColor: "#a78bfa",
+                            pointBorderColor: "#fff",
+                            pointHoverBackgroundColor: "#fff",
+                            pointHoverBorderColor: "#a78bfa"
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    elements: {
+                        line: { borderWidth: 2 }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { color: "#444" },
+                            grid: { color: "#333" },
+                            pointLabels: {
+                                color: "#ccc",
+                                font: { size: 11 }
+                            },
+                            ticks: {
+                                color: "#999",
+                                backdropColor: "transparent",
+                                stepSize: 20
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: "#ccc" }
+                        }
+                    }
+                }
+            });
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const calendar = new VanillaCalendar("#calendar", {
+                    type: "default",
+                    settings: {
+                        selection: {
+                            day: "multiple"
+                        }
+                    },
+                    popups: {
+                        "2025-05-13": { modifier: "event-monday" },
+                        "2025-05-15": { modifier: "event-thursday" }
+                    }
+                });
+
+                calendar.init();
+            });
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const isOnline = window.BOT_STATUS === "online";
+                const logs = isOnline
+                    ? [
+                          "[✔] Discord ready",
+                          "[✔] Commands loaded",
+                          "[✔] Module Sync OK",
+                          "[✔] Kernel initialized",
+                          "[✔] Permissions verified",
+                          "[✔] Uplink active"
+                      ]
+                    : [
+                          "[×] Uplink lost",
+                          "[!] /cmd fail",
+                          "[!] ModSync → abort",
+                          "[×] Kernel mismatch",
+                          "[!] Permissions? Nope.",
+                          "[×] Boot denied."
+                      ];
+
+                const logEl = document.getElementById("bootLog");
+                const overlay = document.getElementById("bootOverlay");
+                const onlineStatus = document.getElementById("onlineStatus");
+                const wrapper = document.getElementById("avatarWrapper");
+                const behindOnline = document.getElementById("overlayBehindOnline");
+                const card = document.getElementById("statusCard");
+                const avatar = document.getElementById("avatarImage");
+
+                function typeLine(text, targetClass, callback) {
+                    const line = document.createElement("div");
+                    line.classList.add(targetClass);
+                    logEl.prepend(line);
+
+                    let i = 0;
+                    const interval = setInterval(() => {
+                        line.textContent += text[i];
+                        i++;
+                        if (i >= text.length) {
+                            clearInterval(interval);
+                            callback();
+                        }
+                    }, 20);
+                }
+
+                let index = 0;
+                function nextLog() {
+                    if (index < logs.length) {
+                        const color = isOnline ? "text-green-300" : "text-yellow-300";
+                        typeLine(logs[index++], color, () => {
+                            setTimeout(nextLog, 200);
+                        });
+                    } else {
+                        setTimeout(() => {
+                            overlay.classList.add("translate-y-full", "opacity-0");
+                            wrapper.classList.replace(
+                                "border-zinc-700",
+                                isOnline ? "border-green-500" : "border-red-500"
+                            );
+                            card.classList.replace("bg-zinc-800", isOnline ? "bg-green-950" : "bg-red-950");
+
+                            if (isOnline) {
+                                card.classList.add("pulse-green");
+                            } else {
+                                avatar.classList.add("transition-opacity", "duration-600", "opacity-0");
+                                setTimeout(() => {
+                                    avatar.src = "assets/img/meat_bot_offline.webp";
+                                    avatar.classList.remove("opacity-0");
+                                }, 500);
+                            }
+
+                            setTimeout(() => {
+                                onlineStatus.textContent = isOnline ? "[ONLINE]" : "[OFFLINE]";
+                                onlineStatus.classList.remove("opacity-0");
+
+                                if (!isOnline) {
+                                    onlineStatus.classList.remove("text-green-400");
+                                    onlineStatus.classList.add("text-red-400");
+                                    behindOnline.classList.remove("opacity-0");
+                                }
+                            }, 800);
+                        }, 1000);
+                    }
+                }
+
+                nextLog();
+            });
+        </script>
+        <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const isOnline = window.BOT_STATUS === "online";
+
+    // Beispielwerte (später via Backend dynamisch befüllbar)
+    const botStats = {
+      uptime: "3 Tage, 4 Std",
+      servers: 2,
+      commands: 12,
+      ping: 58,         // in ms
+      errors: 0,        // Anzahl Fehler
+      featureLoad: 95   // Prozent 0–100
+    };
+
+    // Ziel-Elemente
+    const statusBox = document.querySelector("#statusCard");
+    const activityBox = document.querySelector(".meat-activity");
+
+    // 🔁 Utils
+    const colorByPing = (ms) => {
+      if (ms < 50) return "text-green-400";
+      if (ms < 150) return "text-yellow-400";
+      return "text-red-400";
+    };
+
+    const colorByError = (count) => {
+      if (count === 0) return "text-green-400";
+      if (count < 1) return "text-yellow-400";
+      return "text-red-400";
+    };
+
+    const colorByPercent = (val) => {
+      if (val >= 90) return "bg-green-500 text-green-400";
+      if (val >= 60) return "bg-yellow-500 text-yellow-400";
+      return "bg-red-500 text-red-400";
+    };
+
+    // 🔄 Inhalte setzen
+    activityBox.innerHTML = `
+      <!-- Systemstatus -->
+      <div class="border border-zinc-700 rounded-lg p-2">
+        <ul class="text-gray-300 text-sm space-y-1">
+          <li>Status:
+            <span class="inline-block text-xs font-mono px-2 py-[1px] rounded border border-zinc-950 bg-zinc-900 ${isOnline ? "text-green-400" : "text-red-400"} shadow-sm tracking-tight">
+              ${isOnline ? "Online" : "Offline"}
+            </span>
+          </li>
+          <li>Uptime:
+            <span class="inline-block text-xs font-mono px-2 py-[1px] rounded border border-zinc-950 bg-zinc-900 text-purple-400 shadow-sm tracking-tight">
+              ${botStats.uptime}
+            </span>
+          </li>
+          <li>Server:
+            <span class="inline-block text-xs font-mono px-2 py-[1px] rounded border border-zinc-950 bg-zinc-900 text-white shadow-sm tracking-tight">
+              ${botStats.servers}
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Performance -->
+      <div class="border border-zinc-700 rounded-lg p-2 mt-2" style="margin-top:6px;">
+        <ul class="text-gray-300 text-sm space-y-1">
+          <li>Reaktionszeit:
+            <span class="inline-block text-xs font-mono px-2 py-[1px] rounded border border-zinc-950 bg-zinc-900 ${colorByPing(botStats.ping)} shadow-sm tracking-tight">
+              ${botStats.ping}ms
+            </span>
+          </li>
+          <li>Commands geladen:
+            <span class="inline-block text-xs font-mono px-2 py-[1px] rounded border border-zinc-950 bg-zinc-900 text-white shadow-sm tracking-tight">
+              ${botStats.commands}
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Diagnose -->
+      <div class="border border-zinc-700 rounded-lg p-2 mt-2" style="margin-top:6px;">
+        <ul class="text-gray-300 text-sm space-y-1">
+          <li>Fehler:
+            <span class="inline-block text-xs font-mono px-2 py-[1px] rounded border border-zinc-950 bg-zinc-900 ${colorByError(botStats.errors)} shadow-sm tracking-tight">
+              ${botStats.errors === 0 ? "0 (noch)" : botStats.errors}
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Bot-Funktionalität -->
+      <div class="border border-zinc-700 rounded-lg p-2 mt-2" style="margin-top:6px;">
+        <ul class="text-gray-300 text-sm space-y-1">
+          <li>Module geladen:
+            <span class="inline-block text-xs font-mono px-2 py-[1px] ml-1 rounded border border-zinc-950 bg-zinc-900 ${colorByPercent(botStats.featureLoad).split(" ")[1]} shadow-sm tracking-tight">
+              ${botStats.featureLoad}%
+            </span>
+            <div class="w-full bg-zinc-700 h-2 mt-1 rounded">
+              <div class="${colorByPercent(botStats.featureLoad).split(" ")[0]} h-full rounded" style="width: ${botStats.featureLoad}%"></div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    `;
   });
 </script>
 
-
-</body>
+    </body>
 </html>
