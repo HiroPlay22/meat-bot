@@ -1,5 +1,3 @@
-import "dotenv/config"; // 🆕 unbedingt ganz oben!
-
 import {
   Client,
   GatewayIntentBits,
@@ -18,7 +16,8 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
+    GatewayIntentBits.MessageContent,
+     GatewayIntentBits.GuildMessagePolls
   ],
   partials: [Partials.Channel]
 });

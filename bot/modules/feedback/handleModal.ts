@@ -2,8 +2,7 @@ import {
   ModalSubmitInteraction,
   EmbedBuilder,
   TextChannel,
-  PermissionsBitField,
-  MessageFlags
+  PermissionsBitField
 } from "discord.js";
 import { createFeedback } from "@services/feedback/createFeedback.js";
 
@@ -29,7 +28,7 @@ export async function handleFeedbackModal(interaction: ModalSubmitInteraction) {
   const protocolNo = feedback.protocolNo.toString().padStart(4, "0");
 
   const userEmbed = new EmbedBuilder()
-    .setTitle(`Feedback-Protokoll #${protocolNo}`)
+    .setTitle(`📡 Feedback-Protokoll #${protocolNo}`)
     .setDescription(
       `Protokoll #${protocolNo} erfolgreich gesendet.\n` +
       `M.E.A.T. analysiert deine Eingabe mit... fragwürdiger Hingabe.`
@@ -43,7 +42,7 @@ export async function handleFeedbackModal(interaction: ModalSubmitInteraction) {
 
   await interaction.reply({
     embeds: [userEmbed],
-    flags: MessageFlags.Ephemeral, // Nur für den User sichtbar
+    ephemeral: true, // Nur für den User sichtbar
     allowedMentions: { repliedUser: false },
   });
 
@@ -71,6 +70,7 @@ export async function handleFeedbackModal(interaction: ModalSubmitInteraction) {
         { name: "Inhalt", value: description }
       )
       .setColor(0x00b5cc)
+      .setTimestamp()
       .setFooter({ text: `Empfangen am ${new Date().toLocaleString("de-DE")}` });
 
     // Falls berechtigte Rollen existieren, wird deren Mention im Embed hinzugefügt

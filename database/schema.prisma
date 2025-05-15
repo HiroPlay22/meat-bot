@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite" // Alternativ: "postgresql"
+  provider = "sqlite" // Oder: "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -36,35 +36,39 @@ model Feedback {
   createdAt   DateTime @default(now())
 }
 
-model DinoName {
-  id        Int      @id @default(autoincrement())
-  dinoName  String   // z. B. "T-Rex"
-  style     String   // z. B. "Trashig", "Mutiert", etc.
-  color     String   // z. B. "blau", "rot", etc.
-  traits    String   // z. B. "episch", "süß"
-  name      String   // z. B. "BiteByte"
+model FunGame {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  emoji     String?
+  isFree    Boolean  @default(false)
+
+  wonPolls  Poll[]   @relation("PollWinner")
+  polls     Poll[]   @relation("PollGames")
+  votes     Vote[]
 }
 
-model DinoUserStat {
-  id            Int       @id @default(autoincrement())
-  userId        String    // Discord User ID
-  totalRolls    Int       @default(0)
-  totalFavorites Int      @default(0)
-  lastRolled    DateTime  @default(now())
+model Poll {
+  id         String     @id @default(cuid())
+  question   String
+  type       String
+  pollNumber Int
+  messageId  String
+  createdAt  DateTime   @default(now())
+  endedAt    DateTime?
+  winnerId   String?
+  winner     FunGame?   @relation("PollWinner", fields: [winnerId], references: [id])
+
+  games      FunGame[]  @relation("PollGames")
+  votes      Vote[]
 }
 
-model DinoFavorite {
-  id         Int      @id @default(autoincrement())
-  userId     String   // Discord User ID
-  name       String
-  dinoName   String
-  style      String
-  color      String
-  createdAt  DateTime @default(now())
-}
+model Vote {
+  id        String   @id @default(cuid())
+  userId    String
+  gameId    String
+  pollId    String
+  createdAt DateTime @default(now())
 
-model DinoColorStat {
-  id        Int      @id @default(autoincrement())
-  color     String   // Farbe: rot, blau, etc.
-  selected  Int      @default(0) // Wie oft diese Farbe gewählt wurde
+  game      FunGame  @relation(fields: [gameId], references: [id])
+  poll      Poll     @relation(fields: [pollId], references: [id])
 }

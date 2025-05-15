@@ -1,0 +1,10 @@
+{
+  "guilds": {
+    "1363882923450957874": {
+      "modCategoryId": "1364920868295278633",
+      "feedbackChannelId": "1364920956954607737",
+      "allowedPollRoles": [],
+      "allowAnonymousFeedback": true
+    }
+  }
+}

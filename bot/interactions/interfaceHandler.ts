@@ -4,7 +4,6 @@ import {
   ModalSubmitInteraction,
   SelectMenuInteraction,
   Interaction,
-  MessageFlags
 } from "discord.js";
 
 /**
@@ -25,13 +24,13 @@ export async function interfaceHandler(interaction: Interaction) {
 
     switch (interaction.customId) {
       case "demo_primary":
-        return interaction.reply({ content: "🟦 Du hast den Primary-Button gedrückt.", flags: MessageFlags.Ephemeral });
+        return interaction.reply({ content: "🟦 Du hast den Primary-Button gedrückt.", ephemeral: true });
       case "demo_secondary":
-        return interaction.reply({ content: "🖤 Du hast den Secondary-Button gedrückt.", flags: MessageFlags.Ephemeral });
+        return interaction.reply({ content: "🖤 Du hast den Secondary-Button gedrückt.", ephemeral: true });
       case "demo_success":
-        return interaction.reply({ content: "✅ Du hast den Success-Button gedrückt.", flags: MessageFlags.Ephemeral });
+        return interaction.reply({ content: "✅ Du hast den Success-Button gedrückt.", ephemeral: true });
       case "demo_danger":
-        return interaction.reply({ content: "❌ Du hast den Danger-Button gedrückt.", flags: MessageFlags.Ephemeral });
+        return interaction.reply({ content: "❌ Du hast den Danger-Button gedrückt.", ephemeral: true });
       case "open_modal":
         return interaction.showModal({
           customId: "demo_modal",
@@ -74,14 +73,14 @@ export async function interfaceHandler(interaction: Interaction) {
 
     return interaction.reply({
       content: `🧾 Danke für dein Feedback, **${name}**!\n\n📨 \`\`\`${feedback}\`\`\``,
-      flags: MessageFlags.Ephemeral,
+      ephemeral: true,
     });
   }
 
-  if (interaction.isStringSelectMenu() && interaction.customId === "demo_dropdown") {
+  if (interaction.isSelectMenu() && interaction.customId === "demo_dropdown") {
     return interaction.reply({
       content: `📋 Du hast gewählt: **${interaction.values.join(", ")}**`,
-      flags: MessageFlags.Ephemeral,
+      ephemeral: true,
     });
   }
 }

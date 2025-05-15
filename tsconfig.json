@@ -1,47 +1,26 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "node16",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "baseUrl": "./",
-
-    // ✅ Pfad-Aliasstruktur
     "paths": {
-      "@/*": ["*"],
-
+      "@/*": ["bot/*"],
       "@database/*": ["database/*"],
-      "@config/*": ["config/*"],
       "@services/*": ["bot/services/*"],
+      "@config/*": ["config/*"],
+      "@modules/*": ["bot/modules/*"],
       "@utils/*": ["bot/utils/*"],
       "@commands/*": ["bot/commands/*"],
-      "@modules/*": ["bot/modules/*"],
-      "@api/*": ["bot/api/*"],
-      "@loader/*": ["bot/loader/*"],
-      "@lib/*": ["lib/gpt/*"],
-      "@style/*": ["bot/utils/style/*"]
+      "@interactions/*": ["bot/interactions/*"],
     },
-
-    // ✅ Unterstützt native Node.js-Typen
-    "types": ["node"]
+    "types": ["node", "discord.js"]  // Füge discord.js zu den Typen hinzu
   },
-
-  // ✅ Enthält alles Relevante für das Projekt
-  "include": [
-    "bot",
-    "web",
-    "config",
-    "database",
-    "types"
-  ],
-
-  // ✅ Schließt Build-Ziele und Dependencies aus
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["bot", "web", "config", "database", "types"],
+  "exclude": ["node_modules", "dist"]
 }
