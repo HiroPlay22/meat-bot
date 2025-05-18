@@ -496,6 +496,21 @@ export async function registerInteractions(client: Client) {
         return interaction.deferUpdate();
       }
 
+      // === STATS: Button-Navigation
+      if (interaction.isButton() && interaction.customId.startsWith("stats_")) {
+        const [_, view, userId] = interaction.customId.split("_")
+        if (interaction.user.id !== userId) {
+          return interaction.reply({
+            content: "⛔ Nur du darfst deine Stats klicken.",
+            ephemeral: true
+          })
+        }
+
+        const { handleStatsButton } = await import("@interactions/buttons/statsHandler.js")
+        return await handleStatsButton(interaction, view)
+      }
+
+
     } catch (error) {
       console.error("❌ Fehler bei Interaktion:", error)
 

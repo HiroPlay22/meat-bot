@@ -1,9 +1,9 @@
 {
   "guilds": {
-    "1363882923450957874": {
-      "modCategoryId": "1364920868295278633",
-      "dinonameSuggestionChannelId": "1372625243025309817",
-      "feedbackChannelId": "1364920956954607737",
+    "271568768268894218": {
+      "modCategoryId": "1373610328507551784",
+      "dinonameSuggestionChannelId": "1373610620372385895",
+      "feedbackChannelId": "1373610456358457344",
       "allowedPollRoles": [],
       "allowAnonymousFeedback": true
     }

@@ -6,6 +6,7 @@
   "main": "run-dev.ts",
   "scripts": {
     "dev": "tsx --require tsconfig-paths/register run-dev.ts",
+    "snapshot": "tsx scripts/dailySnapshot.ts",
     "build": "tsc",
     "deploy": "tsx bot/loader/deploySlashCommands.ts",
     "generate": "prisma generate --schema=database/schema.prisma",
