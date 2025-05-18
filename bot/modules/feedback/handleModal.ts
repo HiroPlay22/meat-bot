@@ -1,3 +1,4 @@
+// modules/feedback/handleModal.ts
 import {
   ModalSubmitInteraction,
   EmbedBuilder,
@@ -7,6 +8,7 @@ import {
 import { createFeedback } from "@services/feedback/createFeedback.js";
 import fs from "fs";
 import path from "path";
+import { prisma } from "@database/client.js";
 
 export async function handleFeedbackModal(interaction: ModalSubmitInteraction) {
   console.log("✅ handleFeedbackModal() wurde aufgerufen");
@@ -23,8 +25,16 @@ export async function handleFeedbackModal(interaction: ModalSubmitInteraction) {
     serverId: interaction.guildId || "DM",
     title,
     description,
-    category: "Unkategorisiert", // Keine Kategorie mehr
-    importance: "Mittel", // Standardwert, da keine Auswahl mehr für Wichtigkeit
+    category: "Unkategorisiert",
+    importance: "Mittel",
+  });
+
+  // 📈 FeedbackStats-Tracking
+  await prisma.feedbackStats.create({
+    data: {
+      guildId: interaction.guildId || "DM",
+      submittedBy: interaction.user.id
+    }
   });
 
   const protocolNo = feedback.protocolNo.toString().padStart(4, "0");
@@ -44,7 +54,7 @@ export async function handleFeedbackModal(interaction: ModalSubmitInteraction) {
 
   await interaction.reply({
     embeds: [userEmbed],
-    ephemeral: true, // Nur für den User sichtbar
+    ephemeral: true,
     allowedMentions: { repliedUser: false },
   });
 
@@ -66,15 +76,13 @@ export async function handleFeedbackModal(interaction: ModalSubmitInteraction) {
   const logChannel = interaction.client.channels.cache.get(feedbackChannelId) as TextChannel;
 
   if (logChannel?.isTextBased()) {
-    // Berechtigte Rollen ermitteln
     const guildRoles = interaction.guild?.roles.cache;
     const visibleRoles = guildRoles?.filter(role =>
       logChannel.permissionsFor(role)?.has(PermissionsBitField.Flags.ViewChannel)
     ) ?? new Map();
 
-    // Berechtigte Rollen als Mentions
     const roleMentions = [...visibleRoles.values()]
-      .filter(role => !role.managed && role.id !== interaction.guild?.id) // Keine Bot-Rollen oder @everyone
+      .filter(role => !role.managed && role.id !== interaction.guild?.id)
       .map(role => `<@&${role.id}>`)
       .join(" ");
 
@@ -88,7 +96,6 @@ export async function handleFeedbackModal(interaction: ModalSubmitInteraction) {
       .setTimestamp()
       .setFooter({ text: `Empfangen am ${new Date().toLocaleString("de-DE")}` });
 
-    // Falls berechtigte Rollen existieren, wird deren Mention im Embed hinzugefügt
     if (roleMentions) {
       publicEmbed.addFields({ name: "Berechtigte Rollen", value: roleMentions });
     }

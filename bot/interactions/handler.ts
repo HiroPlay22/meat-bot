@@ -386,10 +386,16 @@ export async function registerInteractions(client: Client) {
         });
       }
 
-            // === 9. Fungames-Liste anzeigen
+      // === 9. Fungames-Liste anzeigen
       if (interaction.isButton() && interaction.customId === "show_fungames_list") {
         const games = await prisma.funGame.findMany({ orderBy: { name: "asc" } });
         const gameCount = games.length;
+
+        // 📊 Stat erhöhen (Fungames-Ansicht)
+        await prisma.guildStats.updateMany({
+          where: { guildId: interaction.guildId },
+          data: { fungamesViews: { increment: 1 } }
+        });
 
         const gameList = games.map(g => `• ${g.name}`).join('\n');
 
@@ -413,9 +419,16 @@ export async function registerInteractions(client: Client) {
 
       // === 10. Fungames Voting starten
       if (interaction.isButton() && interaction.customId === "start_poll_fungames") {
+        // 🗳️ Stat erhöhen (Voting gestartet)
+        await prisma.guildStats.updateMany({
+          where: { guildId: interaction.guildId },
+          data: { votingsStarted: { increment: 1 } }
+        });
+
         const { default: handleStartPollFungames } = await import("@interactions/buttons/startPollFungames.js");
         return await handleStartPollFungames(interaction);
       }
+
 
       // === 11. Fungames Voting beenden
       if (interaction.isButton() && interaction.customId.startsWith("end_poll_fungames_")) {

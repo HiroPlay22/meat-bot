@@ -79,18 +79,28 @@ export default async function handleStartPollFungames(interaction: ButtonInterac
     },
   });
 
-  // 5. Poll speichern
-  await prisma.poll.create({
-    data: {
-      type: 'fungames',
-      pollNumber,
-      question: title,
-      messageId: pollMsg.id,
-      games: {
-        connect: selectedGames.map(g => ({ id: g.id })),
-      },
+ // 5. Poll speichern
+await prisma.poll.create({
+  data: {
+    type: 'fungames',
+    pollNumber,
+    question: title,
+    messageId: pollMsg.id,
+    games: {
+      connect: selectedGames.map(g => ({ id: g.id })),
     },
-  });
+  },
+});
+
+// 6. VotingStats-Tracking
+await prisma.votingStats.create({
+  data: {
+    votingType: 'fungames',
+    startedAt: new Date(),
+    guildId: interaction.guildId ?? undefined
+  }
+});
+
 
   // kein Reply nötig, Poll steht ja öffentlich im Chat
 }

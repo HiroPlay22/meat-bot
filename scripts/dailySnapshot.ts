@@ -1,6 +1,8 @@
 import { Client, GatewayIntentBits } from 'discord.js'
 import { prisma } from '../database/client'
 import 'dotenv/config'
+import fs from 'fs'
+import path from 'path'
 
 console.log('🧪 Starte Snapshot-Script...')
 console.log('📁 Token geladen:', process.env.DISCORD_TOKEN ? '[OK]' : '[FEHLT]')
@@ -43,6 +45,8 @@ client.on('ready', async () => {
       const roleCount = guild.roles.cache.size
       const createdAt = guild.createdAt
 
+      const feedbacks = await prisma.feedbackStats.count({ where: { guildId } })
+
       await prisma.guildStats.create({
         data: {
           guildId,
@@ -52,6 +56,7 @@ client.on('ready', async () => {
           voiceChannelCount: voiceChannels,
           roleCount,
           createdAt,
+          feedbacks,
           newMembers24h: 0
         }
       })
@@ -59,8 +64,22 @@ client.on('ready', async () => {
       console.log(`✅ Snapshot gespeichert für ${guild.name} (${guildId})`)
     }
 
+    // 🔍 DB-Größe ermitteln
+    let dbSizeMB = 0
+    const dbPath = path.resolve('./database/dev.db') // ggf. anpassen
+
+    try {
+      const stats = fs.statSync(dbPath)
+      dbSizeMB = +(stats.size / (1024 * 1024)).toFixed(2)
+    } catch (err) {
+      console.warn('⚠️ Konnte DB-Größe nicht ermitteln:', err)
+    }
+
+    // 🌍 Globale Werte
     const totalGuilds = allGuildIds.length
-    const totalDinoSuggestions = await prisma.dinoName.count()
+    const totalDinoSuggestions = await prisma.dinoName.count({
+      where: { submittedBy: { not: null } }
+    })
     const totalDinoApproved = await prisma.dinoName.count({ where: { approved: true } })
     const totalGamesInDB = await prisma.funGame.count()
     const totalFeedbacks = await prisma.feedbackStats.count()
@@ -78,10 +97,11 @@ client.on('ready', async () => {
         totalFeedbacks,
         totalVotingsStarted,
         totalVotesCast: totalVotesCast._sum.votesCast || 0,
-        dbSizeMB: 0
+        dbSizeMB
       }
     })
 
+    console.log(`💾 DB-Größe: ${dbSizeMB} MB`)
     console.log('🌍 GlobalStats Snapshot gespeichert.')
     console.log('✅ Daily snapshot abgeschlossen.')
 
@@ -93,8 +113,8 @@ client.on('ready', async () => {
   }
 })
 
-client.on('error', (e) => console.error('❌ Discord-Client-Fehler:', e))
-client.on('shardError', (e) => console.error('❌ Shard-Fehler:', e))
+client.on('error', e => console.error('❌ Discord-Client-Fehler:', e))
+client.on('shardError', e => console.error('❌ Shard-Fehler:', e))
 
 client.login(process.env.DISCORD_TOKEN).then(() => {
   console.log('🟢 login() erfolgreich ausgeführt')
