@@ -5,21 +5,21 @@ Powered by Hiro – forever burned into the M.E.A.T.-core
 
 ## Features
 📝 Feedback-System
-• Modalgestütztes Einsenden von Nutzerfeedback
-• Anzeige im Mod-Channel als Embed
-• Sichtbarkeit nur für berechtigte Rollen (Mod-Channel-Category)
+- Modalgestütztes Einsenden von Nutzerfeedback
+- Anzeige im Mod-Channel als Embed
+- Sichtbarkeit nur für berechtigte Rollen (Mod-Channel-Category)
 
 🗳️ Native Polls: Fungames-Voting
-• Erstellung von Discord-Polls aus Gamelisten-DB
-• Automatische Ausschlüsse (letzter Gewinner)
-• Multivote aktiviert, max. 20 Spiele
-• Buttons: Poll starten, Spiel hinzufügen/entfernen (Modal + SelectMenu)
+- Erstellung von Discord-Polls aus Gamelisten-DB
+- Automatische Ausschlüsse (letzter Gewinner)
+- Multivote aktiviert, max. 20 Spiele
+- Buttons: Poll starten, Spiel hinzufügen/entfernen (Modal + SelectMenu)
 
 🦖 ARK Dino Name Generator
-• Namen aus lokaler Dino-Datenbank mit Eigenschaftenfilter (z. B. trashig, groß, pink)
-• Modal zur Auswahl von Stil/Farbe/Größe/Typ
-• Vorschläge in Moderations-Channel zur Freigabe/Ablehnung
-• Embed-Ausgabe mit Stil-Footer und wechselnden Zitaten
+- Namen aus lokaler Dino-Datenbank mit Eigenschaftenfilter (z. B. trashig, groß, pink)
+- Modal zur Auswahl von Stil/Farbe/Größe/Typ
+- Vorschläge in Moderations-Channel zur Freigabe/Ablehnung
+- Embed-Ausgabe mit Stil-Footer und wechselnden Zitaten
 
 ## Features (plan)
 - Modulbasiertes System: Jeder Funktionsbereich ist ein aktivierbares Modul
