@@ -2,6 +2,7 @@
   "guilds": {
     "1363882923450957874": {
       "modCategoryId": "1364920868295278633",
+      "dinonameSuggestionChannelId": "1372625243025309817",
       "feedbackChannelId": "1364920956954607737",
       "allowedPollRoles": [],
       "allowAnonymousFeedback": true

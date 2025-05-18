@@ -44,17 +44,22 @@ const command: Command = {
       const pollUrl = `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${activePoll.messageId}`;
 
       const embed = new EmbedBuilder()
-        .setTitle(`📊 M.E.A.T.-Protokoll: VOTE:MON-${nextMonday}/#${pollNumber} läuft bereits`)
+        .setTitle(`📊 M.E.A.T.-Protokoll: VOTE/MON-${nextMonday}/#${pollNumber} läuft bereits`)
         .setDescription('> Protokollschacht ist belegt. Neues Voting abgelehnt.')
         .setColor(0xFF4F4F);
 
-      const button = new ButtonBuilder()
+      const buttonLink = new ButtonBuilder()
         .setLabel('Zur Abstimmung')
         .setStyle(ButtonStyle.Link)
-        .setEmoji('📄')
         .setURL(pollUrl);
 
-      const row = new ActionRowBuilder<ButtonBuilder>().addComponents(button);
+      const buttonEnd = new ButtonBuilder()
+        .setCustomId(`end_poll_fungames_${activePoll.id}`) // Wichtig: Poll-ID drin
+        .setLabel('Abstimmung beenden')
+        .setStyle(ButtonStyle.Danger)
+        .setDisabled(!hasAccess); // Zugriffsbeschränkung wie bei "Spiel entfernen"
+
+      const row = new ActionRowBuilder<ButtonBuilder>().addComponents(buttonLink, buttonEnd);
 
       return interaction.reply({
         embeds: [embed],
@@ -68,12 +73,11 @@ const command: Command = {
     const lastWinner = await getLastWinner('fungames');
 
     const embed = new EmbedBuilder()
-      .setTitle(`🧠 M.E.A.T.-Protokoll: VOTE:MON-${nextMonday}/#${pollNumber}`)
+      .setTitle(`🧠 M.E.A.T.-Protokoll: VOTE/MON-${nextMonday}/#${pollNumber}`)
       .setDescription([
         `Letzte Woche wurde **${lastWinner}** gezockt.`,
         `> Wird für diese Runde blockiert.`,
         ``,
-        `📅 Abstimmung endet automatisch **Sonntag um 23:59 Uhr**.`,
         `\nZeit, das Kampfgebiet neu zu wählen.`,
       ].join('\n'))
       .setColor(0xF5A623);
@@ -85,18 +89,21 @@ const command: Command = {
         .setEmoji('📊')
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
+        .setCustomId('show_fungames_list')
+        .setLabel('Spiele anzeigen')
+        .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
         .setCustomId('add_game_fungames')
         .setLabel('Spiel hinzufügen')
-        .setEmoji('✚')
         .setStyle(ButtonStyle.Success)
         .setDisabled(!hasAccess),
       new ButtonBuilder()
         .setCustomId('remove_game_fungames')
         .setLabel('Spiel entfernen')
-        .setEmoji('✕')
         .setStyle(ButtonStyle.Danger)
         .setDisabled(!hasAccess)
     );
+
 
     await interaction.reply({
       embeds: [embed],

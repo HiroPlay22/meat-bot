@@ -11,7 +11,6 @@ import { getNextMondayFormatted } from '@utils/date';
 import { getPollNumber } from '@modules/poll/utils';
 
 export default async function handleStartPollFungames(interaction: ButtonInteraction) {
-  await interaction.deferReply({ ephemeral: true });
 
   // 1. Check: Läuft bereits ein Voting?
   const active = await prisma.poll.findFirst({
@@ -41,9 +40,18 @@ export default async function handleStartPollFungames(interaction: ButtonInterac
     orderBy: { endedAt: 'desc' },
   });
 
+  function shuffleArray<T>(array: T[]): T[] {
+    return array
+      .map(value => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value);
+  }
+
   const excludedGameId = lastWinner?.winnerId;
   const filteredGames = allGames.filter(g => g.id !== excludedGameId);
-  const selectedGames = filteredGames.slice(0, 10); // max 10 für Discord
+  const shuffledGames = shuffleArray(filteredGames);
+  const selectedGames = shuffledGames.slice(0, 10); // 🎲 zufällig ausgewählt
+
 
   if (selectedGames.length < 2) {
     return interaction.editReply({

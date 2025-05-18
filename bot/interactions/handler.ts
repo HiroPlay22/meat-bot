@@ -3,14 +3,14 @@ import {
   Interaction,
   ChatInputCommandInteraction,
   ModalSubmitInteraction,
-  ButtonInteraction,
+  ActionRowBuilder,
+  ButtonBuilder,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  EmbedBuilder
+  EmbedBuilder,
+  StringSelectMenuBuilder,
+  SelectMenuBuilder
 } from "discord.js";
 
 import { loadSlashCommands } from "../loader/commandLoader.js";
@@ -18,12 +18,70 @@ import { logSystem } from "@services/internal/log";
 import { prisma } from "@database/client.js";
 import { handleFeedbackModal } from "@modules/feedback/handleModal.js";
 
+import serverSettings from "@config/serverSettings.json" with { type: "json" };
+
+// Hilfsfunktion für Spiel-Löschseiten
+async function buildGameDeletePage(interaction: Interaction, page: number) {
+  const PAGE_SIZE = 25;
+  const allGames = await prisma.funGame.findMany({ orderBy: { name: "asc" } });
+  const totalPages = Math.ceil(allGames.length / PAGE_SIZE);
+  const currentPage = Math.max(1, Math.min(page, totalPages));
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const games = allGames.slice(start, start + PAGE_SIZE);
+
+  const select = new StringSelectMenuBuilder()
+    .setCustomId(`delete_game_select_page_${currentPage}`)
+    .setPlaceholder("Wähle Spiel(e) zum Löschen...")
+    .setMinValues(1)
+    .setMaxValues(games.length)
+    .addOptions(
+      games.map(game => ({
+        label: game.name,
+        value: game.id
+      }))
+    );
+
+  const selectRow = new ActionRowBuilder<SelectMenuBuilder>().addComponents(select);
+
+  const backButton = new ButtonBuilder()
+    .setCustomId(`game_page_back_${currentPage}`)
+    .setLabel("⬅️ Zurück")
+    .setStyle(2)
+    .setDisabled(currentPage === 1);
+
+  const nextButton = new ButtonBuilder()
+    .setCustomId(`game_page_next_${currentPage}`)
+    .setLabel("Weiter ➡️")
+    .setStyle(2)
+    .setDisabled(currentPage === totalPages);
+
+  const navRow = new ActionRowBuilder<ButtonBuilder>().addComponents(backButton, nextButton);
+
+  return {
+    content: `❌ Spiel löschen – Seite ${currentPage} von ${totalPages}`,
+    components: [selectRow, navRow],
+    ephemeral: true
+  };
+}
+
 export async function registerInteractions(client: Client) {
   const commandMap = await loadSlashCommands();
 
   client.on("interactionCreate", async (interaction: Interaction) => {
     try {
       console.log("⚡ interactionCreate fired");
+
+      // === DinoName: Würfeln
+      if (interaction.isButton() && interaction.customId === "dinoname_generate") {
+        const { handleDinoGenerate } = await import("@modules/dinos/handleDinoGenerate.js")
+        return await handleDinoGenerate(interaction)
+      }
+
+      // === Dino Dropdown-Auswahl speichern
+      if (interaction.isStringSelectMenu() && interaction.customId.startsWith("dino_")) {
+        const { handleDinoSelect } = await import("@modules/dinos/handleDinoSelect.js")
+        return await handleDinoSelect(interaction)
+      }
 
       // === 1. Slash Commands ===
       if (interaction.isChatInputCommand()) {
@@ -38,15 +96,12 @@ export async function registerInteractions(client: Client) {
 
       // === 2. Feedback Modal SUBMIT ===
       if (interaction.isModalSubmit() && interaction.customId === "feedback_modal") {
-        console.log("🧠 Feedback-Modal SUBMIT erkannt");
         await handleFeedbackModal(interaction as ModalSubmitInteraction);
         return;
       }
 
-      // === 3. Feedback Button: Modal anzeigen ===
+      // === 3. Feedback öffnen
       if (interaction.isButton() && interaction.customId === "open_feedback_modal") {
-        console.log("📨 Feedback-Modal öffnen");
-
         const modal = new ModalBuilder()
           .setCustomId("feedback_modal")
           .setTitle("Feedback-Protokoll 📡")
@@ -66,193 +121,391 @@ export async function registerInteractions(client: Client) {
                 .setRequired(true)
             )
           );
+        await interaction.showModal(modal);
+        return;
+      }
+
+      // === DinoName: Würfeln
+      if (interaction.isButton() && interaction.customId === "dinoname_generate") {
+        const { handleDinoGenerate } = await import("@modules/dinos/handleDinoGenerate.js")
+        return await handleDinoGenerate(interaction)
+      }
+
+      // === Dino Dropdown-Auswahl speichern
+      if (interaction.isStringSelectMenu() && interaction.customId.startsWith("dino_")) {
+        const { handleDinoSelect } = await import("@modules/dinos/handleDinoSelect.js")
+        return await handleDinoSelect(interaction)
+      }
+
+      // === Dino Vorschlag senden
+      if (interaction.isButton() && interaction.customId === 'dinoname_submit') {
+        const modal = new ModalBuilder()
+          .setCustomId('dinoname_submit_modal')
+          .setTitle('Dino-Vorschlag einreichen')
+          .addComponents(
+            new ActionRowBuilder<TextInputBuilder>().addComponents(
+              new TextInputBuilder()
+                .setCustomId('suggested_name')
+                .setLabel('Dein Namensvorschlag')
+                .setRequired(true)
+                .setStyle(TextInputStyle.Short)
+            )
+          )
+
+        await interaction.showModal(modal)
+        return
+      }
+
+      // === Dino Vorschlag Modal SUBMIT
+      if (interaction.isModalSubmit() && interaction.customId === 'dinoname_submit_modal') {
+        const name = interaction.fields.getTextInputValue('suggested_name')
+        const { submitSuggestion } = await import('@/modules/dinos/submitSuggestion.js')
+
+
+
+        await submitSuggestion({
+          guildId: interaction.guildId!,
+          member: interaction.member!,
+          name
+        })
+
+        await interaction.reply({
+          content: `✅ Name **${name}** eingereicht!`,
+          ephemeral: true
+        })
+        return
+      }
+
+      // === Dino Vorschlag genehmigen
+      if (interaction.isButton() && interaction.customId.startsWith('approve_dinoname_')) {
+        const name = interaction.customId.replace('approve_dinoname_', '')
+        const settings = serverSettings.guilds[interaction.guildId!]
+        const modCat = settings?.modCategoryId
+        const member = interaction.member
+
+        if (!modCat || !interaction.guild?.channels.cache.get(modCat)?.permissionsFor(member!)?.has('ViewChannel')) {
+          return interaction.reply({ content: '❌ Keine Berechtigung.', ephemeral: true })
+        }
+
+        const alreadyApproved = await prisma.dinoName.findFirst({ where: { name } })
+        if (alreadyApproved) {
+          return interaction.update({
+            embeds: [
+              EmbedBuilder.from(interaction.message.embeds[0])
+                .setTitle('⚠️ Name war schon vorhanden')
+                .setColor(0xf5a623)
+            ],
+            components: []
+          })
+        }
+
+        await prisma.dinoName.create({ data: { name, approved: true } })
+
+        await interaction.update({
+          embeds: [
+            EmbedBuilder.from(interaction.message.embeds[0])
+              .setTitle('✅ Name hinzugefügt')
+              .setColor(0x7ed321)
+              .setFooter({
+                text: `freigegeben von ${interaction.user.displayName}`,
+                iconURL: interaction.user.displayAvatarURL()
+              })
+          ],
+          components: []
+        })
+
+        return
+      }
+
+
+      if (interaction.isButton() && interaction.customId.startsWith('reject_dinoname_')) {
+        const name = interaction.customId.replace('reject_dinoname_', '')
+        const settings = serverSettings.guilds[interaction.guildId!]
+        const modCat = settings?.modCategoryId
+        const member = interaction.member
+
+        if (!modCat || !interaction.guild?.channels.cache.get(modCat)?.permissionsFor(member!)?.has('ViewChannel')) {
+          return interaction.reply({ content: '❌ Keine Berechtigung.', ephemeral: true })
+        }
+
+        // Nur reagieren, wenn Buttons vorhanden sind (nicht erneut bearbeitbar)
+        if (!interaction.message.components.length) {
+          return interaction.reply({ content: '⚠️ Dieser Vorschlag wurde bereits bearbeitet.', ephemeral: true })
+        }
+
+        await interaction.update({
+          embeds: [
+            EmbedBuilder.from(interaction.message.embeds[0])
+              .setTitle('❌ Abgelehnt')
+              .setColor(0xd0021b)
+              .setFooter({
+                text: `abgelehnt von ${interaction.user.displayName}`,
+                iconURL: interaction.user.displayAvatarURL()
+              })
+          ],
+          components: []
+        })
+
+        return
+      }
+
+
+
+      // === 4. Spiel hinzufügen – Modal öffnen (nur für Mods)
+      if (interaction.isButton() && interaction.customId === "add_game_fungames") {
+        const settings = serverSettings.guilds[interaction.guildId!];
+        const modCategoryId = settings?.modCategoryId;
+        const modCategory = interaction.guild?.channels.cache.get(modCategoryId ?? "");
+        const allowed = modCategory?.permissionsFor(interaction.member!)?.has("ViewChannel");
+
+        if (!allowed) {
+          return interaction.reply({
+            content: "❌ Du hast keinen Zugriff auf diesen Bereich.",
+            ephemeral: true
+          });
+        }
+
+        const modal = new ModalBuilder()
+          .setCustomId("modal_add_game_fungames")
+          .setTitle("➕ Spiel hinzufügen")
+          .addComponents(
+            new ActionRowBuilder<TextInputBuilder>().addComponents(
+              new TextInputBuilder()
+                .setCustomId("game_name")
+                .setLabel("Name des Spiels")
+                .setStyle(TextInputStyle.Short)
+                .setRequired(true)
+            ),
+            new ActionRowBuilder<TextInputBuilder>().addComponents(
+              new TextInputBuilder()
+                .setCustomId("game_free")
+                .setLabel("Ist das Spiel kostenlos? (ja/nein)")
+                .setStyle(TextInputStyle.Short)
+                .setRequired(true)
+            )
+          );
 
         await interaction.showModal(modal);
         return;
       }
 
-      // === 4. Voting Button (Montagsrunde) ===
-      if (interaction.isButton() && interaction.customId.startsWith("vote_montag_")) {
-        console.log("🗳️ Voting Button erkannt:", interaction.customId);
+      // === 5. Spiel hinzufügen – Modal SUBMIT
+      if (interaction.isModalSubmit() && interaction.customId === "modal_add_game_fungames") {
+        const gameName = interaction.fields.getTextInputValue("game_name");
+        const freeInput = interaction.fields.getTextInputValue("game_free").toLowerCase();
+        const isFree = freeInput === "ja" || freeInput === "yes" || freeInput === "true";
 
-        const [_prefix, pollId, gameId] = interaction.customId.split("_");
-        const userId = interaction.user.id;
+        const settings = serverSettings.guilds[interaction.guildId!];
+        const modCategoryId = settings?.modCategoryId;
+        const modCategory = interaction.guild?.channels.cache.get(modCategoryId ?? "");
+        const allowed = modCategory?.permissionsFor(interaction.member!)?.has("ViewChannel");
 
-        try {
-          const poll = await prisma.poll.findUnique({ where: { id: pollId } });
-          if (!poll || poll.endedAt !== null) {
-            return interaction.reply({
-              content: "❌ Dieses Voting ist nicht mehr aktiv.",
-              ephemeral: true
-            });
-          }
-
-          const existingVote = await prisma.vote.findFirst({
-            where: { userId, gameId, pollId }
-          });
-
-          if (existingVote) {
-            await prisma.vote.delete({ where: { id: existingVote.id } });
-            console.log(`❎ Stimme entfernt für User ${userId} bei Game ${gameId}`);
-          } else {
-            await prisma.vote.create({
-              data: { userId, gameId, pollId }
-            });
-            console.log(`✅ Stimme gespeichert für User ${userId} bei Game ${gameId}`);
-          }
-
-          const userVotes = await prisma.vote.findMany({
-            where: { userId, pollId },
-            select: { gameId: true }
-          });
-          const activeGameIds = new Set(userVotes.map(v => v.gameId));
-
-          const allVotes = await prisma.vote.findMany({
-            where: { pollId },
-            select: { gameId: true }
-          });
-          const voteMap = new Map<string, number>();
-          for (const vote of allVotes) {
-            voteMap.set(vote.gameId, (voteMap.get(vote.gameId) || 0) + 1);
-          }
-
-          const allGames = await prisma.funGame.findMany({
-            select: { id: true, name: true }
-          });
-          const gameNameMap = new Map(allGames.map(g => [g.id, g.name]));
-
-          const updatedRows: ActionRowBuilder<ButtonBuilder>[] = [];
-          let currentRow = new ActionRowBuilder<ButtonBuilder>();
-
-          for (const row of interaction.message.components) {
-            for (const component of row.components) {
-              if (component.type !== 2) continue;
-
-              const customId = component.customId;
-              const [_prefix, btnPollId, btnGameId] = customId?.split("_") ?? [];
-              if (btnPollId !== pollId) continue;
-
-              const isActive = activeGameIds.has(btnGameId);
-              const voteCount = voteMap.get(btnGameId) || 0;
-              const gameName = gameNameMap.get(btnGameId) || "Spiel";
-
-              const newButton = new ButtonBuilder()
-                .setCustomId(customId)
-                .setLabel(`${gameName} (${voteCount})`)
-                .setStyle(isActive ? ButtonStyle.Success : ButtonStyle.Primary);
-
-              currentRow.addComponents(newButton);
-              if (currentRow.components.length === 4) {
-                updatedRows.push(currentRow);
-                currentRow = new ActionRowBuilder<ButtonBuilder>();
-              }
-            }
-          }
-
-          if (currentRow.components.length > 0) {
-            updatedRows.push(currentRow);
-          }
-
-          await interaction.update({ components: updatedRows });
-        } catch (error) {
-          console.error("❌ Fehler beim Abstimmen:", error);
-          if (!interaction.replied && !interaction.deferred) {
-            await interaction.reply({
-              content: "❌ Fehler beim Abstimmen.",
-              ephemeral: true
-            });
-          }
-        }
-
-        return;
-      }
-
-      // === 5. Ergebnis-Button (Archiv) ===
-      if (interaction.isButton() && interaction.customId.startsWith("view_poll_result_montag_")) {
-        const pollId = interaction.customId.replace("view_poll_result_montag_", "");
-        console.log("📊 Ergebnis-Button erkannt:", pollId);
-
-        const poll = await prisma.poll.findUnique({ where: { id: pollId } });
-        if (!poll || !poll.endedAt || !poll.winnerId) {
+        if (!allowed) {
           return interaction.reply({
-            content: "❌ Protokoll beschädigt oder Voting noch aktiv.",
+            content: "❌ Du hast keinen Zugriff auf diesen Bereich.",
             ephemeral: true
           });
         }
 
-        const votes = await prisma.vote.findMany({
-          where: { pollId },
-          include: { game: true }
+        const exists = await prisma.funGame.findFirst({
+          where: { name: gameName.trim() }
         });
 
-        const voteCounts: Record<string, { name: string, count: number }> = {};
-        for (const vote of votes) {
-          if (!voteCounts[vote.gameId]) {
-            voteCounts[vote.gameId] = { name: vote.game.name, count: 0 };
+        if (exists) {
+          return interaction.reply({
+            content: "⚠️ Dieses Spiel ist bereits in der Liste.",
+            ephemeral: true
+          });
+        }
+
+        await prisma.funGame.create({
+          data: {
+            name: gameName.trim(),
+            isFree
           }
-          voteCounts[vote.gameId].count++;
+        });
+
+        return interaction.reply({
+          content: `✅ \`${gameName}\` wurde zur Fungames-Liste hinzugefügt.`,
+          ephemeral: true
+        });
+      }
+
+            // === 6. Spiel entfernen – SelectMenu öffnen mit Paging
+      if (interaction.isButton() && interaction.customId === "remove_game_fungames") {
+        const settings = serverSettings.guilds[interaction.guildId!];
+        const modCategoryId = settings?.modCategoryId;
+        const modCategory = interaction.guild?.channels.cache.get(modCategoryId ?? "");
+        const allowed = modCategory?.permissionsFor(interaction.member!)?.has("ViewChannel");
+
+        if (!allowed) {
+          return interaction.reply({
+            content: "❌ Du hast keinen Zugriff auf diesen Bereich.",
+            ephemeral: true
+          });
         }
 
-        const totalVotes = votes.length;
-        const sortedVotes = Object.entries(voteCounts).sort((a, b) => b[1].count - a[1].count);
-        const topVoteCount = sortedVotes[0][1].count;
+        const data = await buildGameDeletePage(interaction, 1);
+        return interaction.reply(data);
+      }
 
-        let falloutContent = "```diff";
-        for (const [_, { name, count }] of sortedVotes) {
-          const percentage = Math.round((count / totalVotes) * 100);
-          const bar = "█".repeat(Math.round(percentage / 10)).padEnd(10, "░");
-          const prefix = count === topVoteCount ? "+" : "-";
-          const fixedName = name.length > 18 ? name.slice(0, 15) + "..." : name.padEnd(18, " ");
-          falloutContent += `\n${prefix} ${fixedName} ${bar} ${percentage}%${count === topVoteCount ? " 🏆" : ""}`;
+      // === 7. Paging Buttons für Spiel löschen
+      if (interaction.isButton() && interaction.customId.startsWith("game_page_")) {
+        const [, , direction, currentStr] = interaction.customId.split("_");
+        const current = parseInt(currentStr);
+        const newPage = direction === "next" ? current + 1 : current - 1;
+
+        const data = await buildGameDeletePage(interaction, newPage);
+        return interaction.update(data);
+      }
+
+      // === 8. Spiel löschen – Auswahl mit Mehrfachauswahl
+      if (interaction.isStringSelectMenu() && interaction.customId.startsWith("delete_game_select_page_")) {
+        const selectedIds = interaction.values;
+
+        const games = await prisma.funGame.findMany({
+          where: { id: { in: selectedIds } }
+        });
+
+        if (games.length === 0) {
+          return interaction.reply({
+            content: "❌ Keine gültigen Spiele ausgewählt.",
+            ephemeral: true
+          });
         }
-        falloutContent += "\n```";
 
-        const winnerName = sortedVotes.find(([id]) => id === poll.winnerId)?.[1].name || "Unbekannt";
+        await prisma.funGame.deleteMany({
+          where: { id: { in: selectedIds } }
+        });
+
+        const names = games.map(g => `• ${g.name}`).join("\n");
+
+        return interaction.update({
+          content: `✅ Gelöscht:\n${names}`,
+          components: []
+        });
+      }
+
+            // === 9. Fungames-Liste anzeigen
+      if (interaction.isButton() && interaction.customId === "show_fungames_list") {
+        const games = await prisma.funGame.findMany({ orderBy: { name: "asc" } });
+        const gameCount = games.length;
+
+        const gameList = games.map(g => `• ${g.name}`).join('\n');
 
         const embed = new EmbedBuilder()
-          .setTitle("📊 Fallout-Terminal: M.E.A.T.-Archiv-Protokoll")
-          .setDescription(`${falloutContent}\n💾 Gewonnen hat: **${winnerName}**`)
-          .setColor(0x00AEFF);
+          .setTitle(`🕹️ Fungames-Liste (${gameCount})`)
+          .setDescription(
+            gameCount > 0
+              ? gameList
+              : "*Keine Games gefunden. Datenbank defekt oder rebellisch.*"
+          )
+          .setColor(0x7ED321)
+          .setFooter({
+            text: "M.E.A.T. hat alles auf Lager. Du musst nur wählen."
+          });
 
-        await interaction.reply({ embeds: [embed], ephemeral: true });
-        return;
-      }
-
-      // === 6. Fallback Modal ===
-      if (interaction.isModalSubmit()) {
-        logSystem(`📝 Modal abgeschickt (unbekannt): ${interaction.customId}`);
-        await interaction.reply({
-          content: `Danke für dein Formular: **${interaction.customId}**.`,
+        return interaction.reply({
+          embeds: [embed],
           ephemeral: true
         });
-        return;
       }
 
-      // === 6. Fallback Modal ===
-      if (interaction.isModalSubmit()) {
-        logSystem(`📝 Modal abgeschickt (unbekannt): ${interaction.customId}`);
-        await interaction.reply({
-          content: `Danke für dein Formular: **${interaction.customId}**.`,
-          ephemeral: true
-        });
-        return;
-      }
-
-      // === 7. FunGames: Poll starten ===
+      // === 10. Fungames Voting starten
       if (interaction.isButton() && interaction.customId === "start_poll_fungames") {
-        console.log("🎲 FunGames Voting-Button gedrückt");
         const { default: handleStartPollFungames } = await import("@interactions/buttons/startPollFungames.js");
         return await handleStartPollFungames(interaction);
       }
 
+      // === 11. Fungames Voting beenden
+      if (interaction.isButton() && interaction.customId.startsWith("end_poll_fungames_")) {
+        const pollId = interaction.customId.replace("end_poll_fungames_", "");
+
+        const poll = await prisma.poll.findUnique({
+          where: { id: pollId },
+          include: { games: true }
+        });
+        if (!poll) return;
+
+        const message = await interaction.channel?.messages.fetch(poll.messageId);
+        if (!message?.poll) return;
+
+        await message.poll.end();
+        await prisma.poll.update({
+          where: { id: pollId },
+          data: { endedAt: new Date() }
+        });
+
+        try {
+          await interaction.message.delete();
+        } catch (err) {
+          console.warn("⚠️ Konnte alte Button-Nachricht nicht löschen:", err);
+        }
+
+        const embed = new EmbedBuilder()
+          .setTitle("📣 Abstimmung wurde beendet")
+          .setDescription("Wähle jetzt direkt das Gewinner-Spiel aus dem Dropdown aus.")
+          .setColor(0xf5a623);
+
+        const menu = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
+          new StringSelectMenuBuilder()
+            .setCustomId(`set_winner_fungames_${pollId}`)
+            .setPlaceholder("🏆 Sieger-Spiel auswählen...")
+            .addOptions(
+              poll.games.map(game => ({
+                label: game.name,
+                value: game.id
+              }))
+            )
+        );
+
+        await interaction.channel?.send({
+          embeds: [embed],
+          components: [menu]
+        });
+
+        return interaction.deferUpdate();
+      }
+
+            // === 12. Gewinner speichern
+      if (interaction.isStringSelectMenu() && interaction.customId.startsWith("set_winner_fungames_")) {
+        const pollId = interaction.customId.replace("set_winner_fungames_", "");
+        const selected = interaction.values[0];
+
+        const updatedPoll = await prisma.poll.update({
+          where: { id: pollId },
+          data: { winnerId: selected },
+          include: { games: true }
+        });
+
+        const winnerName = updatedPoll.games.find(g => g.id === selected)?.name || "Unbekannt";
+
+        const embed = new EmbedBuilder()
+          .setTitle("Widerstand zwecklos. Die Entscheidung steht.")
+          .setDescription(`Dieser Montag gehört: 🏆 **${winnerName}**`)
+          .setColor(0x00aeff);
+
+        try {
+          await interaction.message.delete();
+        } catch (e) {
+          console.warn("⚠️ Fehler beim Löschen der Select-Message:", e);
+        }
+
+        await interaction.channel?.send({ embeds: [embed] });
+
+        return interaction.deferUpdate();
+      }
+
     } catch (error) {
-      console.error("❌ Fehler bei Interaktion:", error);
-      if (interaction.isRepliable()) {
+      console.error("❌ Fehler bei Interaktion:", error)
+
+      if (interaction.isRepliable() && !interaction.replied && !interaction.deferred) {
         await interaction.reply({
           content: "❌ Es ist ein Fehler aufgetreten.",
           ephemeral: true
-        });
+        }).catch(() => {})
       }
+
     }
   });
 

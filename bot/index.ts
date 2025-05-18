@@ -8,6 +8,7 @@ import { registerPrefixCommands } from "@modules/message/prefixRouter";
 import { getDiscordToken } from "@config/secrets";
 import { logSystem } from "@services/internal/log";
 
+
 // 🟢 Initialisierung
 logSystem("🟢 M.E.A.T. wird initialisiert...");
 

@@ -58,8 +58,14 @@ export async function registerSlashCommands(token: string, isGlobal = false) {
   const commands = await getSlashCommandData();
 
   try {
+    // 🔥 Schritt 1: Alte Commands entfernen
+    logSystem(`🧽 Entferne alte ${isGlobal ? "globalen" : "guild"}-Commands...`);
+    await rest.put(route, { body: [] });
+
+    // ✅ Schritt 2: Neue Commands registrieren
     logSystem(`🔁 Slash-Commands werden ${isGlobal ? "global" : "guild-basiert"} registriert...`);
     await rest.put(route, { body: commands });
+
     logSystem(`✅ Slash-Commands erfolgreich registriert (${commands.length})`);
   } catch (error) {
     console.error("❌ Fehler bei Slash-Command-Registrierung:", error);

@@ -72,3 +72,56 @@ model Vote {
   game      FunGame  @relation(fields: [gameId], references: [id])
   poll      Poll     @relation(fields: [pollId], references: [id])
 }
+
+enum DinoColor {
+  rot
+  gruen
+  blau
+  gelb
+  orange
+  lila
+  braun
+  pink
+  schwarz
+  weiss
+}
+
+enum DinoType {
+  fleischfresser
+  vegetarier
+}
+
+enum DinoSize {
+  klein
+  mittel
+  gross
+}
+
+enum DinoStyle {
+  suess
+  gefaehrlich
+  trashig
+  nobel
+  nerdig
+  rtl
+}
+
+model DinoName {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  color       DinoColor?  // Optional – Auswahl wie im Modal
+  type        DinoType?   // Optional
+  size        DinoSize?   // Optional
+  style       DinoStyle?  // Optional
+
+  approved    Boolean     @default(false)
+  submittedBy String?     // Discord User ID
+  createdAt   DateTime    @default(now())
+}
+
+model DinoStats {
+  id           Int      @id @default(autoincrement())
+  totalUses    Int      @default(0)
+  totalRerolls Int      @default(0)
+  updatedAt    DateTime @updatedAt
+}

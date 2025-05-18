@@ -5,6 +5,8 @@ import {
   PermissionsBitField
 } from "discord.js";
 import { createFeedback } from "@services/feedback/createFeedback.js";
+import fs from "fs";
+import path from "path";
 
 export async function handleFeedbackModal(interaction: ModalSubmitInteraction) {
   console.log("✅ handleFeedbackModal() wurde aufgerufen");
@@ -47,7 +49,20 @@ export async function handleFeedbackModal(interaction: ModalSubmitInteraction) {
   });
 
   // 📢 Channel-Post mit Rollenanzeige
-  const feedbackChannelId = "1364920956954607737"; // Dein Channel hier
+  const settingsPath = path.resolve("config/serverSettings.json");
+  let feedbackChannelId: string | undefined;
+
+  if (interaction.guildId) {
+    const settingsRaw = fs.readFileSync(settingsPath, "utf-8");
+    const serverSettings = JSON.parse(settingsRaw);
+    feedbackChannelId = serverSettings.guilds?.[interaction.guildId]?.feedbackChannelId;
+  }
+
+  if (!feedbackChannelId) {
+    console.warn(`⚠️ Kein Feedback-Channel für Guild ${interaction.guildId} gefunden.`);
+    return;
+  }
+
   const logChannel = interaction.client.channels.cache.get(feedbackChannelId) as TextChannel;
 
   if (logChannel?.isTextBased()) {
