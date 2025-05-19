@@ -50,7 +50,7 @@ export async function handleFeedbackModal(interaction: ModalSubmitInteraction) {
       { name: "Feedback", value: description }
     )
     .setColor(0x00b5cc)
-    .setFooter({ text: `Systemstatus: Eingabe empfangen • M.E.A.T. läuft` });
+    .setFooter({ text: `Systemstatus: Eingabe empfangen • Die Mods müssen es nur noch lesen` });
 
   await interaction.reply({
     embeds: [userEmbed],
@@ -86,6 +86,10 @@ export async function handleFeedbackModal(interaction: ModalSubmitInteraction) {
       .map(role => `<@&${role.id}>`)
       .join(" ");
 
+    const member = await interaction.guild?.members.fetch(interaction.user.id);
+    const displayName = member?.displayName || interaction.user.username;
+    const avatarUrl = interaction.user.displayAvatarURL({ extension: "png", size: 128 });
+
     const publicEmbed = new EmbedBuilder()
       .setTitle(`Neues Feedback #${protocolNo}`)
       .addFields(
@@ -94,7 +98,11 @@ export async function handleFeedbackModal(interaction: ModalSubmitInteraction) {
       )
       .setColor(0x00b5cc)
       .setTimestamp()
-      .setFooter({ text: `Empfangen am ${new Date().toLocaleString("de-DE")}` });
+      .setThumbnail(avatarUrl)
+      .setFooter({
+        text: `Von ${displayName} • Empfangen am ${new Date().toLocaleString("de-DE")}`,
+        iconURL: avatarUrl
+      });
 
     if (roleMentions) {
       publicEmbed.addFields({ name: "Berechtigte Rollen", value: roleMentions });

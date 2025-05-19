@@ -73,8 +73,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       {
         name: 'Technik & Boosts',
         value: [
-            `${safe(emoji.meat_boosts)} Boosts \`${f(boosts)}\``,
-            `${safe(emoji.meat_boostlevel)} Boost-Stufe \`${boostLevel}\``,
+            `${safe(emoji.meat_boost)} Boosts \`${f(boosts)}\``,
+            `${safe(emoji.meat_boost)} Boost-Stufe \`${boostLevel}\``,
             `${safe(emoji.meat_categories)} Kategorien \`${f(categories)}\``,
             `${safe(emoji.meat_threads)} Threads/Foren \`${f(threads)}\``,
             `${safe(emoji.meat_emojis)} Emojis \`${f(emojis)}\``,

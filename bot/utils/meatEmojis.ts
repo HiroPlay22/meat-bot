@@ -7,6 +7,10 @@ export const emoji = {
   meat_discord: '<:meat_discord:1373694059352166522>',
   meat_github: '<:meat_hub:1373697340556447865>',
   meat_avatar: '<:meat_core:1373697438073884692>',
+  meat_version: '<:meat_version:1373694029539184870>',
+  meat_boss: '<:meat_boss:1374064288997576805>',
+  meat_boost: '<:meat_boost:1374064286208495757>',
+  meat_calendar: '<:meat_calendar:1374064287751864481>',
 
   // 📊 Globale Bot-Stats
   meat_servers: '<:meat_servers:1373694046194761779>',

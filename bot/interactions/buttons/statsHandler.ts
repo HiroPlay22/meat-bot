@@ -83,8 +83,8 @@ export async function handleStatsButton(interaction: ButtonInteraction, view: st
           {
             name: 'Technik & Boosts',
             value: [
-              `${safe(emoji.meat_boosts)} Boosts \`${f(boosts)}\``,
-              `${safe(emoji.meat_boostlevel)} Boost-Stufe \`${boostLevel}\``,
+              `${safe(emoji.meat_boost)} Boosts \`${f(boosts)}\``,
+              `${safe(emoji.meat_boost)} Boost-Stufe \`${boostLevel}\``,
               `${safe(emoji.meat_categories)} Kategorien \`${f(categories)}\``,
               `${safe(emoji.meat_threads)} Threads/Foren \`${f(threads)}\``,
               `${safe(emoji.meat_emojis)} Emojis \`${f(emojis)}\``,
@@ -203,7 +203,7 @@ export async function handleStatsButton(interaction: ButtonInteraction, view: st
           {
             name: 'Links',
             value: [
-              `${safe(emoji.meat_website)} M.E.A.T HQ [meatbot.de](https://meatbot.de)`,
+              `${safe(emoji.meat_avatar)} M.E.A.T HQ [meatbot.de](https://meatbot.de)`,
               `${safe(emoji.meat_github)} GitHub [Repo](https://github.com/HiroPlay22/meat-bot)`,
               `${safe(emoji.meat_discord)} Discord [Server](https://discord.gg/uZurfaWVPa)`
             ].join('\n'),

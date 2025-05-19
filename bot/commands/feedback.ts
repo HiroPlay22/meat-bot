@@ -22,9 +22,9 @@ import {
   
     const embed = createStandardEmbed({
       module: "feedback",
-      moduleName: "Unser Feedback-Protokoll",
+      moduleName: "Feedback-Protokoll",
       user: interaction.user,
-      title: `📡 Unser Feedback-Protokoll #${protocolNo.toString().padStart(4, "0")}`,
+      title: `Feedback-Protokoll #${protocolNo.toString().padStart(4, "0")}`,
       bodyText:
         "Willkommen im M.E.A.T.-Archiv.\n" +
         "Hier kannst du Lob, Bugs oder Ideen einreichen.\n" +
