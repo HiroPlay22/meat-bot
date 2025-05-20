@@ -4,8 +4,16 @@
       "modCategoryId": "1373610328507551784",
       "dinonameSuggestionChannelId": "1373610620372385895",
       "feedbackChannelId": "1373610456358457344",
+      "joinChannelId": "390936188795617301",
       "allowedPollRoles": [],
-      "allowAnonymousFeedback": true
+      "allowAnonymousFeedback": true,
+      "welcomeChannels": {
+        "rules": "747117359071756357",
+        "firstText": "271568768268894218",
+        "firstVoice": "749646065019388016",
+        "extraInfo": "375986070271033344",
+        "starterChannel": "925325312567427123"
+      }
     }
   }
 }

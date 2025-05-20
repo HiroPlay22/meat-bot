@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "node16",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -17,9 +17,9 @@
       "@modules/*": ["bot/modules/*"],
       "@utils/*": ["bot/utils/*"],
       "@commands/*": ["bot/commands/*"],
-      "@interactions/*": ["bot/interactions/*"],
+      "@interactions/*": ["bot/interactions/*"]
     },
-    "types": ["node", "discord.js"]  // Füge discord.js zu den Typen hinzu
+    "types": ["node", "discord.js"]
   },
   "include": ["bot", "web", "config", "database", "types"],
   "exclude": ["node_modules", "dist"]
