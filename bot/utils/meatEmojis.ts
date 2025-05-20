@@ -1,4 +1,4 @@
-// utils/meatEmojis.ts
+// File: utils/meatEmojis.ts
 
 export const emoji = {
   // 🧠 M.E.A.T. Core & System
@@ -18,12 +18,17 @@ export const emoji = {
   meat_channels: '<:meat_channels:1373694042985992272>',
   meat_commands: '<:meat_commands:1373694040176070779>',
 
-  // 🏠 Server Stats
+  // 🏠 Server Stats (verwendet im /info)
   meat_members: '<:meat_user:1373694031124627478>',
   meat_online: '<:meat_online:1373697659478478888>',
   meat_text: '<:meat_text:1373694036614971484>',
   meat_voice: '<:meat_voice:1373694035151028417>',
   meat_roles: '<:meat_roles:1373694032462614528>',
+  meat_threads: '<:meat_threads:ID>',               // NEW
+  meat_afk: '<:meat_afk:ID>',                       // NEW
+  meat_lock: '<:meat_lock:ID>',                     // NEW (2FA + Sicherheitsstufe)
+  meat_nsfw: '<:meat_nsfw:ID>',                     // NEW
+  meat_feature: '<:meat_feature:ID>',               // NEW (Features wie Community etc.)
 
   // 🦖 Aktivität & Features
   meat_dinos: '<:meat_dinos:ID>',
@@ -39,5 +44,5 @@ export const emoji = {
 
 // 🔒 Sicheres Einfügen von Emojis, falls ID noch fehlt
 export function safe(icon: string | undefined, fallback = emoji.meat_leer): string {
-  return icon && !icon.includes(':ID') ? icon : fallback
+  return icon && !icon.includes(':ID') ? icon : fallback;
 }

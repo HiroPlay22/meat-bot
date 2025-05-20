@@ -522,6 +522,15 @@ export async function registerInteractions(client: Client) {
         const { handleStatsButton } = await import("@interactions/buttons/statsHandler.js")
         return await handleStatsButton(interaction, view)
       }
+      
+      // In deiner zentralen Interaktions-Logik:
+      if (interaction.isButton()) {
+        if (interaction.customId === 'open_stats') {
+          // Direktes Einsteigen in den Stats-Modus mit Default „server“
+          const { handleStatsButton } = await import('@/interactions/buttons/statsHandler.js')
+          return handleStatsButton(interaction, 'server')
+        }
+      }
 
 
     } catch (error) {
