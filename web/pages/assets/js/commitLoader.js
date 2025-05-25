@@ -1,13 +1,10 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const commitBox = document.getElementById("commitLog");
-
   if (!commitBox) return;
 
   try {
     const res = await fetch("https://api.github.com/repos/HiroPlay22/meat-bot/commits?per_page=5");
     const commits = await res.json();
-
-    if (!Array.isArray(commits)) throw new Error("No commit data");
 
     commitBox.innerHTML = commits
       .map(
