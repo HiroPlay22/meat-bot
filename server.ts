@@ -7,27 +7,26 @@ import handleStatsRequest from './api/stats/index.js';
 
 const app = express();
 
-// 📍 ESM-kompatibles __dirname erzeugen
+// 🧭 Pfad-Hilfen
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ✅ API-Routen immer ZUERST definieren
+// 📡 API zuerst
 app.get('/api/stats', (req, res) => {
-  console.log("📡 [API] /api/stats wurde aufgerufen");
+  console.log("📡 [API] /api/stats aufgerufen");
   const client = globalThis.discordClient as Client;
   return handleStatsRequest(req, res, client);
 });
 
-// ✅ Danach statische Inhalte freigeben
-const publicPath = path.resolve(__dirname, 'web/pages');
-app.use(express.static(publicPath));
+// 🌍 Statische Dateien (z. B. CSS, JS, Bilder) – aus web/pages/assets
+app.use('/assets', express.static(path.resolve(__dirname, 'web/pages/assets')));
 
-// ✅ Fallback für nicht definierte Routen
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route nicht gefunden.' });
+// 🏠 HTML-Seite für alle anderen Routen
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'web/pages/index.html'));
 });
 
-// ✅ Server starten
+// 🚀 Serverstart
 app.listen(3000, () => {
   console.log('🌐 Webserver läuft unter http://localhost:3000');
 });
