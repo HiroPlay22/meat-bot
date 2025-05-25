@@ -1,14 +1,31 @@
-import "dotenv/config";                 // Lädt .env-Variablen
-import "tsconfig-paths/register";       // Aktiviert Pfad-Aliase wie @config/*
+// run-dev.ts
+import "dotenv/config";
+import "tsconfig-paths/register";
 
-console.log("🟢 Starte M.E.A.T. über run-dev.ts ...");
+console.log("🟢 Starte M.E.A.T. (Bot + Webserver)...");
 
-// ✅ "file://" URL erzeugen – damit Windows & Node den Pfad verstehen
-const entryUrl = new URL("./bot/index.ts", import.meta.url);
+// Helper für file:// -> Pfade (weil wir ESM sind)
+import { fileURLToPath } from "url";
+import path from "path";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-import(entryUrl.href)
-  .then(() => console.log("✅ Bot gestartet."))
-  .catch((err) => {
+async function start() {
+  try {
+    // 1. 🧠 BOT starten
+    const botPath = path.resolve(__dirname, "bot/index.ts");
+    await import(`file://${botPath}`);
+    console.log("✅ Bot-Modul geladen.");
+
+    // 2. 🌐 Webserver starten
+    const serverPath = path.resolve(__dirname, "server.ts");
+    await import(`file://${serverPath}`);
+    console.log("✅ Webserver-Modul geladen.");
+
+  } catch (err) {
     console.error("❌ Fehler beim Start:", err);
     process.exit(1);
-  });
+  }
+}
+
+start();
