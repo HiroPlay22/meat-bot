@@ -7,16 +7,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     const commits = await res.json();
 
     commitBox.innerHTML = commits
-      .map(
-        (commit) => `
-        <div class="border border-zinc-700 rounded p-3 bg-zinc-900">
-          <div class="text-white font-semibold mb-1">${commit.commit.message.split("\n")[0]}</div>
-          <div class="text-gray-400 text-xs">
-            ${new Date(commit.commit.author.date).toLocaleString("de-DE")} – ${commit.commit.author.name}
-          </div>
-          <a href="${commit.html_url}" class="text-blue-400 text-xs underline hover:text-blue-200 mt-1 inline-block">Commit ansehen →</a>
-        </div>`
-      )
+      .map((commit) => {
+        const date = new Date(commit.commit.author.date).toLocaleString("de-DE", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        return `
+        <div class="flex items-center gap-3 text-sm text-gray-400">
+          <span class="whitespace-nowrap text-xs text-zinc-500">${date}</span>
+          <span class="text-blue-400 truncate max-w-[60%]">${commit.commit.message.split("\n")[0]}</span>
+          <a href="${commit.html_url}" target="_blank" class="ml-auto text-xs px-2 py-[2px] border border-zinc-600 rounded hover:text-white hover:border-white transition">Commit</a>
+        </div>`;
+      })
       .join("");
   } catch (err) {
     console.error("Fehler beim Laden der Commits:", err);
