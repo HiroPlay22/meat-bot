@@ -10,8 +10,8 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ✅ ⬅️ API zuerst
 app.get('/api/stats', (req, res) => {
+  console.log("📡 API /api/stats wurde aufgerufen");
   const client = globalThis.discordClient as Client;
   return handleStatsRequest(req, res, client);
 });
