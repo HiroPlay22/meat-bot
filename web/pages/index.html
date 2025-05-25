@@ -376,11 +376,23 @@
             </h4>
             <div id="calendar" class="vanilla-calendar w-full"></div>
         </div>
+        <!-- Neue System-Auslastung -->
         <div class="bg-zinc-800 p-6 rounded-xl shadow">
-            <h4 class="text-lg font-semibold text-white mb-2">
-                <i class="fa-sm fa-solid fa-terminal mr-2"></i>Command-Nutzung <span class="text-xs text-gray-400">(heute)</span>
-            </h4>
-            <canvas id="commandChart" class="w-full"></canvas>
+          <h4 class="text-lg font-semibold text-white mb-2">
+            <i class="fa-sm fa-solid fa-microchip mr-2"></i>System-Auslastung <span class="text-xs text-gray-400">(live)</span>
+          </h4>
+
+          <!-- CPU -->
+          <div class="mb-4">
+            <p class="text-xs text-gray-400 mb-1">CPU-Auslastung</p>
+            <canvas id="cpuChart" height="60"></canvas>
+          </div>
+
+          <!-- RAM -->
+          <div>
+            <p class="text-xs text-gray-400 mb-1">RAM-Auslastung</p>
+            <canvas id="ramChart" height="60"></canvas>
+          </div>
         </div>
         <div class="bg-zinc-800 p-6 rounded-xl shadow">
             <h4 class="text-lg font-semibold text-white mb-2">
