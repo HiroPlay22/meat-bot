@@ -6,9 +6,24 @@ import { logSystem } from '@services/internal/log';
 import { handleMemberJoin } from '@modules/join/index.js';
 import { loadSlashCommands } from './loader/commandLoader.js';
 import presenceUpdate from './listeners/presenceUpdate.js';
+import { writeBotStatus } from "./utils/writeBotStatus.js";
 
 // 🟢 Initialisierung (nur Konsole)
 logSystem('🟢 M.E.A.T. wird initialisiert...');
+
+// ✅ Botstatus: online
+writeBotStatus("online");
+
+// Graceful Shutdown
+process.on("exit", () => writeBotStatus("offline"));
+process.on("SIGINT", () => {
+  writeBotStatus("offline");
+  process.exit();
+});
+process.on("SIGTERM", () => {
+  writeBotStatus("offline");
+  process.exit();
+});
 
 // Discord-Client Setup
 const client = new Discord.Client({
