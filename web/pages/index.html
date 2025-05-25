@@ -17,19 +17,41 @@
         <script src="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro@1.7.1/build/vanilla-calendar.min.js"></script>
 
         <script>
-          // Fallback nur falls fetch fehlschlägt
           window.BOT_STATUS = "offline";
 
           fetch("assets/json/bot-status.json")
-            .then(res => res.json())
-            .then(data => {
+            .then((res) => res.json())
+            .then((data) => {
               window.BOT_STATUS = data.status || "offline";
+
+              const isOnline = window.BOT_STATUS === "online";
+
+              document.addEventListener("DOMContentLoaded", () => {
+                const tipBox = document.getElementById("meat-tip-text");
+                const tipWrapper = document.getElementById("meat-tip-box");
+
+                const highlightCommands = () => {
+                  const commandRegex = /\/[a-zäöüß0-9_-]+/gi;
+                  tipBox.innerHTML = tipBox.textContent.replace(commandRegex, (match) => {
+                    return `<span class='inline-block text-xs font-mono px-2 py-[1px] rounded border border-zinc-800 text-white bg-zinc-950 shadow-sm tracking-tight'>${match}</span>`;
+                  });
+                };
+
+                tipWrapper.classList.toggle("meat-alert--offline", !isOnline);
+
+                const onlineTips = [/* ... */];
+                const offlineTips = [/* ... */];
+
+                const selectedTips = isOnline ? onlineTips : offlineTips;
+                const randomTip = selectedTips[Math.floor(Math.random() * selectedTips.length)];
+                tipBox.textContent = randomTip;
+                highlightCommands();
+              });
             })
             .catch(() => {
-              console.warn("Konnte bot-status.json nicht laden.");
+              console.warn("Bot-Status konnte nicht geladen werden.");
             });
         </script>
-
 
     </head>
 
@@ -564,24 +586,6 @@
                 }
 
                 nextLog();
-                // ⬇️ Avatar-Status dynamisch aktualisieren nach Log-Ende
-                setTimeout(() => {
-                  const currentStatus = window.BOT_STATUS;
-                  if (currentStatus === "online") {
-                    onlineStatus.textContent = "[ONLINE]";
-                    onlineStatus.classList.remove("text-red-400");
-                    onlineStatus.classList.add("text-green-400");
-                    card.classList.replace("bg-zinc-800", "bg-green-950");
-                    wrapper.classList.replace("border-zinc-700", "border-green-500");
-                    card.classList.add("pulse-green");
-                  } else {
-                    onlineStatus.textContent = "[OFFLINE]";
-                    onlineStatus.classList.remove("text-green-400");
-                    onlineStatus.classList.add("text-red-400");
-                    card.classList.replace("bg-zinc-800", "bg-red-950");
-                    wrapper.classList.replace("border-zinc-700", "border-red-500");
-                  }
-                }, 1800); // ⏱️ kommt nach overlay transition
             });
         </script>
         <script>
