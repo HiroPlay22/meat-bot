@@ -1,61 +1,18 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>M.E.A.T. HQ</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-            crossorigin="anonymous" />
-        <link rel="stylesheet" href="assets/css/style.css" />
-        <link
-            rel="stylesheet"
-            href="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro@1.7.1/build/vanilla-calendar.min.css" />
-        <script src="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro@1.7.1/build/vanilla-calendar.min.js"></script>
-
-        <script>
-          window.BOT_STATUS = "offline";
-
-          fetch("assets/json/bot-status.json")
-            .then((res) => res.json())
-            .then((data) => {
-              window.BOT_STATUS = data.status || "offline";
-
-              const isOnline = window.BOT_STATUS === "online";
-
-              document.addEventListener("DOMContentLoaded", () => {
-                const tipBox = document.getElementById("meat-tip-text");
-                const tipWrapper = document.getElementById("meat-tip-box");
-
-                const highlightCommands = () => {
-                  const commandRegex = /\/[a-zäöüß0-9_-]+/gi;
-                  tipBox.innerHTML = tipBox.textContent.replace(commandRegex, (match) => {
-                    return `<span class='inline-block text-xs font-mono px-2 py-[1px] rounded border border-zinc-800 text-white bg-zinc-950 shadow-sm tracking-tight'>${match}</span>`;
-                  });
-                };
-
-                tipWrapper.classList.toggle("meat-alert--offline", !isOnline);
-
-                const onlineTips = [/* ... */];
-                const offlineTips = [/* ... */];
-
-                const selectedTips = isOnline ? onlineTips : offlineTips;
-                const randomTip = selectedTips[Math.floor(Math.random() * selectedTips.length)];
-                tipBox.textContent = randomTip;
-                highlightCommands();
-              });
-            })
-            .catch(() => {
-              console.warn("Bot-Status konnte nicht geladen werden.");
-            });
-        </script>
-
-    </head>
-
-    <body class="bg-zinc-900 text-white font-sans min-h-screen">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>M.E.A.T. HQ</title>
+  <!-- styles and libs -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro@1.7.1/build/vanilla-calendar.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro@1.7.1/build/vanilla-calendar.min.js"></script>
+</head>
+<body class="bg-zinc-900 text-white font-sans min-h-screen">
         <nav class="bg-zinc-800 px-6 py-4 flex justify-between items-center shadow-md">
             <img src="assets/img/meat_logo1.png" alt="Profil" class="w-10 h-10" />
             <div class="flex items-center space-x-6">
@@ -693,7 +650,6 @@
 </script>
 <script src="assets/js/statsLoader.js"></script>
 <script src="assets/js/commitLoader.js"></script>
-
-
+<script src="assets/js/statusLoader.js"></script>
     </body>
 </html>
