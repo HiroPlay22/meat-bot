@@ -546,8 +546,8 @@
             });
         </script>
         <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const isOnline = window.BOT_STATUS === "online";
+  document.addEventListener("botstatus:ready", (e) => {
+    const isOnline = e.detail.status === "online";
 
     // Beispielwerte (später via Backend dynamisch befüllbar).
     const botStats = {
