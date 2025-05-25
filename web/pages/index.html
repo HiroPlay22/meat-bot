@@ -17,8 +17,18 @@
         <script src="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro@1.7.1/build/vanilla-calendar.min.js"></script>
 
         <script>
-            window.BOT_STATUS = "offline"; // <<< HIER umstellen auf "offline". Später dynamisch!
+          window.BOT_STATUS = "offline"; // Fallback
+
+          fetch("bot-status.json")
+            .then((res) => res.json())
+            .then((data) => {
+              window.BOT_STATUS = data.status || "offline";
+            })
+            .catch(() => {
+              console.warn("Bot-Status konnte nicht geladen werden.");
+            });
         </script>
+
     </head>
 
     <body class="bg-zinc-900 text-white font-sans min-h-screen">
