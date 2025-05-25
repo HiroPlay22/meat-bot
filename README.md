@@ -20,3 +20,4 @@ Powered by Hiro – forever burned into the M.E.A.T.-core
 M.E.A.T. Custom License v1.0
 Keine öffentliche Nutzung oder Weitergabe ohne schriftliche Genehmigung.
 Exklusiv für autorisierte Systeme und Server vorgesehen.// test
+// ping webhook
