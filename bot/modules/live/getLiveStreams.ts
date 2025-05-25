@@ -1,5 +1,7 @@
 import fetch from 'node-fetch';
-import { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET } from '@/config/secrets';
+
+const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID!;
+const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET!;
 
 let cachedAccessToken: string | null = null;
 let tokenExpiresAt = 0;
@@ -11,7 +13,7 @@ async function getAccessToken(): Promise<string> {
     return cachedAccessToken;
   }
 
-  const res = await fetch(`https://id.twitch.tv/oauth2/token`, {
+  const res = await fetch('https://id.twitch.tv/oauth2/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({

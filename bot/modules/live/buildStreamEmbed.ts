@@ -1,49 +1,45 @@
+// 📄 modules/live/buildStreamEmbed.ts
+
 import {
   EmbedBuilder,
   ActionRowBuilder,
   ButtonBuilder,
-  ButtonStyle,
-  User,
-  type Activity,
-  type APIEmbedField,
+  ButtonStyle
 } from 'discord.js';
-import { getSafeTwitchThumbnail } from './getSafeTwitchThumbnail.js';
 import { emoji } from '@/utils/meatEmojis.js';
+import { getSafeTwitchThumbnail } from './getSafeTwitchThumbnail.js';
 
-export async function buildStreamEmbed(user: User, activity: Activity) {
-  const url = activity.url ?? '';
-  const isTwitch = url.includes('twitch.tv');
-  const isYouTube = url.includes('youtube.com') || url.includes('youtu.be');
+type StreamData = {
+  username: string;
+  title: string;
+  game: string;
+  viewers: number;
+  thumbnail: string;
+};
 
-  const username = url.split('/').pop() ?? user.username;
-
-  const thumbnail = isTwitch
-    ? getSafeTwitchThumbnail(username)
-    : 'https://i.ytimg.com/vi_webp/default/hqdefault.webp'; // optional YouTube fallback
-
-  const platformColor = isTwitch ? '#9146FF' : isYouTube ? '#FF0000' : '#666666';
-  const platformIcon = isTwitch ? emoji.twitch : isYouTube ? emoji.youtube : emoji.meat_leer;
-  const platformName = isTwitch ? 'Twitch' : isYouTube ? 'YouTube' : 'Stream';
+export async function buildStreamEmbed(stream: StreamData) {
+  const url = `https://twitch.tv/${stream.username}`;
+  const thumbnail = getSafeTwitchThumbnail(stream.username);
 
   const embed = new EmbedBuilder()
-    .setColor(platformColor)
+    .setColor('#9146FF')
     .setAuthor({
-      name: `${user.username} streamt: ${activity.state ?? 'Unbekannt'}`,
-      iconURL: user.displayAvatarURL(),
+      name: `${stream.username} ist jetzt live!`,
+      iconURL: 'https://static.twitchcdn.net/assets/favicon-32-e29e246c157142c94346.png'
     })
     .setImage(thumbnail)
-    .setDescription(`${emoji.stream} ${activity.details ?? `Live auf ${platformName}`}\n${emoji.text} ${activity.name ?? 'Stream läuft!'}`)
+    .setDescription(`${emoji.stream} ${stream.title}\n${emoji.text} Stream läuft auf Twitch`)
     .addFields([
-      { name: `${emoji.user}`, value: username, inline: true },
-      { name: `${emoji.viewers}`, value: '— Zuschauer', inline: true },
-      { name: `${emoji.category} Kategorie`, value: activity.state ?? '—', inline: true },
+      { name: `${emoji.user}`, value: stream.username, inline: true },
+      { name: `${emoji.viewers}`, value: `${stream.viewers} Zuschauer`, inline: true },
+      { name: `${emoji.category} Kategorie`, value: stream.game || '—', inline: true }
     ])
-    .setFooter({ text: 'Letzte Aktivität: Jetzt' });
+    .setFooter({ text: 'Live via Twitch API' });
 
   const button = new ButtonBuilder()
-    .setLabel(`▶️ Zum Stream auf ${platformName}`)
+    .setLabel(`▶️ Zum Stream`)
     .setStyle(ButtonStyle.Link)
-    .setEmoji(platformIcon)
+    .setEmoji(emoji.twitch)
     .setURL(url);
 
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(button);
