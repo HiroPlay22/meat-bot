@@ -185,8 +185,8 @@
 
             <!-- ✅ Tipps je nach Status -->
             <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                    const isOnline = window.BOT_STATUS === "online";
+                document.addEventListener("botstatus:ready", (e) => {
+                    const isOnline = e.detail.status === "online";
                     const tipBox = document.getElementById("meat-tip-text");
                     const highlightCommands = () => {
                         const commandRegex = /\/[a-zäöüß0-9_-]+/gi;
