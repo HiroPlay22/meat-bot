@@ -16,7 +16,7 @@ async function start() {
     await import(`file://${botPath}`);
     console.log("✅ Bot-Modul geladen.");
 
-    // ✅ SERVER laden (WICHTIG!)
+    // ✅ SERVER laden
     const serverPath = path.resolve(__dirname, "server.ts");
     await import(`file://${serverPath}`);
     console.log("✅ Webserver-Modul geladen.");
