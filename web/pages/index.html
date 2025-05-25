@@ -445,42 +445,42 @@
   </div>
 </div>
 
-<div class="bg-zinc-800 p-6 rounded-xl shadow w-full text-white text-sm">
-                        <h4 class="text-lg font-semibold text-white mb-4 flex items-center">
-                            <i class="fa-sm fa-solid fa-calendar-days mr-2"></i>Eventkalender
-                        </h4>
-                        <div id="calendar" class="vanilla-calendar w-full"></div>
-                    </div>
-                    <div class="bg-zinc-800 p-6 rounded-xl shadow">
-                        <h4 class="text-lg font-semibold text-white mb-2">
-                            <i class="fa-sm fa-solid fa-terminal mr-2"></i>Command-Nutzung <span class="text-xs text-gray-400">(heute)</span>
-                        </h4>
-                        <canvas id="commandChart" class="w-full"></canvas>
-                    </div>
-                    <div class="bg-zinc-800 p-6 rounded-xl shadow">
-                        <h4 class="text-lg font-semibold text-white mb-2">
-                            <i class="fa-sm fa-solid fa-user mr-2"></i>User-Aktivität <span class="text-xs text-gray-400">(heute)</span>
-                        </h4>
-                        <canvas id="userRadarChart" class="w-full max-w-sm mx-auto"></canvas>
-                        <p class="text-xs text-green-400 mt-4 text-center">
-                            <i class="fa-solid fa-arrow-trend-up mr-1"></i>
-                            Trending up by 5.2% this month<br />
-                            <span class="text-zinc-500">January – June 2025</span>
-                        </p>
-                    </div>
-                    <div class="bg-zinc-800 p-4 rounded-lg border border-zinc-800 shadow flex flex-col justify-between text-sm font-mono">
-                      <div class="text-gray-400 text-xs mb-1">📅 2025-05-25</div>
-                      <div class="text-sky-400 font-semibold mb-2">Merge branch 'main' of https://github.com/HiroPlay22/meat-bot</div>
-                      <div class="flex justify-end">
-                        <a href="https://github.com/HiroPlay22/meat-bot/commits/main" target="_blank"
-                          class="text-gray-400 border border-zinc-700 px-3 py-1 text-xs rounded hover:bg-zinc-700 transition">
-                          git
-                        </a>
-                      </div>
-                    </div>
+        <div class="bg-zinc-800 p-6 rounded-xl shadow w-full text-white text-sm">
+            <h4 class="text-lg font-semibold text-white mb-4 flex items-center">
+                <i class="fa-sm fa-solid fa-calendar-days mr-2"></i>Eventkalender
+            </h4>
+            <div id="calendar" class="vanilla-calendar w-full"></div>
+        </div>
+        <div class="bg-zinc-800 p-6 rounded-xl shadow">
+            <h4 class="text-lg font-semibold text-white mb-2">
+                <i class="fa-sm fa-solid fa-terminal mr-2"></i>Command-Nutzung <span class="text-xs text-gray-400">(heute)</span>
+            </h4>
+            <canvas id="commandChart" class="w-full"></canvas>
+        </div>
+        <div class="bg-zinc-800 p-6 rounded-xl shadow">
+            <h4 class="text-lg font-semibold text-white mb-2">
+                <i class="fa-sm fa-solid fa-user mr-2"></i>User-Aktivität <span class="text-xs text-gray-400">(heute)</span>
+            </h4>
+            <canvas id="userRadarChart" class="w-full max-w-sm mx-auto"></canvas>
+            <p class="text-xs text-green-400 mt-4 text-center">
+                <i class="fa-solid fa-arrow-trend-up mr-1"></i>
+                Trending up by 5.2% this month<br />
+                <span class="text-zinc-500">January – June 2025</span>
+            </p>
+        </div>
+        <div class="bg-zinc-800 p-6 rounded-xl shadow w-full text-white text-sm">
+  <h4 class="text-lg font-semibold text-white mb-4 flex items-center justify-between">
+    <span><i class="fa-sm fa-solid fa-clock-rotate-left mr-2"></i>Letzte Updates</span>
+    <a href="https://github.com/HiroPlay22/meat-bot/commits/main" class="text-gray-400 text-xs border px-2 py-1 rounded hover:text-white hover:border-white">
+      Alle anzeigen
+    </a>
+  </h4>
+  <div id="commitLog" class="space-y-2 font-mono text-sm"></div>
+</div>
 
-                </div>
-            </section>
+
+    </div>
+</section>
 
             <footer class="mt-24 text-center text-sm text-gray-600">
                 <p>
@@ -724,23 +724,8 @@
   });
 </script>
 <script src="assets/js/statsLoader.js"></script>
-<script>
-fetch("meta/last-update.txt")
-  .then((res) => res.text())
-  .then((data) => {
-    const list = document.getElementById("updateHistory");
-    list.innerHTML = "";
-    data.trim().split("\n").slice(-5).reverse().forEach((line) => {
-      const li = document.createElement("li");
-      li.textContent = "📦 " + line;
-      list.appendChild(li);
-    });
-  })
-  .catch(() => {
-    const list = document.getElementById("updateHistory");
-    list.innerHTML = "<li class='text-red-500'>Fehler beim Laden</li>";
-  });
-</script>
+<script src="assets/js/commitLoader.js"></script>
+
 
     </body>
 </html>

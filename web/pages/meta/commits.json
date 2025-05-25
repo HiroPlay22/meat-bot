@@ -1,0 +1,12 @@
+[
+  {
+    "date": "2025-05-25",
+    "message": "Fix: korrigiere .env Handling",
+    "url": "https://github.com/HiroPlay22/meat-bot/commit/ab30854"
+  },
+  {
+    "date": "2025-05-24",
+    "message": "Feature: Git-Webhooks eingebunden",
+    "url": "https://github.com/HiroPlay22/meat-bot/commit/1cdef33"
+  }
+]
