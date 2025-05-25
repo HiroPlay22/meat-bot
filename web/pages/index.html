@@ -17,17 +17,19 @@
         <script src="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro@1.7.1/build/vanilla-calendar.min.js"></script>
 
         <script>
-          window.BOT_STATUS = "offline"; // Fallback
+          // Fallback nur falls fetch fehlschlägt
+          window.BOT_STATUS = "offline";
 
-          fetch("bot-status.json")
-            .then((res) => res.json())
-            .then((data) => {
+          fetch("assets/json/bot-status.json")
+            .then(res => res.json())
+            .then(data => {
               window.BOT_STATUS = data.status || "offline";
             })
             .catch(() => {
-              console.warn("Bot-Status konnte nicht geladen werden.");
+              console.warn("Konnte bot-status.json nicht laden.");
             });
         </script>
+
 
     </head>
 
