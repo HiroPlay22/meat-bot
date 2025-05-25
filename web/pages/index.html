@@ -564,6 +564,24 @@
                 }
 
                 nextLog();
+                // ⬇️ Avatar-Status dynamisch aktualisieren nach Log-Ende
+                setTimeout(() => {
+                  const currentStatus = window.BOT_STATUS;
+                  if (currentStatus === "online") {
+                    onlineStatus.textContent = "[ONLINE]";
+                    onlineStatus.classList.remove("text-red-400");
+                    onlineStatus.classList.add("text-green-400");
+                    card.classList.replace("bg-zinc-800", "bg-green-950");
+                    wrapper.classList.replace("border-zinc-700", "border-green-500");
+                    card.classList.add("pulse-green");
+                  } else {
+                    onlineStatus.textContent = "[OFFLINE]";
+                    onlineStatus.classList.remove("text-green-400");
+                    onlineStatus.classList.add("text-red-400");
+                    card.classList.replace("bg-zinc-800", "bg-red-950");
+                    wrapper.classList.replace("border-zinc-700", "border-red-500");
+                  }
+                }, 1800); // ⏱️ kommt nach overlay transition
             });
         </script>
         <script>
