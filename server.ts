@@ -1,3 +1,5 @@
+
+console.log("🟢 server.ts wurde geladen – LIVE");
 // server.ts
 import express from 'express';
 import path from 'path';
