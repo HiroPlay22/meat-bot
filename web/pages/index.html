@@ -458,8 +458,8 @@
             });
         </script>
         <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                const isOnline = window.BOT_STATUS === "online";
+           document.addEventListener("botstatus:ready", (e) => {
+                const isOnline = e.detail.status === "online";
                 const logs = isOnline
                     ? [
                           "[✔] Discord ready",
