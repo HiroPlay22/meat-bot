@@ -372,26 +372,36 @@
                     <div>
 
   <div class="grid grid-cols-2 sm:grid-cols-2 gap-1 text-sm font-mono">
-    <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
-      <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Version</div>
-      <div class="text-violet-400 text-sm">v0.003-CONSTRUCT</div>
-    </div>
-    <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
-      <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">DB Größe</div>
-      <div class="text-lime-400 text-sm">142.3 MB</div>
-    </div>
-    <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
-      <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Command-Aufrufe</div>
-      <div class="text-white text-sm">31.532</div>
-    </div>
-    <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
-      <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Events erstellt</div>
-      <div class="text-white font-bold">437</div>
-    </div>
-    <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
-      <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Ø Reaktionszeit</div>
-      <div class="text-yellow-400 text-sm">87ms</div>
-    </div>
+    <!-- Version -->
+<div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
+  <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Version</div>
+  <div class="text-violet-400 text-sm" data-stat="version">–</div>
+</div>
+
+<!-- DB Größe -->
+<div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
+  <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">DB Größe</div>
+  <div class="text-lime-400 text-sm" data-stat="db-size">–</div>
+</div>
+
+<!-- Command-Aufrufe -->
+<div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
+  <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Command-Aufrufe</div>
+  <div class="text-white text-sm" data-stat="commands">–</div>
+</div>
+
+<!-- Events erstellt -->
+<div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
+  <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Events erstellt</div>
+  <div class="text-white font-bold" data-stat="events">–</div>
+</div>
+
+<!-- Ø Reaktionszeit -->
+<div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
+  <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Ø Reaktionszeit</div>
+  <div class="text-yellow-400 text-sm" data-stat="ping">–</div>
+</div>
+
     <div class="bg-zinc-800 p-3 rounded-lg border border-zinc-800 text-center shadow">
       <div class="text-gray-400 text-xs mb-1 uppercase tracking-widest">Gaming API-Insights</div>
       <div class="w-full h-5 bg-zinc-800 rounded overflow-hidden flex shadow-inner text-xs font-mono text-white">
@@ -492,90 +502,7 @@
                 // Liste bleibt geöffnet
             }
         </script>
-        <script>
-            const ctx1 = document.getElementById("commandChart").getContext("2d");
-            new Chart(ctx1, {
-                type: "bar",
-                data: {
-                    labels: ["!clip", "!event", "!poll", "!stats", "!feedback"],
-                    datasets: [
-                        {
-                            label: "Verwendung",
-                            data: [42, 31, 58, 25, 12],
-                            backgroundColor: "#ff002f"
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
-                }
-            });
-
-            const ctxRadar = document.getElementById("userRadarChart").getContext("2d");
-
-            new Chart(ctxRadar, {
-                type: "radar",
-                data: {
-                    labels: ["🗳️ Votings", "📅 Events", "💬 Feedback", "🎮 Game Interaktionen", "📈 Reaktionen"],
-                    datasets: [
-                        {
-                            label: "Total Uses",
-                            data: [85, 62, 44, 97, 88],
-                            fill: true,
-                            backgroundColor: "rgba(56,189,248,0.2)",
-                            borderColor: "#38bdf8",
-                            pointBackgroundColor: "#38bdf8",
-                            pointBorderColor: "#fff",
-                            pointHoverBackgroundColor: "#fff",
-                            pointHoverBorderColor: "#38bdf8"
-                        },
-                        {
-                            label: "Unique Users",
-                            data: [30, 26, 19, 40, 38],
-                            fill: true,
-                            backgroundColor: "rgba(167,139,250,0.2)",
-                            borderColor: "#a78bfa",
-                            pointBackgroundColor: "#a78bfa",
-                            pointBorderColor: "#fff",
-                            pointHoverBackgroundColor: "#fff",
-                            pointHoverBorderColor: "#a78bfa"
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    elements: {
-                        line: { borderWidth: 2 }
-                    },
-                    scales: {
-                        r: {
-                            angleLines: { color: "#444" },
-                            grid: { color: "#333" },
-                            pointLabels: {
-                                color: "#ccc",
-                                font: { size: 11 }
-                            },
-                            ticks: {
-                                color: "#999",
-                                backdropColor: "transparent",
-                                stepSize: 20
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            labels: { color: "#ccc" }
-                        }
-                    }
-                }
-            });
-        </script>
+        
         <script>
             document.addEventListener("DOMContentLoaded", () => {
                 const calendar = new VanillaCalendar("#calendar", {
@@ -785,6 +712,6 @@
     `;
   });
 </script>
-
+<script src="assets/js/statsLoader.js"></script>
     </body>
 </html>

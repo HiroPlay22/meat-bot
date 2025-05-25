@@ -10,7 +10,7 @@ import {
 
 export const data = new SlashCommandBuilder()
   .setName('dinoname')
-  .setDescription('Öffnet ARKitekt zur Dino-Namensgenerierung')
+  .setDescription('Namen generieren')
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const embed = new EmbedBuilder()

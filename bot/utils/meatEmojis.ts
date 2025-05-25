@@ -1,5 +1,3 @@
-// File: utils/meatEmojis.ts
-
 export const emoji = {
   // 🧠 M.E.A.T. Core & System
   meat_dev: '<:meat_dev:1373670733607338015>',
@@ -26,9 +24,9 @@ export const emoji = {
   meat_roles: '<:meat_roles:1373694032462614528>',
   meat_threads: '<:meat_threads:ID>',               // NEW
   meat_afk: '<:meat_afk:ID>',                       // NEW
-  meat_lock: '<:meat_lock:ID>',                     // NEW (2FA + Sicherheitsstufe)
+  meat_lock: '<:meat_lock:ID>',                     // NEW
   meat_nsfw: '<:meat_nsfw:ID>',                     // NEW
-  meat_feature: '<:meat_feature:ID>',               // NEW (Features wie Community etc.)
+  meat_feature: '<:meat_feature:ID>',               // NEW
 
   // 🦖 Aktivität & Features
   meat_dinos: '<:meat_dinos:ID>',
@@ -38,9 +36,20 @@ export const emoji = {
   meat_votes: '<:meat_votes:ID>',
   meat_fungames: '<:meat_fungames:ID>',
 
+  // 📺 Plattformen
+  twitch: '<:twitch:ID>',
+  youtube: '<:youtube:ID>',
+
+  // 🎥 Stream-Embed-Icons (zentral für buildStreamEmbed)
+  stream: '🎥',            // Titel des Streams
+  text: '📝',              // Beschreibung
+  user: '👤',              // Streamername
+  viewers: '👁️',          // Zuschauer
+  category: '🗂️',         // Kategorie / Spiel
+
   // Fallback
   meat_leer: '<:meat_leer:1373700191294722058>'
-}
+};
 
 // 🔒 Sicheres Einfügen von Emojis, falls ID noch fehlt
 export function safe(icon: string | undefined, fallback = emoji.meat_leer): string {

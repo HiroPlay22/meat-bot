@@ -36,7 +36,7 @@ const serverSettings: ServerSettings = raw;
 
 export const data = new SlashCommandBuilder()
   .setName('info')
-  .setDescription('Zeigt alle wichtigen Infos über diesen Server.');
+  .setDescription('Zeige Serverinfos');
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const guild = interaction.guild;

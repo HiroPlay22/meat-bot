@@ -86,11 +86,42 @@ export async function registerInteractions(client: Client) {
       // === 1. Slash Commands ===
       if (interaction.isChatInputCommand()) {
         const handler = commandMap.get(interaction.commandName);
+        const userMention = `<@${interaction.user.id}>`;
+        const userId = interaction.user.id;
+
+        await logSystem(
+          `🧾 /${interaction.commandName} ausgeführt von ${userMention} (ID: ${userId})`,
+          interaction.client
+        );
+
         if (!handler) {
-          logSystem(`⚠️ Kein Handler für Slash-Command: ${interaction.commandName}`);
-          return interaction.reply({ content: "Unbekannter Befehl.", ephemeral: true });
+          await logSystem(
+            `⚠️ Kein Handler für Slash-Command: /${interaction.commandName}`,
+            interaction.client
+          );
+          return interaction.reply({
+            content: "Unbekannter Befehl.",
+            ephemeral: true
+          });
         }
-        await handler(interaction as ChatInputCommandInteraction);
+
+        try {
+          await handler(interaction as ChatInputCommandInteraction);
+        } catch (err) {
+          const errMsg = err instanceof Error ? err.message : String(err);
+          await logSystem(
+            `❌ Fehler bei /${interaction.commandName} von ${userMention}: ${errMsg}`,
+            interaction.client
+          );
+
+          if (!interaction.replied && !interaction.deferred) {
+            await interaction.reply({
+              content: "Beim Ausführen des Befehls ist ein Fehler aufgetreten.",
+              ephemeral: true
+            }).catch(() => {});
+          }
+        }
+
         return;
       }
 
@@ -534,16 +565,37 @@ export async function registerInteractions(client: Client) {
 
 
     } catch (error) {
-      console.error("❌ Fehler bei Interaktion:", error)
+      console.error("❌ Fehler bei Interaktion:", error);
+
+      const userMention = `<@${interaction.user?.id ?? '??'}>`;
+      const displayName = (interaction.member as any)?.displayName || interaction.user?.tag || 'Unbekannt';
+
+      let identifier = 'Unbekannte Interaktion';
+      if (interaction.isChatInputCommand()) {
+        identifier = `/${interaction.commandName}`;
+      } else if (
+        interaction.isButton() ||
+        interaction.isStringSelectMenu() ||
+        interaction.isModalSubmit()
+      ) {
+        identifier = `CustomID: ${interaction.customId}`;
+      }
+
+      const errMsg = error instanceof Error ? error.message : String(error);
+
+      await logSystem(
+        `❌ Fehler bei Interaktion ${identifier} von ${userMention}: ${errMsg}`,
+        interaction.client
+      );
 
       if (interaction.isRepliable() && !interaction.replied && !interaction.deferred) {
         await interaction.reply({
           content: "❌ Es ist ein Fehler aufgetreten.",
           ephemeral: true
-        }).catch(() => {})
+        }).catch(() => {});
       }
-
     }
+
   });
 
   logSystem("✅ Interaktionen registriert.");

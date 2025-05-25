@@ -12,7 +12,7 @@ import {
   
   export const data = new SlashCommandBuilder()
     .setName("feedback")
-    .setDescription("📡 M.E.A.T. empfängt deine Worte, Rebell. Mach’s offiziell – drop dein Feedback ins Archiv");
+    .setDescription("Sende Feedback!");
   
   export async function execute(interaction: ChatInputCommandInteraction) {
     const usageCount = await incrementUsage("feedback");

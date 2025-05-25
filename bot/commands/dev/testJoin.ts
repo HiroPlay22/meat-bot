@@ -8,7 +8,7 @@ import { handleMemberJoin } from '@/modules/join/index.js';
 
 export const data = new SlashCommandBuilder()
   .setName('test-join')
-  .setDescription('Simuliert einen neuen Join (für dich selbst)')
+  .setDescription('Test-Serverbeitritt')
   .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild);
 
 export async function execute(interaction: ChatInputCommandInteraction) {

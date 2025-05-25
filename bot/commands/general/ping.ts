@@ -7,7 +7,7 @@ import { incrementUsage } from "@services/internal/commandStat.service";
 
 export const data = new SlashCommandBuilder()
   .setName("ping")
-  .setDescription("Zeigt dir die aktuelle Reaktionszeit von M.E.A.T.");
+  .setDescription("Bot Reaktionszeit");
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const latency = interaction.client.ws.ping;

@@ -1,10 +1,16 @@
 {
+  "logChannelId": "1373610845761962036",
   "guilds": {
     "271568768268894218": {
       "modCategoryId": "1373610328507551784",
       "dinonameSuggestionChannelId": "1373610620372385895",
       "feedbackChannelId": "1373610456358457344",
       "joinChannelId": "390936188795617301",
+      "liveChannelId": "271574753683177473",
+      "allowedLiveRoles": [
+        "746488530729172992",
+        "746491637227585597"
+      ],
       "allowedPollRoles": [],
       "allowAnonymousFeedback": true,
       "welcomeChannels": {

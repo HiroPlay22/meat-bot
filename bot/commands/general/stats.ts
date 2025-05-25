@@ -22,7 +22,7 @@ function f(n: number): string {
 
 export const data = new SlashCommandBuilder()
   .setName('stats')
-  .setDescription('Zeigt dir die aktuellen M.E.A.T.-Statistiken')
+  .setDescription('Zeige Statistiken')
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   await interaction.deferReply()
