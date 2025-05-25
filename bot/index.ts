@@ -7,6 +7,7 @@ import { handleMemberJoin } from '@modules/join/index.js';
 import { loadSlashCommands } from './loader/commandLoader.js';
 import presenceUpdate from './listeners/presenceUpdate.js';
 import { writeBotStatus } from "./utils/writeBotStatus.js";
+import { startTwitchLivePoll } from '@/modules/live/twitchLivePoll.js';
 
 // 🟢 Initialisierung (nur Konsole)
 logSystem('🟢 M.E.A.T. wird initialisiert...');
@@ -56,6 +57,7 @@ client.once('ready', async () => {
   // 🔁 Prefix-Kommandos registrieren
   registerPrefixCommands(client);
   await logSystem(`✅ Prefix-Commands registriert`, client);
+  startTwitchLivePoll();
 });
 
 // 🟢 Registriere Join-Handler
