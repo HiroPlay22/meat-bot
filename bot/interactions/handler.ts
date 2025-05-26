@@ -17,6 +17,7 @@ import { loadSlashCommands } from "../loader/commandLoader.js";
 import { logSystem } from "@services/internal/log";
 import { prisma } from "@database/client.js";
 import { handleFeedbackModal } from "@modules/feedback/handleModal.js";
+import { handleRollButtons } from "@modules/roll/handleRollButtons.js";
 
 import serverSettings from "@config/serverSettings.json" with { type: "json" };
 
@@ -539,6 +540,19 @@ export async function registerInteractions(client: Client) {
 
         return interaction.deferUpdate();
       }
+      
+      // === ROLL: Button
+      if (interaction.isButton() && interaction.customId.startsWith("roll_")) {
+        const { handleRollButtons } = await import("@modules/roll/handleRollButtons.js");
+        return await handleRollButtons(interaction);
+      }
+
+      // === ROLL: Modifier Modal
+      if (interaction.isModalSubmit() && interaction.customId === "roll_modifier_modal") {
+        const { handleRollModal } = await import("@modules/roll/handleRollModal.js");
+        return await handleRollModal(interaction);
+      }
+
 
       // === STATS: Button-Navigation
       if (interaction.isButton() && interaction.customId.startsWith("stats_")) {
