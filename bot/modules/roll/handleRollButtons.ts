@@ -1,7 +1,7 @@
 import {
   ButtonInteraction
 } from 'discord.js';
-import { setRollState, getRollState, clearRollState } from './rollState.js';
+import { setRollState, getRollState } from './rollState.js';
 import { buildRollEmbed } from './buildRollEmbed.js';
 import { buildRollButtons } from './buildRollButtons.js';
 import { rollDice } from './rollUtils.js';
@@ -113,8 +113,6 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
       modifier: state.modifier || 0
     });
 
-    clearRollState(userId);
-
     const guildId = interaction.guildId!;
     const gmChannelId = serverSettings.guilds[guildId]?.gamemasterChannelId;
     const targetChannel = state.gmEnabled
@@ -123,13 +121,6 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
 
     if (!targetChannel?.isTextBased()) {
       return safeReply(interaction, '❌ Fehler beim Zielkanal.');
-    }
-
-    try {
-      await interaction.update({ components: [] });
-    } catch (e: any) {
-      if (e.code !== 10062) throw e;
-      console.warn('⚠️ Interaktion war schon abgelaufen (roll_go)');
     }
 
     try {
