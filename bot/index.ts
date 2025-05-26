@@ -5,7 +5,6 @@ import { getDiscordToken } from '@config/secrets';
 import { logSystem } from '@services/internal/log';
 import { handleMemberJoin } from '@modules/join/index.js';
 import { loadSlashCommands } from './loader/commandLoader.js';
-import presenceUpdate from './listeners/presenceUpdate.js';
 import { writeBotStatus } from "./utils/writeBotStatus.js";
 import { startTwitchLivePoll } from '@/modules/live/twitchLivePoll.js';
 
