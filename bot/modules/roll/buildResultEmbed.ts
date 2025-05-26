@@ -19,9 +19,9 @@ export function buildResultEmbed({
   const comment = getComment(quality);
 
   // Darstellung der Würfe
-  const emojiRow = rolls.map(() => '🎲'); // Du kannst hier später safe(emoji.meat_dice) einbauen
+  const emojiRow = rolls.map(() => '🎲');
   const valueRow = rolls.map(n => `${n}`.padStart(2, ' '));
-  const displayLine = emojiRow.map((e, i) => `${e} ${valueRow[i]}`).join('   ');
+  const displayLine = emojiRow.map((e, i) => `${e} ${valueRow[i]}`).join(', ');
 
   const descriptionLines = [
     '```',
