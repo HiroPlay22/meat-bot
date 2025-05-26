@@ -6,7 +6,7 @@ import { buildRollEmbed } from './buildRollEmbed.js';
 import { buildRollButtons } from './buildRollButtons.js';
 import { rollDice } from './rollUtils.js';
 import { buildResultEmbed } from './buildResultEmbed.js';
-import serverSettings from '../../../config/serverSettings.json' assert { type: 'json' };
+import serverSettings from '../../../config/serverSettings.json' with { type: 'json' };
 
 export async function handleRollButtons(interaction: ButtonInteraction) {
   const userId = interaction.user.id;
@@ -126,7 +126,13 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
     }
 
     try {
-      await interaction.deferUpdate();
+      await interaction.update({ components: [] });
+    } catch (e: any) {
+      if (e.code !== 10062) throw e;
+      console.warn('⚠️ Interaktion war schon abgelaufen (roll_go)');
+    }
+
+    try {
       await targetChannel.send({ embeds: [resultEmbed] });
     } catch (e) {
       console.warn('⚠️ Fehler beim Senden des Ergebnisses:', e);
