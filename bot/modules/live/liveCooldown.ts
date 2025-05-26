@@ -1,4 +1,4 @@
-// 📄 modules/live/liveCooldown.ts
+// modules/live/liveCooldown.ts
 
 const cooldownMap = new Map<string, number>();
 

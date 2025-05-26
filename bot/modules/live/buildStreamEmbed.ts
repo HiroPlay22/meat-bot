@@ -1,4 +1,4 @@
-// 📄 modules/live/buildStreamEmbed.ts
+// modules/live/buildStreamEmbed.ts
 
 import {
   EmbedBuilder,
