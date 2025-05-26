@@ -1,6 +1,6 @@
-import {
-  ButtonInteraction
-} from 'discord.js';
+// modules/roll/handleRollButtons.ts
+
+import { ButtonInteraction } from 'discord.js';
 import { setRollState, getRollState } from './rollState.js';
 import { buildRollEmbed } from './buildRollEmbed.js';
 import { buildRollButtons } from './buildRollButtons.js';
@@ -49,7 +49,7 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
     if (!state) return safeReply(interaction, '⚠️ Deine Würfel-Session ist abgelaufen.');
     if (!state.type) return updatePhase(interaction, 'phase1');
     if (!state.count) {
-      if (['d4','d6','d8','d10','d12','d20'].includes(state.type)) {
+      if (['d4', 'd6', 'd8', 'd10', 'd12', 'd20'].includes(state.type)) {
         return updatePhase(interaction, 'phase_dnd_select');
       } else {
         return updatePhase(interaction, 'phase1');
@@ -121,7 +121,7 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
     }
 
     if (state.lastRollAt && Date.now() - state.lastRollAt < 800) {
-      return safeReply(interaction, '⏳ Du hast gerade gewürfelt.');
+      return safeReply(interaction, '⏳ Du hast gerade schon gewürfelt.');
     }
 
     setRollState(userId, { ...state, lastRollAt: Date.now() });
@@ -142,6 +142,12 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
 
     if (!targetChannel?.isTextBased()) {
       return safeReply(interaction, '❌ Fehler beim Zielkanal.');
+    }
+
+    try {
+      await interaction.deferUpdate();
+    } catch (e: any) {
+      if (e.code !== 10062) throw e;
     }
 
     try {

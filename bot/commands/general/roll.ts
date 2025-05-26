@@ -7,7 +7,7 @@ import { buildRollButtons } from '@/modules/roll/buildRollButtons.js';
 
 export const data = new SlashCommandBuilder()
   .setName('roll')
-  .setDescription('Starte einen Würfelvorgang (d6 oder DnD-Würfel)');
+  .setDescription('Würfelt d4 bis d20');
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   await interaction.deferReply({ ephemeral: true });
