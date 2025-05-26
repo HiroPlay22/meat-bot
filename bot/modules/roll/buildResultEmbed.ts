@@ -20,8 +20,8 @@ export function buildResultEmbed({
 
   // Darstellung der Würfe
   const emojiRow = rolls.map(() => '🎲');
-  const valueRow = rolls.map(n => `${n}`.padStart(2, ' '));
-  const displayLine = emojiRow.map((e, i) => `${e} ${valueRow[i]}`).join(', ');
+  const valueRow = rolls.map(n => `${n}`.padStart(2, ''));
+  const displayLine = emojiRow.map((e, i) => `${e}${valueRow[i]}`).join(' ');
 
   const descriptionLines = [
     '```',
