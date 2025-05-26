@@ -2,7 +2,7 @@
 
 import { EmbedBuilder, User } from 'discord.js';
 import { imageAssets } from './imageAssets.js';
-import { getDiceEmoji } from './rollUtils.js';
+import { emoji, safe } from '@/utils/meatEmojis.js';
 
 export function buildRollEmbed({
   phase,
@@ -20,7 +20,7 @@ export function buildRollEmbed({
   gmEnabled?: boolean;
 }) {
   const embed = new EmbedBuilder()
-    .setColor(0x5865F2)
+    .setColor(0x5865f2)
     .setAuthor({ name: `${user.username} würfelt...`, iconURL: user.displayAvatarURL() });
 
   switch (phase) {
@@ -34,29 +34,28 @@ export function buildRollEmbed({
     case 'phase2':
       if (!type) throw new Error('Missing dice type in phase2');
       embed
-        .setTitle(type === 'd6' ? '🎲 Würfelmodus aktiviert' : '🧙 DnD-Modus aktiviert')
+        .setTitle(type === 'd6' ? `${safe(emoji.meat_dice)} Würfelmodus aktiviert` : `${safe(emoji.meat_dnd)} DnD-Modus aktiviert`)
         .setDescription('Wie viele Würfel möchtest du rollen?')
-        .setImage(imageAssets.rollDiceSelect);
+        .setImage(type === 'd6' ? imageAssets.rollDiceClassic : imageAssets.rollDiceDnd);
       break;
 
     case 'phase3':
       if (!type || !count) throw new Error('Missing type or count in phase3');
 
-      const diceLine = getDiceEmoji(count);
       const modText = modifier !== undefined ? ` mit einem Modifier von ${modifier > 0 ? `+${modifier}` : modifier}` : '';
       const description = `Du hast ${count}× ${type} gewählt${modText}. Jetzt leg los!`;
 
       embed
-        .setTitle(`${type === 'd6' ? '🎲' : '🧙'} ${count}× ${type}`)
+        .setTitle(`${type === 'd6' ? safe(emoji.meat_dice) : safe(emoji.meat_dnd)} ${count}× ${type}`)
         .setDescription(description)
-        .setImage(imageAssets.rollDiceSelect)
+        .setImage(type === 'd6' ? imageAssets.rollDiceClassic : imageAssets.rollDiceDnd)
         .setFooter({
-          text: `${type === 'd6' ? '🎲' : '🧙'} ${count}× ${type}${modifier !== undefined ? ` ${modifier > 0 ? '+' : ''}${modifier}` : ''}`
+          text: `${type === 'd6' ? safe(emoji.meat_dice) : safe(emoji.meat_dnd)} ${count}× ${type}${modifier !== undefined ? ` ${modifier > 0 ? '+' : ''}${modifier}` : ''}`
         });
 
       if (gmEnabled) {
         embed.addFields({
-          name: '📡 GM-Channel-Modus aktiviert',
+          name: `${safe(emoji.meat_gm)} GM-Channel-Modus aktiviert`,
           value: 'Dein Ergebnis wird im GameMaster-Channel veröffentlicht.'
         });
       }

@@ -47,13 +47,48 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
   }
 
   // === GM TOGGLE ===
-  if (id === 'roll_gm_toggle') {
-    if (!state) return interaction.reply({ content: '❌ Kein Wurf aktiv.', ephemeral: true });
+    if (id === 'roll_gm_toggle') {
+    const state = getRollState(userId);
+    if (!state) {
+        return interaction.reply({
+        content: '❌ Kein Wurf aktiv.',
+        ephemeral: true
+        });
+    }
 
-    const newState = { ...state, gmEnabled: !state.gmEnabled };
+    // Toggle gmEnabled
+    const newState = {
+        ...state,
+        gmEnabled: !state.gmEnabled
+    };
     setRollState(userId, newState);
-    return updatePhase(interaction, 'phase3');
-  }
+
+    const embed = buildRollEmbed({
+        phase: 'phase3',
+        user: interaction.user,
+        type: newState.type,
+        count: newState.count,
+        modifier: newState.modifier,
+        gmEnabled: newState.gmEnabled
+    });
+
+    const buttons = buildRollButtons({
+        phase: 'phase3',
+        viewer: interaction.user,
+        owner: interaction.user,
+        type: newState.type,
+        gmEnabled: newState.gmEnabled,
+        modifierSet: typeof newState.modifier === 'number'
+    });
+
+    await interaction.update({
+        embeds: [embed],
+        components: buttons
+    });
+
+    return;
+    }
+
 
   // === MODIFIER ===
   if (id === 'roll_modifier') {

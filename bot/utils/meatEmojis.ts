@@ -1,3 +1,5 @@
+// utils/meatEmojis.ts
+
 export const emoji = {
   // 🧠 M.E.A.T. Core & System
   meat_dev: '<:meat_dev:1373670733607338015>',
@@ -22,11 +24,11 @@ export const emoji = {
   meat_text: '<:meat_text:1373694036614971484>',
   meat_voice: '<:meat_voice:1373694035151028417>',
   meat_roles: '<:meat_roles:1373694032462614528>',
-  meat_threads: '<:meat_threads:ID>',               // NEW
-  meat_afk: '<:meat_afk:ID>',                       // NEW
-  meat_lock: '<:meat_lock:ID>',                     // NEW
-  meat_nsfw: '<:meat_nsfw:ID>',                     // NEW
-  meat_feature: '<:meat_feature:ID>',               // NEW
+  meat_threads: '<:meat_threads:ID>',
+  meat_afk: '<:meat_afk:ID>',
+  meat_lock: '<:meat_lock:ID>',
+  meat_nsfw: '<:meat_nsfw:ID>',
+  meat_feature: '<:meat_feature:ID>',
 
   // 🦖 Aktivität & Features
   meat_dinos: '<:meat_dinos:ID>',
@@ -41,11 +43,16 @@ export const emoji = {
   youtube: '<:youtube:ID>',
 
   // 🎥 Stream-Embed-Icons (zentral für buildStreamEmbed)
-  stream: '🎥',            // Titel des Streams
-  text: '📝',              // Beschreibung
-  user: '👤',              // Streamername
-  viewers: '👁️',          // Zuschauer
-  category: '🗂️',         // Kategorie / Spiel
+  stream: '🎥',
+  text: '📝',
+  user: '👤',
+  viewers: '👁️',
+  category: '🗂️',
+
+  // 🎲 Roll-System Erweiterung
+  meat_dice: '<:meat_dice:123456789012345678>',    // Standard-Würfel
+  meat_dnd: '<:meat_dnd:123456789012345679>',      // DnD-Würfel
+  meat_gm: '<:meat_gm:123456789012345680>',        // GM-Channel-Indikator
 
   // Fallback
   meat_leer: '<:meat_leer:1373700191294722058>'
