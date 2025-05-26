@@ -1,3 +1,5 @@
+// modules/roll/buildRollButtons.ts
+
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -13,10 +15,10 @@ export function buildRollButtons({
   gmEnabled,
   modifierSet
 }: {
-  phase: 'phase1' | 'phase2' | 'phase3';
+  phase: 'phase1' | 'phase2' | 'phase3' | 'phase_dnd_select';
   viewer: User;
   owner: User;
-  type?: 'd6' | 'd4' | 'd8' | 'd10' | 'd12' | 'd20';
+  type?: 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20';
   gmEnabled?: boolean;
   modifierSet?: boolean;
 }) {
@@ -24,6 +26,7 @@ export function buildRollButtons({
   const rows: ActionRowBuilder<ButtonBuilder>[] = [];
 
   if (!isOwner) {
+    // Nur ansehen, nicht klicken
     const infoRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId('roll_locked')
@@ -44,7 +47,6 @@ export function buildRollButtons({
     return rows;
   }
 
-  // === Eigentümeransicht ===
   if (phase === 'phase1') {
     rows.push(
       new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -60,6 +62,29 @@ export function buildRollButtons({
           .setCustomId('roll_type_aram')
           .setLabel('🧊 ARAM')
           .setDisabled(true)
+          .setStyle(ButtonStyle.Secondary)
+      )
+    );
+  }
+
+  if (phase === 'phase_dnd_select') {
+    const dndButtons: ButtonBuilder[] = ['d4','d6','d8','d10','d12','d20'].map(type =>
+      new ButtonBuilder()
+        .setCustomId(`roll_dndtype_${type}`)
+        .setLabel(type)
+        .setStyle(ButtonStyle.Primary)
+    );
+
+    // Max 5 Buttons pro Row
+    for (let i = 0; i < dndButtons.length; i += 5) {
+      rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(...dndButtons.slice(i, i + 5)));
+    }
+
+    rows.push(
+      new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId('roll_back')
+          .setLabel('🔙 Zurück')
           .setStyle(ButtonStyle.Secondary)
       )
     );

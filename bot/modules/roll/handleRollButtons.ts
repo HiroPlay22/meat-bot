@@ -15,12 +15,20 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
 
   // === TYPE SELECTION ===
   if (id === 'roll_type_d6') {
-    setRollState(userId, { type: 'd6', count: 0 });
+    setRollState(userId, { count: 0, type: 'd6' });
     return updatePhase(interaction, 'phase2');
   }
 
   if (id === 'roll_type_dnd') {
-    setRollState(userId, { type: 'd20', count: 0 });
+    setRollState(userId, { count: 0 });
+    return updatePhase(interaction, 'phase_dnd_select');
+  }
+
+  // === DND WÜRFEL TYP AUSWAHL ===
+  if (id.startsWith('roll_dndtype_')) {
+    const dndType = id.replace('roll_dndtype_', '') as 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20';
+    if (!state) return safeReply(interaction, '⚠️ Session nicht gefunden.');
+    setRollState(userId, { ...state, type: dndType });
     return updatePhase(interaction, 'phase2');
   }
 
@@ -39,8 +47,15 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
   // === BACK ===
   if (id === 'roll_back') {
     if (!state) return safeReply(interaction, '⚠️ Deine Würfel-Session ist abgelaufen.');
-    const previousPhase = !state.count ? 'phase1' : state.count > 0 ? 'phase2' : 'phase1';
-    return updatePhase(interaction, previousPhase);
+    if (!state.type) return updatePhase(interaction, 'phase1');
+    if (!state.count) {
+      if (['d4','d6','d8','d10','d12','d20'].includes(state.type)) {
+        return updatePhase(interaction, 'phase_dnd_select');
+      } else {
+        return updatePhase(interaction, 'phase1');
+      }
+    }
+    return updatePhase(interaction, 'phase2');
   }
 
   // === GM TOGGLE ===
@@ -105,6 +120,12 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
       return safeReply(interaction, '❌ Roll unvollständig.');
     }
 
+    if (state.lastRollAt && Date.now() - state.lastRollAt < 800) {
+      return safeReply(interaction, '⏳ Du hast gerade gewürfelt.');
+    }
+
+    setRollState(userId, { ...state, lastRollAt: Date.now() });
+
     const rolls = rollDice(state.type, state.count);
     const resultEmbed = buildResultEmbed({
       user: interaction.user,
@@ -136,7 +157,7 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
 }
 
 // === Embed & Buttons aktualisieren ===
-async function updatePhase(interaction: ButtonInteraction, phase: 'phase1' | 'phase2' | 'phase3') {
+async function updatePhase(interaction: ButtonInteraction, phase: 'phase1' | 'phase2' | 'phase3' | 'phase_dnd_select') {
   const state = getRollState(interaction.user.id);
   if (!state) return safeReply(interaction, '⚠️ Deine Session ist abgelaufen. Bitte /roll erneut ausführen.');
 
