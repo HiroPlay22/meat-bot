@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"status":"offline"}
+=======
+{"status":"online"}
+>>>>>>> 6b697f3 (feat: Twitch Live-Tracking + API Embed System)

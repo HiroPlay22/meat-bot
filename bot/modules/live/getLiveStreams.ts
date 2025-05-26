@@ -1,6 +1,8 @@
 import fetch from 'node-fetch';
 import 'dotenv/config';
 
+// bot/modules/live/getLiveStreams.ts
+import 'dotenv/config';
 
 const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID!;
 const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET!;
@@ -10,10 +12,14 @@ let tokenExpiresAt = 0;
 
 async function getAccessToken(): Promise<string> {
   const now = Date.now();
+<<<<<<< HEAD
 
   if (cachedAccessToken && now < tokenExpiresAt) {
     return cachedAccessToken;
   }
+=======
+  if (cachedAccessToken && now < tokenExpiresAt) return cachedAccessToken;
+>>>>>>> 6b697f3 (feat: Twitch Live-Tracking + API Embed System)
 
   const res = await fetch('https://id.twitch.tv/oauth2/token', {
     method: 'POST',
@@ -26,8 +32,13 @@ async function getAccessToken(): Promise<string> {
   });
 
   if (!res.ok) throw new Error('Twitch Token konnte nicht geholt werden');
+<<<<<<< HEAD
 
   const data = await res.json();
+=======
+  const data = await res.json();
+
+>>>>>>> 6b697f3 (feat: Twitch Live-Tracking + API Embed System)
   cachedAccessToken = data.access_token;
   tokenExpiresAt = now + data.expires_in * 1000;
   return cachedAccessToken;
