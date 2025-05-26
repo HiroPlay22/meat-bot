@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import 'dotenv/config';
 
 const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID!;
 const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET!;
