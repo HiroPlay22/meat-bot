@@ -1,7 +1,7 @@
 // bot/modules/live/getLiveStreams.ts
 
+import 'dotenv/config'; // ⬅️ Wichtig, damit .env gelesen wird
 import fetch from 'node-fetch';
-import 'dotenv/config';
 
 const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID!;
 const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET!;
@@ -34,7 +34,7 @@ async function getAccessToken(): Promise<string> {
   return cachedAccessToken;
 }
 
-type LiveStream = {
+export type LiveStream = {
   username: string;
   title: string;
   game: string;
@@ -63,6 +63,8 @@ export async function getLiveStreams(usernames: string[]): Promise<LiveStream[]>
     title: entry.title,
     game: entry.game_name,
     viewers: entry.viewer_count,
-    thumbnail: entry.thumbnail_url.replace('{width}', '640').replace('{height}', '360')
+    thumbnail: entry.thumbnail_url
+      .replace('{width}', '640')
+      .replace('{height}', '360')
   }));
 }
