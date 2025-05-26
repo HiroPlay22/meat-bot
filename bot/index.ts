@@ -85,9 +85,6 @@ client.on('messageDelete', async (message) => {
   );
 });
 
-// 🟢 Präsenz-Update-Listener
-client.on('presenceUpdate', presenceUpdate.execute);
-
 // 🚀 Bot starten
 client.login(getDiscordToken());
 
