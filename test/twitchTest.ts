@@ -1,9 +1,10 @@
 // 📄 test/twitchTest.ts
-import { getLiveStreams } from '@modules/live/getLiveStreams';
+import { getLiveStreams } from '../bot/modules/live/getLiveStreams.js';
+
 
 (async () => {
   try {
-    const usernames = ['hiro_live', 'brini_chan']; // hier deine Twitch-User eintragen
+    const usernames = ['hiro_live', 'brinibrinsen']; // hier deine Twitch-User eintragen
     const streams = await getLiveStreams(usernames);
 
     if (streams.length === 0) {
