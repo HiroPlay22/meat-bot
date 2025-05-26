@@ -1,35 +1,30 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { buildRollEmbed } from "@/modules/roll/buildRollEmbed.js";
-import { buildRollButtons } from "@/modules/roll/buildRollButtons.js";
-import { setRollState } from "@/modules/roll/rollState.js";
+// commands/general/roll.ts
+
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { setRollState } from '@/modules/roll/rollState.js';
+import { buildRollEmbed } from '@/modules/roll/buildRollEmbed.js';
+import { buildRollButtons } from '@/modules/roll/buildRollButtons.js';
 
 export const data = new SlashCommandBuilder()
-  .setName("roll")
-  .setDescription("Würfle mit Stil – klassisch, DnD oder sogar im GM-Channel.");
+  .setName('roll')
+  .setDescription('Starte einen Würfelvorgang (d6 oder DnD-Würfel)');
 
 export async function execute(interaction: ChatInputCommandInteraction) {
-  const user = interaction.user;
+  await interaction.deferReply({ ephemeral: true });
 
-  // Setze leeren Würfel-Status (default d6)
-  setRollState(user.id, {
-    type: "d6",
-    count: 0,
-    gmEnabled: false
-  });
+  // Neue Session starten (leer)
+  setRollState(interaction.user.id, {});
 
   const embed = buildRollEmbed({
-    phase: "phase1",
-    user
+    phase: 'phase1',
+    user: interaction.user
   });
 
   const components = buildRollButtons({
-    phase: "phase1",
-    viewer: user,
-    owner: user
+    phase: 'phase1',
+    viewer: interaction.user,
+    owner: interaction.user
   });
 
-  await interaction.reply({
-    embeds: [embed],
-    components
-  });
+  await interaction.editReply({ embeds: [embed], components });
 }
