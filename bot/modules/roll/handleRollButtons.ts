@@ -39,7 +39,7 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
   // === BACK ===
   if (id === 'roll_back') {
     if (!state) return safeReply(interaction, '⚠️ Deine Würfel-Session ist abgelaufen.');
-    const previousPhase = state.count > 0 ? 'phase2' : 'phase1';
+    const previousPhase = !state.count ? 'phase1' : state.count > 0 ? 'phase2' : 'phase1';
     return updatePhase(interaction, previousPhase);
   }
 
