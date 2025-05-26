@@ -1,5 +1,3 @@
-// modules/roll/buildResultEmbed.ts
-
 import { EmbedBuilder, User } from 'discord.js';
 import { getDiceEmoji, getRollQuality, getComment } from './rollUtils.js';
 
@@ -20,23 +18,26 @@ export function buildResultEmbed({
   const quality = getRollQuality(total, max);
   const comment = getComment(quality);
 
-  const emojiRow = rolls.map(() => '🎲');
-  const valueRow = rolls.map((n) => `${n}`.padStart(2, ' '));
+  // Darstellung der Würfe
+  const emojiRow = rolls.map(() => '🎲'); // Du kannst hier später safe(emoji.meat_dice) einbauen
+  const valueRow = rolls.map(n => `${n}`.padStart(2, ' '));
   const displayLine = emojiRow.map((e, i) => `${e} ${valueRow[i]}`).join('   ');
+
+  const descriptionLines = [
+    '```',
+    displayLine,
+    '```',
+    modifier !== 0 ? `🎯 Modifier: ${modifier > 0 ? '+' : ''}${modifier}` : null,
+    `🧠 Endergebnis: **${total}**`,
+    '',
+    `> ${comment}`
+  ].filter(Boolean);
 
   const embed = new EmbedBuilder()
     .setColor(0x2f3136)
     .setThumbnail(user.displayAvatarURL())
     .setTitle(`${getDiceEmoji(rolls.length)} Ergebnis: **${total}**`)
-    .setDescription([
-      '```',
-      displayLine,
-      '```',
-      modifier !== 0 ? `🎯 Modifier: ${modifier > 0 ? '+' : ''}${modifier}` : null,
-      `🧠 Endergebnis: **${total}**`,
-      '',
-      `> ${comment}`
-    ].filter(Boolean).join('\n'))
+    .setDescription(descriptionLines.join('\n'))
     .setFooter({
       text: `🧙 ${rolls.length}× ${type}${modifier !== 0 ? ` ${modifier > 0 ? '+' : ''}${modifier}` : ''}`
     });

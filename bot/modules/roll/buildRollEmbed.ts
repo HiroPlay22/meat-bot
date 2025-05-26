@@ -1,5 +1,3 @@
-// modules/roll/buildRollEmbed.ts
-
 import { EmbedBuilder, User } from 'discord.js';
 import { imageAssets } from './imageAssets.js';
 import { emoji, safe } from '@/utils/meatEmojis.js';
@@ -24,34 +22,37 @@ export function buildRollEmbed({
     .setAuthor({ name: `${user.username} würfelt...`, iconURL: user.displayAvatarURL() });
 
   switch (phase) {
-    case 'phase1':
+    case 'phase1': {
       embed
         .setTitle('🎲 Zufallsbefehl getriggert')
         .setDescription('Bereit für das Unbekannte?')
         .setImage(imageAssets.rollStart);
       break;
+    }
 
-    case 'phase2':
+    case 'phase2': {
       if (!type) throw new Error('Missing dice type in phase2');
+
+      const titleEmoji = type === 'd6' ? emoji.meat_dice : emoji.meat_dnd;
       embed
-        .setTitle(type === 'd6' ? `${safe(emoji.meat_dice)} Würfelmodus aktiviert` : `${safe(emoji.meat_dnd)} DnD-Modus aktiviert`)
+        .setTitle(`${safe(titleEmoji)} ${type === 'd6' ? 'Würfelmodus aktiviert' : 'DnD-Modus aktiviert'}`)
         .setDescription('Wie viele Würfel möchtest du rollen?')
         .setImage(type === 'd6' ? imageAssets.rollDiceClassic : imageAssets.rollDiceDnd);
       break;
+    }
 
-    case 'phase3':
+    case 'phase3': {
       if (!type || !count) throw new Error('Missing type or count in phase3');
 
+      const titleEmoji = type === 'd6' ? emoji.meat_dice : emoji.meat_dnd;
       const modText = modifier !== undefined ? ` mit einem Modifier von ${modifier > 0 ? `+${modifier}` : modifier}` : '';
-      const description = `Du hast ${count}× ${type} gewählt${modText}. Jetzt leg los!`;
+      const footerText = `${safe(titleEmoji)} ${count}× ${type}${modifier !== undefined ? ` ${modifier > 0 ? '+' : ''}${modifier}` : ''}`;
 
       embed
-        .setTitle(`${type === 'd6' ? safe(emoji.meat_dice) : safe(emoji.meat_dnd)} ${count}× ${type}`)
-        .setDescription(description)
+        .setTitle(`${safe(titleEmoji)} ${count}× ${type}`)
+        .setDescription(`Du hast ${count}× ${type} gewählt${modText}. Jetzt leg los!`)
         .setImage(type === 'd6' ? imageAssets.rollDiceClassic : imageAssets.rollDiceDnd)
-        .setFooter({
-          text: `${type === 'd6' ? safe(emoji.meat_dice) : safe(emoji.meat_dnd)} ${count}× ${type}${modifier !== undefined ? ` ${modifier > 0 ? '+' : ''}${modifier}` : ''}`
-        });
+        .setFooter({ text: footerText });
 
       if (gmEnabled) {
         embed.addFields({
@@ -60,6 +61,7 @@ export function buildRollEmbed({
         });
       }
       break;
+    }
   }
 
   return embed;

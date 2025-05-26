@@ -1,5 +1,3 @@
-// modules/roll/buildRollButtons.ts
-
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -26,7 +24,6 @@ export function buildRollButtons({
   const rows: ActionRowBuilder<ButtonBuilder>[] = [];
 
   if (!isOwner) {
-    // Andere User – keine Interaktion, nur Statusanzeige
     const infoRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId('roll_locked')
@@ -52,15 +49,15 @@ export function buildRollButtons({
     rows.push(
       new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId(`roll_type_d6`)
+          .setCustomId('roll_type_d6')
           .setLabel('🎲 Würfel')
           .setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
-          .setCustomId(`roll_type_dnd`)
+          .setCustomId('roll_type_dnd')
           .setLabel('🧙 DnD-Würfel')
           .setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
-          .setCustomId(`roll_type_aram`)
+          .setCustomId('roll_type_aram')
           .setLabel('🧊 ARAM')
           .setDisabled(true)
           .setStyle(ButtonStyle.Secondary)
@@ -91,7 +88,7 @@ export function buildRollButtons({
     rows.push(
       new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId(`roll_back`)
+          .setCustomId('roll_back')
           .setLabel('🔙 Zurück')
           .setStyle(ButtonStyle.Secondary)
       )
@@ -101,18 +98,18 @@ export function buildRollButtons({
   if (phase === 'phase3' && type) {
     const mainRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId(`roll_go`)
+        .setCustomId('roll_go')
         .setLabel('🎲 Würfeln')
         .setStyle(ButtonStyle.Success),
       new ButtonBuilder()
-        .setCustomId(`roll_back`)
+        .setCustomId('roll_back')
         .setLabel('🔙 Zurück')
         .setStyle(ButtonStyle.Secondary)
     );
 
     const gmToggleRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId(`roll_gm_toggle`)
+        .setCustomId('roll_gm_toggle')
         .setLabel(gmEnabled ? '🟢 GM-Channel deaktivieren' : '⚫ GM-Channel aktivieren')
         .setStyle(gmEnabled ? ButtonStyle.Success : ButtonStyle.Secondary)
     );
@@ -122,7 +119,7 @@ export function buildRollButtons({
     if (type !== 'd6') {
       const modifierRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId(`roll_modifier`)
+          .setCustomId('roll_modifier')
           .setLabel(modifierSet ? '🧪 Modifier ändern' : '⚙️ Modifier einstellen')
           .setStyle(ButtonStyle.Secondary)
       );
