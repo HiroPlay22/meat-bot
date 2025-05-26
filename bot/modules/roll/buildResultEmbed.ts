@@ -36,7 +36,7 @@ export function buildResultEmbed({
   const embed = new EmbedBuilder()
     .setColor(0x2f3136)
     .setThumbnail(user.displayAvatarURL())
-    .setTitle(`${getDiceEmoji(rolls.length)} Ergebnis: **${total}**`)
+    .setTitle(`${user.displayName} würfelt ...`)
     .setDescription(descriptionLines.join('\n'))
     .setFooter({
       text: `🧙 ${rolls.length}× ${type}${modifier !== 0 ? ` ${modifier > 0 ? '+' : ''}${modifier}` : ''}`
