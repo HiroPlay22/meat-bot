@@ -48,7 +48,7 @@ client.once('ready', async () => {
   globalThis.discordClient = client; // Global verfügbar für API-Routen wie /api/stats
   
   const tag = client.user?.tag ?? 'unbekannt';
-  await logSystem(`🟣 ${tag} ist online`, client);
+  await logSystem(`✅ ${tag} ist online`, client);
 
   // 🔁 Slash-Commands laden & registrieren
   const commandMap = await loadSlashCommands();
