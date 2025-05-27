@@ -1,3 +1,5 @@
+// bot/interactions/handler.ts
+
 import {
   Client,
   Interaction,
@@ -155,6 +157,12 @@ export async function registerInteractions(client: Client) {
           );
         await interaction.showModal(modal);
         return;
+      }
+
+      // === ROLL: Button
+      if (interaction.isButton() && interaction.customId.startsWith("roll_")) {
+        const { handleRollButtons } = await import("@modules/roll/handleRollButtons.js");
+        return await handleRollButtons(interaction);
       }
 
       // === DinoName: Würfeln
@@ -539,12 +547,6 @@ export async function registerInteractions(client: Client) {
         await interaction.channel?.send({ embeds: [embed] });
 
         return interaction.deferUpdate();
-      }
-      
-      // === ROLL: Button
-      if (interaction.isButton() && interaction.customId.startsWith("roll_")) {
-        const { handleRollButtons } = await import("@modules/roll/handleRollButtons.js");
-        return await handleRollButtons(interaction);
       }
 
       // === ROLL: Modifier Modal

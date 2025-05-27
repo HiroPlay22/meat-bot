@@ -19,7 +19,7 @@ import serverSettings from '../../../config/serverSettings.json' with { type: 'j
 export async function handleRollButtons(interaction: ButtonInteraction) {
   const userId = interaction.user.id;
   const id = interaction.customId;
-  const state = getRollState(userId);
+  const state = getRollState(interaction.user.id);
 
   if (!state || state.ownerId !== userId) {
     return safeReply(interaction, '⚠️ Du darfst diese Würfel-Session nicht bedienen.');
