@@ -21,8 +21,13 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
   const id = interaction.customId;
   const state = getRollState(userId);
 
+  //
   if (!state || state.ownerId !== userId) {
-    return safeReply(interaction, '⚠️ Du darfst diese Würfel-Session nicht bedienen.');
+      return safeReply(interaction, '⚠️ Du darfst diese Würfel-Session nicht bedienen.');
+    }
+    if (!interaction.isRepliable()) {
+    console.warn('⛔ Nicht antwortbare Interaktion blockiert.');
+    return;
   }
 
   // === TYPE SELECTION ===
@@ -125,15 +130,19 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
     startRolling(userId);
 
     try {
-      if (!interaction.deferred && !interaction.replied) {
-        try {
-          await interaction.deferUpdate();
-        } catch (err) {
-          console.warn('⚠️ deferUpdate fehlgeschlagen oder bereits abgelaufen:', err);
-          stopRolling(userId);
+      if (interaction.isRepliable() && !interaction.replied && !interaction.deferred) {
+      try {
+        await interaction.deferUpdate();
+      } catch (err: any) {
+        if (err.code === 40060) {
+          console.warn('⚠️ deferUpdate: Interaktion bereits acknowledged.');
           return;
+        } else {
+          throw err;
         }
       }
+    }
+
 
       const rolls = rollDice(state.type, state.count);
       const resultEmbed = buildResultEmbed({
