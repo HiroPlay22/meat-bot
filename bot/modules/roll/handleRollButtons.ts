@@ -247,13 +247,24 @@ async function safeUpdate(interaction: ButtonInteraction, embed: any, buttons: a
     await interaction.update({ embeds: [embed], components: buttons });
   } catch (err: any) {
     if (
-      err.code === 10062 ||
-      err.code === 40060 ||
-      err.message?.includes('Unknown interaction')
+      err.code === 10062 || // Unknown interaction
+      err.code === 40060 || // Interaction already acknowledged
+      err.code === 'InteractionAlreadyReplied'
     ) {
-      console.warn('⚠️ Interaktion (update) abgelaufen oder bereits verarbeitet. Kein Fallback möglich.');
+      console.warn('⚠️ update() fehlgeschlagen – versuche followUp()');
+
+      try {
+        await interaction.followUp({
+          embeds: [embed],
+          components: buttons,
+          ephemeral: true
+        });
+      } catch (followErr: any) {
+        console.warn('❌ Fallback mit followUp() fehlgeschlagen:', followErr);
+      }
     } else {
       throw err;
     }
   }
 }
+
