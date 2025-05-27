@@ -16,9 +16,10 @@ const rollSession = new Map<string, RollState>(); // key = userId
 const activeRolls = new Set<string>(); // Schutz gegen Doppeleingaben
 
 // === SESSION MANAGEMENT ===
-export function setRollState(userId: string, state: Partial<RollState>) {
+export function setRollState(userId: string, partial: Partial<RollState>) {
   const current = rollSession.get(userId) || {};
-  rollSession.set(userId, { ...current, ...state, ownerId: userId });
+  const newOwnerId = current.ownerId ?? userId;
+  rollSession.set(userId, { ...current, ...partial, ownerId: newOwnerId });
 }
 
 export function getRollState(userId: string): RollState | undefined {

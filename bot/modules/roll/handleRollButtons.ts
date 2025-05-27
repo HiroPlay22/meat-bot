@@ -22,7 +22,7 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
   const id = interaction.customId;
   const state = getRollState(userId);
 
-  if (!state || state.ownerId !== userId) {
+  if (!state || state.ownerId !== interaction.user.id) {
     return safeReply(interaction, '⚠️ Du darfst diese Würfel-Session nicht bedienen.');
   }
 
@@ -63,8 +63,15 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
 
   // === ZURÜCK ===
   if (id === 'roll_back') {
-    const prevPhase = popLastPhase(userId);
-    if (!prevPhase) return safeReply(interaction, '⚠️ Kein vorheriger Schritt gefunden.');
+    let prevPhase: any;
+    let safety = 10;
+    do {
+      prevPhase = popLastPhase(userId);
+      safety--;
+    } while (prevPhase === undefined && safety > 0);
+
+    if (!prevPhase) prevPhase = 'phase1';
+
     return updatePhase(interaction, prevPhase);
   }
 
@@ -155,7 +162,10 @@ async function updatePhase(interaction: ButtonInteraction, phase: any) {
   const state = getRollState(interaction.user.id);
   if (!state) return safeReply(interaction, '⚠️ Session abgelaufen. Bitte /roll erneut ausführen.');
 
-  pushPhase(interaction.user.id, phase);
+  const last = state.phaseHistory?.[state.phaseHistory.length - 1];
+  if (last !== phase) {
+    pushPhase(interaction.user.id, phase);
+  }
 
   const embed = buildRollEmbed({
     phase,
