@@ -4,7 +4,6 @@ import { ButtonInteraction } from 'discord.js';
 import {
   setRollState,
   getRollState,
-  clearRollState,
   isRolling,
   startRolling,
   stopRolling,
@@ -22,7 +21,7 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
   const id = interaction.customId;
   const state = getRollState(userId);
 
-  if (!state || state.ownerId !== interaction.user.id) {
+  if (!state || state.ownerId !== userId) {
     return safeReply(interaction, '⚠️ Du darfst diese Würfel-Session nicht bedienen.');
   }
 
@@ -77,7 +76,6 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
 
   // === GM TOGGLE ===
   if (id === 'roll_gm_toggle') {
-    if (!state) return safeReply(interaction, '⚠️ Deine Würfel-Session ist abgelaufen.');
     const newState = { ...state, gmEnabled: !state.gmEnabled };
     setRollState(userId, newState);
     return updatePhase(interaction, 'phase3');
@@ -113,7 +111,7 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
 
   // === 🎲 WÜRFELN ===
   if (id === 'roll_go') {
-    if (!state || !state.type || !state.count) {
+    if (!state?.type || !state?.count) {
       return safeReply(interaction, '❌ Roll unvollständig.');
     }
 
@@ -193,8 +191,12 @@ async function safeReply(interaction: ButtonInteraction, content: string) {
   try {
     await interaction.reply({ content, flags: 64 }); // 64 = ephemeral
   } catch (err: any) {
-    if (err.code === 10062 || err.message?.includes('Unknown interaction')) {
-      console.warn('⚠️ Interaktion (reply) abgelaufen.');
+    if (
+      err.code === 10062 ||
+      err.code === 40060 ||
+      err.message?.includes('Unknown interaction')
+    ) {
+      console.warn('⚠️ Interaktion (reply) abgelaufen oder bereits verarbeitet.');
     } else {
       throw err;
     }
@@ -205,13 +207,12 @@ async function safeUpdate(interaction: ButtonInteraction, embed: any, buttons: a
   try {
     await interaction.update({ embeds: [embed], components: buttons });
   } catch (err: any) {
-    if (err.code === 10062 || err.message?.includes('Unknown interaction')) {
-      console.warn('⚠️ Interaktion (update) abgelaufen. Fallback mit flags.');
-      try {
-        await interaction.reply({ embeds: [embed], components: buttons, flags: 64 });
-      } catch (err2) {
-        console.error('❌ Ersatzantwort ebenfalls gescheitert:', err2);
-      }
+    if (
+      err.code === 10062 ||
+      err.code === 40060 ||
+      err.message?.includes('Unknown interaction')
+    ) {
+      console.warn('⚠️ Interaktion (update) abgelaufen oder bereits verarbeitet. Kein Fallback möglich.');
     } else {
       throw err;
     }
