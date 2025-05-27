@@ -181,8 +181,26 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
 
 // === PHASENWECHSEL ===
 async function updatePhase(interaction: ButtonInteraction, phase: RollPhase) {
+  if (!interaction.isRepliable() || interaction.deferred || interaction.replied) {
+    console.warn('⏱️ Interaktion kann nicht mehr aktualisiert werden.');
+    return;
+  }
+
+  try {
+    await interaction.deferUpdate(); // verhindert Timeout
+  } catch (err: any) {
+    if (err.code === 40060) {
+      console.warn('⚠️ Interaktion bereits acknowledged.');
+      return;
+    } else {
+      throw err;
+    }
+  }
+
   const state = getRollState(interaction.user.id);
-  if (!state) return safeReply(interaction, '⚠️ Session abgelaufen. Bitte /roll erneut ausführen.');
+  if (!state) {
+    return safeReply(interaction, '⚠️ Session abgelaufen. Bitte /roll erneut ausführen.');
+  }
 
   const embed = buildRollEmbed({
     phase,
@@ -205,14 +223,6 @@ async function updatePhase(interaction: ButtonInteraction, phase: RollPhase) {
   return safeUpdate(interaction, embed, buttons);
 }
 
-function detectCurrentPhase(state: ReturnType<typeof getRollState>): RollPhase {
-  if (!state?.type && !state?.count) return 'phase1';
-  if (!state?.type && state?.count) return 'phase_dnd_select';
-  if (state?.type && !state?.count) {
-    return state.type === 'd6' ? 'phase2' : 'phase_dnd_select';
-  }
-  return 'phase3';
-}
 
 
 // === HILFSMETHODEN ===
