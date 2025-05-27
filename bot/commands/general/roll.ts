@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { setRollState, pushPhase } from '@/modules/roll/rollState.js';
+import { setRollState } from '@/modules/roll/rollState.js';
 import { buildRollEmbed } from '@/modules/roll/buildRollEmbed.js';
 import { buildRollButtons } from '@/modules/roll/buildRollButtons.js';
 
@@ -17,7 +17,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     ownerId: userId,
     phaseHistory: []
   });
-  pushPhase(userId, 'phase1');
 
   const embed = buildRollEmbed({
     phase: 'phase1',
