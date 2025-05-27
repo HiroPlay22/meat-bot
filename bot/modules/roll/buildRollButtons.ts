@@ -110,8 +110,8 @@ export function buildRollButtons({
     rows.push(
       new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId('roll_back')
-          .setLabel('Zurück')
+          .setCustomId('roll_dnd_reset_count')
+          .setLabel('🎲 Neue Würfel wählen')
           .setStyle(ButtonStyle.Secondary)
       )
     );
@@ -165,7 +165,6 @@ export function buildRollButtons({
     );
 
     rows.push(row);
-
 
     if (type !== 'd6') {
       const modifierRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
