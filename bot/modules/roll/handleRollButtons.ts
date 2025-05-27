@@ -56,6 +56,13 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
     return updatePhase(interaction, 'phase3');
   }
 
+  // === DND: NEU STARTEN (Zurück zu Anzahl) ===
+  if (id === 'roll_dnd_reset_count') {
+    // Nur den Würfeltyp zurücksetzen
+    setRollState(userId, { type: undefined });
+    return updatePhase(interaction, 'phase_dnd_count');
+  }
+
   // === ANZAHL WÜRFEL (klassisch) ===
   if (id.startsWith('roll_count_')) {
     const [, , type, countStr] = id.split('_');

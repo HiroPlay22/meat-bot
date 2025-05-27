@@ -111,7 +111,7 @@ export function buildRollButtons({
       new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId('roll_dnd_reset_count')
-          .setLabel('🎲 Neue Würfel wählen')
+          .setLabel('🎲 Zurück')
           .setStyle(ButtonStyle.Secondary)
       )
     );
