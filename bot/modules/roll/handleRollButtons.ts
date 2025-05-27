@@ -201,15 +201,15 @@ async function updatePhase(interaction: ButtonInteraction, phase: RollPhase) {
   return safeUpdate(interaction, embed, buttons);
 }
 
-// === PHASEN-ERKENNUNG ===
 function detectCurrentPhase(state: ReturnType<typeof getRollState>): RollPhase {
   if (!state?.type && !state?.count) return 'phase1';
+  if (!state?.type && state?.count) return 'phase_dnd_select';
   if (state?.type && !state?.count) {
     return state.type === 'd6' ? 'phase2' : 'phase_dnd_select';
   }
-  if (!state?.type && state?.count) return 'phase_dnd_count';
   return 'phase3';
 }
+
 
 // === HILFSMETHODEN ===
 async function safeReply(interaction: ButtonInteraction, content: string) {
