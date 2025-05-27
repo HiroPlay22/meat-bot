@@ -141,7 +141,7 @@ export function buildRollButtons({
       new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId('roll_back')
-          .setLabel('🔙 Zurück')
+          .setLabel('Zurück')
           .setStyle(ButtonStyle.Secondary)
       )
     );
@@ -152,7 +152,7 @@ export function buildRollButtons({
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId('roll_go')
-        .setLabel('🎲 Würfeln')
+        .setLabel('Würfeln')
         .setStyle(ButtonStyle.Success),
       new ButtonBuilder()
         .setCustomId('roll_back')
@@ -171,7 +171,7 @@ export function buildRollButtons({
       const modifierRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId('roll_modifier')
-          .setLabel(modifierSet ? '🧪 Modifier ändern' : '⚙️ Modifier einstellen')
+          .setLabel(modifierSet ? '⚙️ Modifier ändern' : '⚙️ Modifier einstellen')
           .setStyle(ButtonStyle.Secondary)
       );
       rows.push(modifierRow);

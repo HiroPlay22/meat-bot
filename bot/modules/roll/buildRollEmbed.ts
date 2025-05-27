@@ -47,7 +47,7 @@ export function buildRollEmbed({
     case 'phase_dnd_count': {
       embed
         .setTitle(`${safe(emoji.meat_dnd)} DnD-Modus`)
-        .setDescription('Wie viele Würfel möchtest du verwenden?')
+        .setDescription('Wie viele Würfel möchtest du rollen?')
         .setImage(imageAssets.rollDiceDnd);
       break;
     }
@@ -67,7 +67,7 @@ export function buildRollEmbed({
 
       const titleEmoji = type === 'd6' ? emoji.meat_dice : emoji.meat_dnd;
       const modText = modifier !== undefined ? ` mit einem Modifier von ${modifier > 0 ? `+${modifier}` : modifier}` : '';
-      const footerText = `${safe(titleEmoji)} ${count}× ${type}${modifier !== undefined ? ` ${modifier > 0 ? '+' : ''}${modifier}` : ''}`;
+      const footerText = `⚙️ ${count}× ${type}${modifier !== undefined ? ` ${modifier > 0 ? '+' : ''}${modifier}` : ''}`;
 
       embed
         .setTitle(`${safe(titleEmoji)} ${count}× ${type}`)
@@ -77,7 +77,7 @@ export function buildRollEmbed({
 
       if (gmEnabled) {
         embed.addFields({
-          name: `${safe(emoji.meat_gm)} GM-Channel-Modus aktiviert`,
+          name: `🟢 GM-Channel-Modus aktiviert`,
           value: 'Dein Ergebnis wird im GameMaster-Channel veröffentlicht.'
         });
       }
