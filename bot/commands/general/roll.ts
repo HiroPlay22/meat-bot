@@ -14,8 +14,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   // Neue Session starten (mit ownerId und leerem Verlauf)
   setRollState(userId, {
-    ownerId: userId,
-    phaseHistory: []
+    ownerId: userId
   });
 
   const embed = buildRollEmbed({
