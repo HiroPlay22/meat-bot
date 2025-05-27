@@ -193,7 +193,7 @@ async function safeReply(interaction: ButtonInteraction, content: string) {
   try {
     await interaction.reply({ content, ephemeral: true });
   } catch (err: any) {
-    if (err.code === 10062) {
+    if (err.code === 10062 || err.message?.includes('Unknown interaction')) {
       console.warn('⚠️ Interaktion (reply) abgelaufen.');
     } else {
       throw err;
@@ -205,8 +205,13 @@ async function safeUpdate(interaction: ButtonInteraction, embed: any, buttons: a
   try {
     await interaction.update({ embeds: [embed], components: buttons });
   } catch (err: any) {
-    if (err.code === 10062) {
-      console.warn('⚠️ Interaktion (update) abgelaufen.');
+    if (err.code === 10062 || err.message?.includes('Unknown interaction')) {
+      console.warn('⚠️ Interaktion (update) abgelaufen. Fallback mit followUp.');
+      try {
+        await interaction.followUp({ embeds: [embed], components: buttons, ephemeral: true });
+      } catch (err2) {
+        console.error('❌ Fallback fehlgeschlagen:', err2);
+      }
     } else {
       throw err;
     }

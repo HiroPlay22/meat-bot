@@ -8,7 +8,7 @@ export const data = new SlashCommandBuilder()
   .setDescription('Würfelt d4 bis d20');
 
 export async function execute(interaction: ChatInputCommandInteraction) {
-  await interaction.deferReply({ ephemeral: true });
+  await interaction.deferReply({ ephemeral: false });
 
   const userId = interaction.user.id;
 
