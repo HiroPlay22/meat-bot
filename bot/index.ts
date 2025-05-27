@@ -45,8 +45,10 @@ const client = new Discord.Client({
 
 // ✅ Online-Log
 client.once('ready', async () => {
+  globalThis.discordClient = client; // Global verfügbar für API-Routen wie /api/stats
+  
   const tag = client.user?.tag ?? 'unbekannt';
-  await logSystem(`✅ ${tag} ist online`, client);
+  await logSystem(`🟣 ${tag} ist online`, client);
 
   // 🔁 Slash-Commands laden & registrieren
   const commandMap = await loadSlashCommands();
@@ -56,8 +58,11 @@ client.once('ready', async () => {
   // 🔁 Prefix-Kommandos registrieren
   registerPrefixCommands(client);
   await logSystem(`✅ Prefix-Commands registriert`, client);
+
+  // 🔁 Twitch-Poll starten
   startTwitchLivePoll();
 });
+
 
 // 🟢 Registriere Join-Handler
 client.on('guildMemberAdd', async (member) => {
@@ -87,6 +92,3 @@ client.on('messageDelete', async (message) => {
 
 // 🚀 Bot starten
 client.login(getDiscordToken());
-
-// 🌐 Global verfügbar für API-Routen wie /api/stats
-globalThis.discordClient = client;

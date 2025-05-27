@@ -19,7 +19,7 @@ type StreamData = {
 
 export async function buildStreamEmbed(stream: StreamData) {
   const url = `https://twitch.tv/${stream.username}`;
-  const thumbnail = getSafeTwitchThumbnail(stream.username);
+  const thumbnail = await getSafeTwitchThumbnail(stream.username); // WICHTIG: await
 
   const embed = new EmbedBuilder()
     .setColor('#9146FF')
