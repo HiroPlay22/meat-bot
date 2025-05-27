@@ -7,9 +7,9 @@ import {
   isRolling,
   startRolling,
   stopRolling,
-  getPreviousPhase
+  getPreviousPhase,
+  RollPhase
 } from './rollState.js';
-import type { RollPhase, RollState } from './rollState.js';
 import { buildRollEmbed } from './buildRollEmbed.js';
 import { buildRollButtons } from './buildRollButtons.js';
 import { rollDice } from './rollUtils.js';
@@ -64,6 +64,16 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
   if (id === 'roll_back') {
     const currentPhase = detectCurrentPhase(state);
     const prevPhase = getPreviousPhase(currentPhase, state);
+
+    // 🧹 Zustand zurücksetzen für echten Rücksprung
+    if (prevPhase === 'phase1') {
+      setRollState(userId, { type: undefined, count: undefined, modifier: undefined, gmEnabled: undefined });
+    } else if (prevPhase === 'phase2') {
+      setRollState(userId, { count: undefined });
+    } else if (prevPhase === 'phase_dnd_count') {
+      setRollState(userId, { type: undefined });
+    }
+
     return updatePhase(interaction, prevPhase);
   }
 
@@ -157,7 +167,7 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
 }
 
 // === PHASENWECHSEL ===
-async function updatePhase(interaction: ButtonInteraction, phase: any) {
+async function updatePhase(interaction: ButtonInteraction, phase: RollPhase) {
   const state = getRollState(interaction.user.id);
   if (!state) return safeReply(interaction, '⚠️ Session abgelaufen. Bitte /roll erneut ausführen.');
 
@@ -182,7 +192,7 @@ async function updatePhase(interaction: ButtonInteraction, phase: any) {
   return safeUpdate(interaction, embed, buttons);
 }
 
-// === PHASEN-ERKENNUNG FÜR ZURÜCK-BUTTON ===
+// === PHASEN-ERKENNUNG ===
 function detectCurrentPhase(state: ReturnType<typeof getRollState>): RollPhase {
   if (!state?.type && !state?.count) return 'phase1';
   if (state?.type && !state?.count) {
