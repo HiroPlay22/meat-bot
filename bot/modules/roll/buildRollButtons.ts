@@ -87,8 +87,8 @@ export function buildRollButtons({
     rows.push(
       new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId('roll_back')
-          .setLabel('Zurück')
+          .setCustomId('roll_reset_all')
+          .setLabel('Zurück2')
           .setStyle(ButtonStyle.Secondary)
       )
     );

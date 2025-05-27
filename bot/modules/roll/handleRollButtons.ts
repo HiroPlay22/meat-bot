@@ -63,6 +63,14 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
     return updatePhase(interaction, 'phase_dnd_count');
   }
 
+  // === KOMPLETT ZURÜCK ZUM START ===
+  if (id === 'roll_reset_all') {
+    clearRollState(userId);
+    setRollState(userId, { ownerId: userId }); // optional wieder setzen
+    return updatePhase(interaction, 'phase1');
+  }
+
+
   // === ANZAHL WÜRFEL (klassisch) ===
   if (id.startsWith('roll_count_')) {
     const [, , type, countStr] = id.split('_');
