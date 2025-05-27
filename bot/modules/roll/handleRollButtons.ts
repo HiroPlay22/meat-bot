@@ -7,9 +7,9 @@ import {
   isRolling,
   startRolling,
   stopRolling,
-  pushPhase,
-  popLastPhase
+  getPreviousPhase
 } from './rollState.js';
+import type { RollPhase, RollState } from './rollState.js';
 import { buildRollEmbed } from './buildRollEmbed.js';
 import { buildRollButtons } from './buildRollButtons.js';
 import { rollDice } from './rollUtils.js';
@@ -19,7 +19,7 @@ import serverSettings from '../../../config/serverSettings.json' with { type: 'j
 export async function handleRollButtons(interaction: ButtonInteraction) {
   const userId = interaction.user.id;
   const id = interaction.customId;
-  const state = getRollState(interaction.user.id);
+  const state = getRollState(userId);
 
   if (!state || state.ownerId !== userId) {
     return safeReply(interaction, '⚠️ Du darfst diese Würfel-Session nicht bedienen.');
@@ -62,15 +62,8 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
 
   // === ZURÜCK ===
   if (id === 'roll_back') {
-    let prevPhase: any;
-    let safety = 10;
-    do {
-      prevPhase = popLastPhase(userId);
-      safety--;
-    } while (prevPhase === undefined && safety > 0);
-
-    if (!prevPhase) prevPhase = 'phase1';
-
+    const currentPhase = detectCurrentPhase(state);
+    const prevPhase = getPreviousPhase(currentPhase, state);
     return updatePhase(interaction, prevPhase);
   }
 
@@ -109,7 +102,7 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
     return;
   }
 
-    // === 🎲 WÜRFELN ===
+  // === 🎲 WÜRFELN ===
   if (id === 'roll_go') {
     if (!state?.type || !state?.count) {
       return safeReply(interaction, '❌ Roll unvollständig.');
@@ -163,16 +156,10 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
   return safeReply(interaction, '❌ Unbekannter Button.');
 }
 
-
 // === PHASENWECHSEL ===
 async function updatePhase(interaction: ButtonInteraction, phase: any) {
   const state = getRollState(interaction.user.id);
   if (!state) return safeReply(interaction, '⚠️ Session abgelaufen. Bitte /roll erneut ausführen.');
-
-  const last = state.phaseHistory?.[state.phaseHistory.length - 1];
-  if (last !== phase) {
-    pushPhase(interaction.user.id, phase);
-  }
 
   const embed = buildRollEmbed({
     phase,
@@ -193,6 +180,16 @@ async function updatePhase(interaction: ButtonInteraction, phase: any) {
   });
 
   return safeUpdate(interaction, embed, buttons);
+}
+
+// === PHASEN-ERKENNUNG FÜR ZURÜCK-BUTTON ===
+function detectCurrentPhase(state: ReturnType<typeof getRollState>): RollPhase {
+  if (!state?.type && !state?.count) return 'phase1';
+  if (state?.type && !state?.count) {
+    return state.type === 'd6' ? 'phase2' : 'phase_dnd_select';
+  }
+  if (!state?.type && state?.count) return 'phase_dnd_count';
+  return 'phase3';
 }
 
 // === HILFSMETHODEN ===
