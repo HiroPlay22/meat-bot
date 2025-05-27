@@ -1,3 +1,5 @@
+// bot/commands/general/roll.ts
+
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { setRollState } from '@/modules/roll/rollState.js';
 import { buildRollEmbed } from '@/modules/roll/buildRollEmbed.js';
@@ -8,25 +10,41 @@ export const data = new SlashCommandBuilder()
   .setDescription('Würfelt d4 bis d20');
 
 export async function execute(interaction: ChatInputCommandInteraction) {
-  await interaction.deferReply({ ephemeral: false });
+  try {
+    // Verhindert doppelte Verarbeitung
+    if (interaction.replied || interaction.deferred) {
+      console.warn('⚠️ /roll wurde bereits beantwortet oder deferred.');
+      return;
+    }
 
-  const userId = interaction.user.id;
+    await interaction.deferReply({ ephemeral: false });
 
-  // Neue Session starten (mit ownerId und leerem Verlauf)
-  setRollState(userId, {
-    ownerId: userId
-  });
+    const userId = interaction.user.id;
 
-  const embed = buildRollEmbed({
-    phase: 'phase1',
-    user: interaction.user
-  });
+    // Neue Session starten (mit ownerId)
+    setRollState(userId, {
+      ownerId: userId
+    });
 
-  const components = buildRollButtons({
-    phase: 'phase1',
-    viewer: interaction.user,
-    owner: { id: userId }
-  });
+    const embed = buildRollEmbed({
+      phase: 'phase1',
+      user: interaction.user
+    });
 
-  await interaction.editReply({ embeds: [embed], components });
+    const components = buildRollButtons({
+      phase: 'phase1',
+      viewer: interaction.user,
+      owner: { id: userId }
+    });
+
+    await interaction.editReply({ embeds: [embed], components });
+  } catch (err: any) {
+    console.error('❌ Fehler im /roll Command:', err);
+    if (!interaction.replied) {
+      await interaction.reply({
+        content: '❌ Beim Ausführen des Befehls ist ein Fehler aufgetreten.',
+        ephemeral: true
+      }).catch(() => {});
+    }
+  }
 }
