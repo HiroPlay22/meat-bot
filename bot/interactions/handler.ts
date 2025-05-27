@@ -162,7 +162,24 @@ export async function registerInteractions(client: Client) {
       // === ROLL: Button
       if (interaction.isButton() && interaction.customId.startsWith("roll_")) {
         const { handleRollButtons } = await import("@modules/roll/handleRollButtons.js");
-        return await handleRollButtons(interaction);
+
+        // Nur ausführen, wenn Interaction nicht bereits verarbeitet
+        if (interaction.replied || interaction.deferred) {
+          console.warn(`⚠️ ROLL: Interaktion ${interaction.customId} bereits beantwortet.`);
+          return;
+        }
+
+        try {
+          return await handleRollButtons(interaction);
+        } catch (err) {
+          console.error(`❌ Fehler beim ROLL-Handling (${interaction.customId}):`, err);
+          if (!interaction.replied && !interaction.deferred) {
+            await interaction.reply({
+              content: '❌ Beim Würfeln ist etwas schiefgelaufen.',
+              ephemeral: true
+            }).catch(() => {});
+          }
+        }
       }
 
       // === DinoName: Würfeln
