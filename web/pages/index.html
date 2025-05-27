@@ -293,7 +293,7 @@
             </script>
 
             <section class="mt-0">
-                <div class="grid md:grid-cols-2 gap-6">
+                <div class="grid md:grid-cols-2 sm:grid-cols-1 gap-6">
                     <div>
 
   <div class="grid grid-cols-2 sm:grid-cols-2 gap-1 text-sm font-mono">
@@ -370,50 +370,7 @@
   </div>
 </div>
 
-        <div class="bg-zinc-800 p-6 rounded-xl shadow w-full text-white text-sm">
-            <h4 class="text-lg font-semibold text-white mb-4 flex items-center">
-                <i class="fa-sm fa-solid fa-calendar-days mr-2"></i>Eventkalender
-            </h4>
-            <div id="calendar" class="vanilla-calendar w-full"></div>
-        </div>
-        <!-- Neue System-Auslastung -->
-        <div class="bg-zinc-800 p-6 rounded-xl shadow">
-          <h4 class="text-lg font-semibold text-white mb-2">
-            <i class="fa-sm fa-solid fa-microchip mr-2"></i>System-Auslastung <span class="text-xs text-gray-400">(live)</span>
-          </h4>
-
-          <!-- CPU -->
-          <div class="mb-4">
-            <p class="text-xs text-gray-400 mb-1">CPU-Auslastung</p>
-            <canvas id="cpuChart" height="60"></canvas>
-          </div>
-
-          <!-- RAM -->
-          <div>
-            <p class="text-xs text-gray-400 mb-1">RAM-Auslastung</p>
-            <canvas id="ramChart" height="60"></canvas>
-          </div>
-        </div>
-        <div class="bg-zinc-800 p-6 rounded-xl shadow">
-            <h4 class="text-lg font-semibold text-white mb-2">
-                <i class="fa-sm fa-solid fa-user mr-2"></i>User-Aktivität <span class="text-xs text-gray-400">(heute)</span>
-            </h4>
-            <canvas id="userRadarChart" class="w-full max-w-sm mx-auto"></canvas>
-            <p class="text-xs text-green-400 mt-4 text-center">
-                <i class="fa-solid fa-arrow-trend-up mr-1"></i>
-                Trending up by 5.2% this month<br />
-                <span class="text-zinc-500">January – June 2025</span>
-            </p>
-        </div>
-        <div class="bg-zinc-800 p-6 rounded-xl shadow w-full text-white text-sm">
-  <h4 class="text-lg font-semibold text-white mb-4 flex items-center justify-between">
-    <span><i class="fa-sm fa-solid fa-clock-rotate-left mr-2"></i>Letzte Updates</span>
-    <a href="https://github.com/HiroPlay22/meat-bot/commits/main" class="text-gray-400 text-xs border px-2 py-1 rounded hover:text-white hover:border-white" target="_blank">
-      Alle anzeigen
-    </a>
-  </h4>
-  <div id="commitLog" class="space-y-2 font-mono text-sm"></div>
-</div>
+        
 
 
     </div>
