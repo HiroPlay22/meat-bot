@@ -8,6 +8,7 @@ import {
   startRolling,
   stopRolling,
   getPreviousPhase,
+  clearRollState,
   RollPhase
 } from './rollState.js';
 import { buildRollEmbed } from './buildRollEmbed.js';
