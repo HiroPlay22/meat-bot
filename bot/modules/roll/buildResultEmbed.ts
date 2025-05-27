@@ -28,7 +28,7 @@ export function buildResultEmbed({
   const descriptionLines = [
     displayLine,
     modifier !== 0 ? `🎯 Modifier: ${modifier > 0 ? '+' : ''}${modifier}` : null,
-    `🧠 Endergebnis: **${total}**`,
+    `Endergebnis: **${total}**`,
     '',
     `> ${comment}`
   ].filter(Boolean);
