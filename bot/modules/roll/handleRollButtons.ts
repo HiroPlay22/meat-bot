@@ -8,6 +8,7 @@ import {
   startRolling,
   stopRolling,
   getPreviousPhase,
+  pushPhase,
   RollPhase
 } from './rollState.js';
 import { buildRollEmbed } from './buildRollEmbed.js';
@@ -37,6 +38,7 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
   }
 
   if (id === 'roll_type_dnd') {
+    pushPhase(userId, 'phase1');
     setRollState(userId, { type: undefined, count: 0 });
     return updatePhase(interaction, 'phase_dnd_count');
   }
@@ -45,6 +47,7 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
   if (id.startsWith('roll_count_dnd_')) {
     const count = parseInt(id.replace('roll_count_dnd_', ''));
     const current = getRollState(userId);
+    pushPhase(userId, 'phase_dnd_count');
     setRollState(userId, { ...current, count });
     return updatePhase(interaction, 'phase_dnd_select');
   }
@@ -52,6 +55,7 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
   if (id.startsWith('roll_dndtype_')) {
     const newType = id.replace('roll_dndtype_', '') as any;
     const current = getRollState(userId);
+    pushPhase(userId, 'phase_dnd_select');
     setRollState(userId, { ...current, type: newType });
     return updatePhase(interaction, 'phase3');
   }

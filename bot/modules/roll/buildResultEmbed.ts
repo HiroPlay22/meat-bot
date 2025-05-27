@@ -39,7 +39,7 @@ export function buildResultEmbed({
     .setTitle(`${user.displayName} würfelt ...`)
     .setDescription(descriptionLines.join('\n'))
     .setFooter({
-      text: `🧙 ${rolls.length}× ${type}${modifier !== 0 ? ` ${modifier > 0 ? '+' : ''}${modifier}` : ''}`
+      text: `⚙️ ${rolls.length}× ${type}${modifier !== 0 ? ` ${modifier > 0 ? '+' : ''}${modifier}` : ''}`
     });
 
   return embed;
