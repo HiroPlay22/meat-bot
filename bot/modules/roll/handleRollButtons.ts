@@ -109,7 +109,7 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
     return;
   }
 
-  // === 🎲 WÜRFELN ===
+    // === 🎲 WÜRFELN ===
   if (id === 'roll_go') {
     if (!state?.type || !state?.count) {
       return safeReply(interaction, '❌ Roll unvollständig.');
@@ -122,7 +122,15 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
     startRolling(userId);
 
     try {
-      await interaction.deferUpdate();
+      if (!interaction.deferred && !interaction.replied) {
+        try {
+          await interaction.deferUpdate();
+        } catch (err) {
+          console.warn('⚠️ deferUpdate fehlgeschlagen oder bereits abgelaufen:', err);
+          stopRolling(userId);
+          return;
+        }
+      }
 
       const rolls = rollDice(state.type, state.count);
       const resultEmbed = buildResultEmbed({
@@ -154,6 +162,7 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
 
   return safeReply(interaction, '❌ Unbekannter Button.');
 }
+
 
 // === PHASENWECHSEL ===
 async function updatePhase(interaction: ButtonInteraction, phase: any) {
