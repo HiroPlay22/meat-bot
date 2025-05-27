@@ -9,7 +9,6 @@ export interface RollState {
   modifier?: number;
   gmEnabled?: boolean;
   ownerId?: string;
-  phaseHistory?: RollPhase[]; // WICHTIG: Verlauf für Zurück-Logik
 }
 
 const rollSession = new Map<string, RollState>(); // key = userId
@@ -43,21 +42,7 @@ export function stopRolling(userId: string) {
   activeRolls.delete(userId);
 }
 
-// === PHASE-HISTORY (für mehrfaches Zurückspringen) ===
-export function pushPhase(userId: string, phase: RollPhase) {
-  const state = getRollState(userId);
-  if (!state) return;
-  if (!state.phaseHistory) state.phaseHistory = [];
-  state.phaseHistory.push(phase);
-}
-
-export function popLastPhase(userId: string): RollPhase | undefined {
-  const state = getRollState(userId);
-  if (!state?.phaseHistory || state.phaseHistory.length === 0) return undefined;
-  return state.phaseHistory.pop();
-}
-
-// === PHASEN-NAVIGATION (Fallback bei direkter Rückfrage) ===
+// === PHASE-NAVIGATION ===
 export function getPreviousPhase(current: RollPhase, state: RollState): RollPhase {
   switch (current) {
     case 'phase3':

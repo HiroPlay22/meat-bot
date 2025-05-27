@@ -8,7 +8,6 @@ import {
   startRolling,
   stopRolling,
   getPreviousPhase,
-  pushPhase,
   RollPhase
 } from './rollState.js';
 import { buildRollEmbed } from './buildRollEmbed.js';
@@ -38,7 +37,6 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
   }
 
   if (id === 'roll_type_dnd') {
-    pushPhase(userId, 'phase1');
     setRollState(userId, { type: undefined, count: 0 });
     return updatePhase(interaction, 'phase_dnd_count');
   }
@@ -47,7 +45,6 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
   if (id.startsWith('roll_count_dnd_')) {
     const count = parseInt(id.replace('roll_count_dnd_', ''));
     const current = getRollState(userId);
-    pushPhase(userId, 'phase_dnd_count');
     setRollState(userId, { ...current, count });
     return updatePhase(interaction, 'phase_dnd_select');
   }
@@ -55,7 +52,6 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
   if (id.startsWith('roll_dndtype_')) {
     const newType = id.replace('roll_dndtype_', '') as any;
     const current = getRollState(userId);
-    pushPhase(userId, 'phase_dnd_select');
     setRollState(userId, { ...current, type: newType });
     return updatePhase(interaction, 'phase3');
   }
@@ -181,26 +177,8 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
 
 // === PHASENWECHSEL ===
 async function updatePhase(interaction: ButtonInteraction, phase: RollPhase) {
-  if (!interaction.isRepliable() || interaction.deferred || interaction.replied) {
-    console.warn('⏱️ Interaktion kann nicht mehr aktualisiert werden.');
-    return;
-  }
-
-  try {
-    await interaction.deferUpdate(); // verhindert Timeout
-  } catch (err: any) {
-    if (err.code === 40060) {
-      console.warn('⚠️ Interaktion bereits acknowledged.');
-      return;
-    } else {
-      throw err;
-    }
-  }
-
   const state = getRollState(interaction.user.id);
-  if (!state) {
-    return safeReply(interaction, '⚠️ Session abgelaufen. Bitte /roll erneut ausführen.');
-  }
+  if (!state) return safeReply(interaction, '⚠️ Session abgelaufen. Bitte /roll erneut ausführen.');
 
   const embed = buildRollEmbed({
     phase,
@@ -223,6 +201,14 @@ async function updatePhase(interaction: ButtonInteraction, phase: RollPhase) {
   return safeUpdate(interaction, embed, buttons);
 }
 
+function detectCurrentPhase(state: ReturnType<typeof getRollState>): RollPhase {
+  if (!state?.type && !state?.count) return 'phase1';
+  if (!state?.type && state?.count) return 'phase_dnd_select';
+  if (state?.type && !state?.count) {
+    return state.type === 'd6' ? 'phase2' : 'phase_dnd_select';
+  }
+  return 'phase3';
+}
 
 
 // === HILFSMETHODEN ===
@@ -247,24 +233,13 @@ async function safeUpdate(interaction: ButtonInteraction, embed: any, buttons: a
     await interaction.update({ embeds: [embed], components: buttons });
   } catch (err: any) {
     if (
-      err.code === 10062 || // Unknown interaction
-      err.code === 40060 || // Interaction already acknowledged
-      err.code === 'InteractionAlreadyReplied'
+      err.code === 10062 ||
+      err.code === 40060 ||
+      err.message?.includes('Unknown interaction')
     ) {
-      console.warn('⚠️ update() fehlgeschlagen – versuche followUp()');
-
-      try {
-        await interaction.followUp({
-          embeds: [embed],
-          components: buttons,
-          ephemeral: true
-        });
-      } catch (followErr: any) {
-        console.warn('❌ Fallback mit followUp() fehlgeschlagen:', followErr);
-      }
+      console.warn('⚠️ Interaktion (update) abgelaufen oder bereits verarbeitet. Kein Fallback möglich.');
     } else {
       throw err;
     }
   }
 }
-
