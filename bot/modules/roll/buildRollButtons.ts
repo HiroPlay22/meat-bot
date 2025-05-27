@@ -88,7 +88,7 @@ export function buildRollButtons({
       new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId('roll_reset_all')
-          .setLabel('Zurück2')
+          .setLabel('Zurück')
           .setStyle(ButtonStyle.Secondary)
       )
     );
@@ -111,7 +111,7 @@ export function buildRollButtons({
       new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId('roll_dnd_reset_count')
-          .setLabel('🎲 Zurück')
+          .setLabel('Zurück')
           .setStyle(ButtonStyle.Secondary)
       )
     );

@@ -238,6 +238,7 @@ async function safeReply(interaction: ButtonInteraction, content: string) {
       err.message?.includes('Unknown interaction')
     ) {
       console.warn('⚠️ Interaktion (reply) abgelaufen oder bereits verarbeitet.');
+      return; // WICHTIG: Verarbeitung abbrechen
     } else {
       throw err;
     }
@@ -254,6 +255,7 @@ async function safeUpdate(interaction: ButtonInteraction, embed: any, buttons: a
       err.message?.includes('Unknown interaction')
     ) {
       console.warn('⚠️ Interaktion (update) abgelaufen oder bereits verarbeitet. Kein Fallback möglich.');
+      return; // WICHTIG: Verarbeitung abbrechen
     } else {
       throw err;
     }
