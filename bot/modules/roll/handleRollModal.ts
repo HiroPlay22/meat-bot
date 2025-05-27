@@ -1,3 +1,5 @@
+// bot/modules/roll/handleRollModal.ts
+
 import { ModalSubmitInteraction } from 'discord.js';
 import { getRollState, setRollState } from './rollState.js';
 import { buildRollEmbed } from './buildRollEmbed.js';

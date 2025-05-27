@@ -1,3 +1,5 @@
+// bot/commands/general/stats.ts
+
 import {
   ChatInputCommandInteraction,
   SlashCommandBuilder,

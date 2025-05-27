@@ -1,4 +1,4 @@
-// modules/roll/rollUtils.ts
+// bot/modules/roll/rollUtils.ts
 
 export function rollDice(type: 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20', count: number): number[] {
   const sides = parseInt(type.replace('d', ''));

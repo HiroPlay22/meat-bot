@@ -1,3 +1,5 @@
+// bot/modules/roll/buildResultEmbed.ts
+
 import { EmbedBuilder, User } from 'discord.js';
 import { getDiceEmoji, getRollQuality, getComment } from './rollUtils.js';
 

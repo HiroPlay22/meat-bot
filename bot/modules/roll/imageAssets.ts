@@ -1,4 +1,4 @@
-// modules/roll/imageAssets.ts
+// bot/modules/roll/imageAssets.ts
 
 export const imageAssets = {
   rollStart: "https://media.discordapp.net/attachments/1374459199181951087/1374734155031777320/roll.webp",

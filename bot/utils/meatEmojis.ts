@@ -27,7 +27,7 @@ export const emoji = {
   meat_threads: '<:meat_threads:ID>',
   meat_afk: '<:meat_afk:ID>',
   meat_lock: '<:meat_lock:ID>',
-  meat_nsfw: '<:meat_nsfw:ID>',
+  meat_nsfw: '<:meat_roles:1373694032462614528>',
   meat_feature: '<:meat_feature:ID>',
 
   // 🦖 Aktivität & Features

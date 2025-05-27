@@ -1,3 +1,6 @@
+
+// bot/modules/roll/buildRollEmbed.ts
+
 import { EmbedBuilder, User } from 'discord.js';
 import { imageAssets } from './imageAssets.js';
 import { emoji, safe } from '@/utils/meatEmojis.js';
@@ -10,7 +13,7 @@ export function buildRollEmbed({
   modifier,
   gmEnabled
 }: {
-  phase: 'phase1' | 'phase2' | 'phase3';
+  phase: 'phase1' | 'phase2' | 'phase3' | 'phase_dnd_count' | 'phase_dnd_select';
   user: User;
   type?: 'd6' | 'd4' | 'd8' | 'd10' | 'd12' | 'd20';
   count?: number;
@@ -38,6 +41,24 @@ export function buildRollEmbed({
         .setTitle(`${safe(titleEmoji)} ${type === 'd6' ? 'Würfelmodus aktiviert' : 'DnD-Modus aktiviert'}`)
         .setDescription('Wie viele Würfel möchtest du rollen?')
         .setImage(type === 'd6' ? imageAssets.rollDiceClassic : imageAssets.rollDiceDnd);
+      break;
+    }
+
+    case 'phase_dnd_count': {
+      embed
+        .setTitle(`${safe(emoji.meat_dnd)} DnD-Modus`)
+        .setDescription('Wie viele Würfel möchtest du verwenden?')
+        .setImage(imageAssets.rollDiceDnd);
+      break;
+    }
+
+    case 'phase_dnd_select': {
+      if (!count) throw new Error('Missing count in phase_dnd_select');
+
+      embed
+        .setTitle(`${safe(emoji.meat_dnd)} Würfelart wählen`)
+        .setDescription(`Du hast dich für **${count}** Würfel entschieden. Jetzt fehlt noch der Typ!`)
+        .setImage(imageAssets.rollDiceDnd);
       break;
     }
 

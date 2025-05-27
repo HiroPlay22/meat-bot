@@ -1,7 +1,5 @@
-// commands/general/roll.ts
-
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { setRollState } from '@/modules/roll/rollState.js';
+import { setRollState, pushPhase } from '@/modules/roll/rollState.js';
 import { buildRollEmbed } from '@/modules/roll/buildRollEmbed.js';
 import { buildRollButtons } from '@/modules/roll/buildRollButtons.js';
 
@@ -12,8 +10,14 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction: ChatInputCommandInteraction) {
   await interaction.deferReply({ ephemeral: true });
 
-  // Neue Session starten (leer)
-  setRollState(interaction.user.id, {});
+  const userId = interaction.user.id;
+
+  // Neue Session starten (mit ownerId und leerem Verlauf)
+  setRollState(userId, {
+    ownerId: userId,
+    phaseHistory: []
+  });
+  pushPhase(userId, 'phase1');
 
   const embed = buildRollEmbed({
     phase: 'phase1',
@@ -23,7 +27,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const components = buildRollButtons({
     phase: 'phase1',
     viewer: interaction.user,
-    owner: interaction.user
+    owner: { id: userId }
   });
 
   await interaction.editReply({ embeds: [embed], components });

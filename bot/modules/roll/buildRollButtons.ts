@@ -1,4 +1,4 @@
-// modules/roll/buildRollButtons.ts
+// bot/modules/roll/buildRollButtons.ts
 
 import {
   ActionRowBuilder,
@@ -15,9 +15,9 @@ export function buildRollButtons({
   gmEnabled,
   modifierSet
 }: {
-  phase: 'phase1' | 'phase2' | 'phase3' | 'phase_dnd_select';
+  phase: 'phase1' | 'phase2' | 'phase3' | 'phase_dnd_count' | 'phase_dnd_select';
   viewer: User;
-  owner: User;
+  owner: { id: string };
   type?: 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20';
   gmEnabled?: boolean;
   modifierSet?: boolean;
@@ -25,12 +25,12 @@ export function buildRollButtons({
   const isOwner = viewer.id === owner.id;
   const rows: ActionRowBuilder<ButtonBuilder>[] = [];
 
+  // 🔒 Nicht-Besitzer = alles disabled
   if (!isOwner) {
-    // Nur ansehen, nicht klicken
-    const infoRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    const lockRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId('roll_locked')
-        .setLabel(`🔒 Hier würfelt ${owner.username}`)
+        .setLabel(`🔒 Hier würfelt ${owner.id}`)
         .setDisabled(true)
         .setStyle(ButtonStyle.Secondary)
     );
@@ -43,10 +43,11 @@ export function buildRollButtons({
         .setStyle(ButtonStyle.Secondary)
     );
 
-    rows.push(infoRow, gmRow);
+    rows.push(lockRow, gmRow);
     return rows;
   }
 
+  // === PHASE 1 ===
   if (phase === 'phase1') {
     rows.push(
       new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -67,6 +68,33 @@ export function buildRollButtons({
     );
   }
 
+  // === NEUE DND-PHASE: ANZAHL AUSWÄHLEN ===
+  if (phase === 'phase_dnd_count') {
+    const countButtons: ButtonBuilder[] = [];
+    for (let i = 1; i <= 10; i++) {
+      countButtons.push(
+        new ButtonBuilder()
+          .setCustomId(`roll_count_dnd_${i}`)
+          .setLabel(`${i} Würfel`)
+          .setStyle(ButtonStyle.Primary)
+      );
+    }
+
+    for (let i = 0; i < countButtons.length; i += 5) {
+      rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(...countButtons.slice(i, i + 5)));
+    }
+
+    rows.push(
+      new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId('roll_back')
+          .setLabel('🔙 Zurück')
+          .setStyle(ButtonStyle.Secondary)
+      )
+    );
+  }
+
+  // === WÜRFELTYP WÄHLEN (DnD) ===
   if (phase === 'phase_dnd_select') {
     const dndButtons: ButtonBuilder[] = ['d4','d6','d8','d10','d12','d20'].map(type =>
       new ButtonBuilder()
@@ -75,7 +103,6 @@ export function buildRollButtons({
         .setStyle(ButtonStyle.Primary)
     );
 
-    // Max 5 Buttons pro Row
     for (let i = 0; i < dndButtons.length; i += 5) {
       rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(...dndButtons.slice(i, i + 5)));
     }
@@ -90,9 +117,9 @@ export function buildRollButtons({
     );
   }
 
+  // === KLASSISCHER WÜRFEL: ANZAHL WÄHLEN ===
   if (phase === 'phase2' && type) {
-    const isDnd = type !== 'd6';
-    const max = isDnd ? 10 : 5;
+    const max = type === 'd6' ? 5 : 10;
     const buttonChunks: ButtonBuilder[][] = [];
 
     for (let i = 1; i <= max; i++) {
@@ -120,6 +147,7 @@ export function buildRollButtons({
     );
   }
 
+  // === PHASE 3: BEREIT ZU WÜRFELN ===
   if (phase === 'phase3' && type) {
     const mainRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()

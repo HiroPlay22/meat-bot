@@ -1,3 +1,5 @@
+// bot/modules/roll/handleRollButtons.ts
+
 import { ButtonInteraction } from 'discord.js';
 import {
   setRollState,
@@ -5,7 +7,9 @@ import {
   clearRollState,
   isRolling,
   startRolling,
-  stopRolling
+  stopRolling,
+  pushPhase,
+  popLastPhase
 } from './rollState.js';
 import { buildRollEmbed } from './buildRollEmbed.js';
 import { buildRollButtons } from './buildRollButtons.js';
@@ -18,6 +22,10 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
   const id = interaction.customId;
   const state = getRollState(userId);
 
+  if (!state || state.ownerId !== userId) {
+    return safeReply(interaction, '⚠️ Du darfst diese Würfel-Session nicht bedienen.');
+  }
+
   // === TYPE SELECTION ===
   if (id === 'roll_type_d6') {
     setRollState(userId, { type: 'd6', count: 0 });
@@ -25,19 +33,26 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
   }
 
   if (id === 'roll_type_dnd') {
-    setRollState(userId, { count: 0 } as any); // Typ wird später gewählt
+    setRollState(userId, { type: undefined, count: 0 });
+    return updatePhase(interaction, 'phase_dnd_count');
+  }
+
+  // === DND: ANZAHL vor TYP ===
+  if (id.startsWith('roll_count_dnd_')) {
+    const count = parseInt(id.replace('roll_count_dnd_', ''));
+    const current = getRollState(userId);
+    setRollState(userId, { ...current, count });
     return updatePhase(interaction, 'phase_dnd_select');
   }
 
-  // === DnD WÜRFEL AUSWÄHLEN ===
   if (id.startsWith('roll_dndtype_')) {
     const newType = id.replace('roll_dndtype_', '') as any;
     const current = getRollState(userId);
     setRollState(userId, { ...current, type: newType });
-    return updatePhase(interaction, 'phase2');
+    return updatePhase(interaction, 'phase3');
   }
 
-  // === ANZAHL WÜRFEL ===
+  // === ANZAHL WÜRFEL (klassisch) ===
   if (id.startsWith('roll_count_')) {
     const [, , type, countStr] = id.split('_');
     const count = parseInt(countStr);
@@ -48,16 +63,9 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
 
   // === ZURÜCK ===
   if (id === 'roll_back') {
-    if (!state) return safeReply(interaction, '⚠️ Keine Session gefunden.');
-
-    // Woher kommen wir?
-    if (!state.type) return updatePhase(interaction, 'phase1');
-    if (!state.count) {
-      if (state.type === 'd6') return updatePhase(interaction, 'phase1');
-      else return updatePhase(interaction, 'phase_dnd_select');
-    }
-
-    return updatePhase(interaction, 'phase2');
+    const prevPhase = popLastPhase(userId);
+    if (!prevPhase) return safeReply(interaction, '⚠️ Kein vorheriger Schritt gefunden.');
+    return updatePhase(interaction, prevPhase);
   }
 
   // === GM TOGGLE ===
@@ -143,9 +151,11 @@ export async function handleRollButtons(interaction: ButtonInteraction) {
 }
 
 // === PHASENWECHSEL ===
-async function updatePhase(interaction: ButtonInteraction, phase: 'phase1' | 'phase2' | 'phase3' | 'phase_dnd_select') {
+async function updatePhase(interaction: ButtonInteraction, phase: any) {
   const state = getRollState(interaction.user.id);
   if (!state) return safeReply(interaction, '⚠️ Session abgelaufen. Bitte /roll erneut ausführen.');
+
+  pushPhase(interaction.user.id, phase);
 
   const embed = buildRollEmbed({
     phase,
@@ -159,7 +169,7 @@ async function updatePhase(interaction: ButtonInteraction, phase: 'phase1' | 'ph
   const buttons = buildRollButtons({
     phase,
     viewer: interaction.user,
-    owner: interaction.user,
+    owner: { id: state.ownerId! },
     type: state.type,
     gmEnabled: state.gmEnabled,
     modifierSet: typeof state.modifier === 'number'
