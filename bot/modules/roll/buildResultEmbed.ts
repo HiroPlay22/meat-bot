@@ -1,6 +1,7 @@
 // bot/modules/roll/buildResultEmbed.ts
 
 import { EmbedBuilder, User } from 'discord.js';
+import { emoji, safe } from '@/utils/meatEmojis.js';
 import { getDiceEmoji, getRollQuality, getComment } from './rollUtils.js';
 
 export function buildResultEmbed({
@@ -21,8 +22,9 @@ export function buildResultEmbed({
   const comment = getComment(quality);
 
   // Darstellung der Würfe
-  const emojiRow = rolls.map(() => '🎲');
-  const valueRow = rolls.map(n => `${n}`.padStart(2, ''));
+  const icon = type === 'd6' ? safe(emoji.meat_dice) : safe(emoji.meat_dnd);
+  const emojiRow = rolls.map(() => icon);
+  const valueRow = rolls.map(n => `${n}`.padStart(2, '0'));
   const displayLine = emojiRow.map((e, i) => `${e}${valueRow[i]}`).join(' ');
 
   const descriptionLines = [
