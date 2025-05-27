@@ -1,5 +1,3 @@
-// utils/meatEmojis.ts
-
 export const emoji = {
   // 🧠 M.E.A.T. Core & System
   meat_dev: '<:meat_dev:1373670733607338015>',
@@ -18,7 +16,7 @@ export const emoji = {
   meat_channels: '<:meat_channels:1373694042985992272>',
   meat_commands: '<:meat_commands:1373694040176070779>',
 
-  // 🏠 Server Stats (verwendet im /info)
+  // 🏠 Server Stats
   meat_members: '<:meat_user:1373694031124627478>',
   meat_online: '<:meat_online:1373697659478478888>',
   meat_text: '<:meat_text:1373694036614971484>',
@@ -42,23 +40,23 @@ export const emoji = {
   twitch: '<:twitch:ID>',
   youtube: '<:youtube:ID>',
 
-  // 🎥 Stream-Embed-Icons (zentral für buildStreamEmbed)
+  // 🎥 Stream-Embed-Icons
   stream: '🎥',
   text: '📝',
   user: '👤',
   viewers: '👁️',
   category: '🗂️',
 
-  // 🎲 Roll-System Erweiterung
-  meat_dice: '<:meat_dice:123456789012345678>',    // Standard-Würfel
-  meat_dnd: '<:meat_dnd:123456789012345679>',      // DnD-Würfel
-  meat_gm: '<:meat_gm:123456789012345680>',        // GM-Channel-Indikator
+  // 🎲 Roll-System
+  meat_dice: '<:meat_dice:1376947755376705568>',    // ⚀ Klassischer Würfel
+  meat_dnd: '<:meat_dnd:1376947757285380197>',      // ⚔️ DnD-Würfel
+  meat_gm: '<:meat_boss:ID>',        // 🧙 GM-Channel-Modus
 
-  // Fallback
+  // 🔙 Fallback
   meat_leer: '<:meat_leer:1373700191294722058>'
 };
 
-// 🔒 Sicheres Einfügen von Emojis, falls ID noch fehlt
+// 🔒 Sicheres Einfügen von Emojis
 export function safe(icon: string | undefined, fallback = emoji.meat_leer): string {
   return icon && !icon.includes(':ID') ? icon : fallback;
 }
