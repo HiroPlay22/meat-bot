@@ -1,3 +1,5 @@
+
+// bot/interactions/buttons/startPollFungames.ts
 import {
   ButtonInteraction,
   EmbedBuilder,
@@ -12,6 +14,7 @@ import { getPollNumber } from '@modules/poll/utils';
 import { logSystem } from '@services/internal/log';
 
 export default async function handleStartPollFungames(interaction: ButtonInteraction) {
+  await interaction.deferReply({ ephemeral: true }); // WICHTIG: sofortiger Schutz
   // 1. Check: Läuft bereits ein Voting?
   const active = await prisma.poll.findFirst({
     where: { type: 'fungames', endedAt: null },

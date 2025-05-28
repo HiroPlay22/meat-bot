@@ -19,9 +19,11 @@ const command: Command = {
 
   run: async (interaction: ChatInputCommandInteraction) => {
     const guildId = interaction.guildId!;
-    const nextMonday = getNextMondayFormatted(); // z. B. "03-06"
+    const nextMonday = getNextMondayFormatted();
     const settings = serverSettings.guilds[guildId];
     const modCategoryId = settings?.modCategoryId;
+
+    await interaction.deferReply({ ephemeral: false }); // 🛡️ verhindert Unknown interaction
 
     // 🔐 Zugriff prüfen
     let hasAccess = false;
@@ -60,10 +62,9 @@ const command: Command = {
 
       const row = new ActionRowBuilder<ButtonBuilder>().addComponents(buttonLink, buttonEnd);
 
-      return interaction.reply({
+      return interaction.editReply({
         embeds: [embed],
-        components: [row],
-        ephemeral: false
+        components: [row]
       });
     }
 
@@ -103,10 +104,9 @@ const command: Command = {
         .setDisabled(!hasAccess)
     );
 
-    await interaction.reply({
+    await interaction.editReply({
       embeds: [embed],
-      components: [buttons],
-      ephemeral: false
+      components: [buttons]
     });
   }
 };
