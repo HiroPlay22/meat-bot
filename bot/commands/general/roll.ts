@@ -17,7 +17,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       return;
     }
 
-    await interaction.deferReply({ ephemeral: false });
+    await interaction.deferReply({ ephemeral: true });
 
     const userId = interaction.user.id;
 
