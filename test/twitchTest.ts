@@ -4,7 +4,8 @@ import { getLiveStreams } from '../bot/modules/live/getLiveStreams.js';
 
 (async () => {
   try {
-    const usernames = ['hiro_live', 'brinibrinsen', 'gamingfriends_', 'perrick']; // Trage hier deine Twitch-User ein
+    const usernames: string[] = []; // leer = keine Streams werden gepollt
+
     const streams = await getLiveStreams(usernames);
 
     if (streams.length === 0) {
