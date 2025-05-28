@@ -30,10 +30,9 @@ export function startTwitchLivePoll() {
 
       for (const stream of liveStreams) {
         const cooldownKey = `live_${stream.username.toLowerCase()}`;
-        const isOnCooldown = hasCooldown(cooldownKey);
-        console.log(`[LivePoll] ${stream.username} Cooldown: ${isOnCooldown}`);
+        if (hasCooldown(cooldownKey)) continue;
 
-        if (isOnCooldown) continue;
+        let hasPosted = false;
 
         for (const [guildId, guildSettings] of Object.entries(serverSettings.guilds)) {
           if (!guildSettings.trackedTwitchUsers?.includes(stream.username.toLowerCase())) continue;
@@ -41,21 +40,22 @@ export function startTwitchLivePoll() {
           const liveChannel = client.channels.cache.get(guildSettings.liveChannelId);
           const logChannel = client.channels.cache.get(serverSettings.logChannelId);
 
-          if (!liveChannel?.isTextBased()) {
-            console.warn(`[LivePoll] Channel ${guildSettings.liveChannelId} nicht gefunden oder nicht textbasiert.`);
-            continue;
-          }
+          if (!liveChannel?.isTextBased()) continue;
 
           const embedWithButton = await buildStreamEmbed(stream);
           await liveChannel.send(embedWithButton);
+          hasPosted = true;
 
           if (logChannel?.isTextBased()) {
             await logChannel.send(`📣 ${stream.username} wurde per Twitch API als 🔴LIVE erkannt.`);
           }
+        }
 
-          setCooldown(cooldownKey, 2 * 60 * 60 * 1000); // 2 Stunden Cooldown
+        if (hasPosted) {
+          setCooldown(cooldownKey, 2 * 60 * 60 * 1000); // ✅ Cooldown erst *nach dem ersten* Post
         }
       }
+
     } catch (err) {
       console.error('[TwitchLivePoll] Fehler:', err);
     }
