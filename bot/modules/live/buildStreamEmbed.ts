@@ -37,9 +37,8 @@ export async function buildStreamEmbed(stream: StreamData) {
     .setFooter({ text: 'Live via Twitch API' });
 
   const button = new ButtonBuilder()
-    .setLabel(`▶️ Zum Stream`)
+    .setLabel(`▶ Zum Stream`)
     .setStyle(ButtonStyle.Link)
-    .setEmoji(emoji.twitch)
     .setURL(url);
 
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(button);
