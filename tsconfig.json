@@ -21,7 +21,8 @@
       "@modules/*": ["bot/modules/*"],
       "@utils/*": ["bot/utils/*"],
       "@commands/*": ["bot/commands/*"],
-      "@interactions/*": ["bot/interactions/*"]
+      "@interactions/*": ["bot/interactions/*"],
+      "@types": ["types/types.ts"]
     },
     "types": ["node", "discord.js"]
   },

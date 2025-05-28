@@ -6,12 +6,11 @@ import {
   ButtonBuilder,
   ButtonStyle,
 } from 'discord.js';
-import { Command } from '@/types';
+import { Command } from '@types';
 import { getNextMondayFormatted } from '@utils/date';
 import { getPollNumber, getLastWinner } from '@modules/poll/utils';
 import { prisma } from '@database/client.js';
 import serverSettings from '@config/serverSettings.json' with { type: "json" };
-
 
 const command: Command = {
   data: new SlashCommandBuilder()
@@ -19,13 +18,13 @@ const command: Command = {
     .setDescription('Zeigt die aktuelle FunGames-Runde'),
 
   run: async (interaction: ChatInputCommandInteraction) => {
-    const nextMonday = getNextMondayFormatted(); // z. B. "19-05"
-
-    // JSON-basierte Serverkonfiguration laden
-    const settings = serverSettings.guilds[interaction.guildId!];
+    const guildId = interaction.guildId!;
+    const nextMonday = getNextMondayFormatted(); // z. B. "03-06"
+    const settings = serverSettings.guilds[guildId];
     const modCategoryId = settings?.modCategoryId;
-    let hasAccess = false;
 
+    // 🔐 Zugriff prüfen
+    let hasAccess = false;
     if (modCategoryId) {
       const modCategory = interaction.guild?.channels.cache.get(modCategoryId);
       if (modCategory?.type === 4) {
@@ -34,14 +33,14 @@ const command: Command = {
       }
     }
 
-    // Check: Läuft bereits ein Voting?
+    // 🛑 Doppelte Polls verhindern
     const activePoll = await prisma.poll.findFirst({
       where: { type: 'fungames', endedAt: null }
     });
 
     if (activePoll) {
       const pollNumber = activePoll.pollNumber ?? '??';
-      const pollUrl = `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${activePoll.messageId}`;
+      const pollUrl = `https://discord.com/channels/${guildId}/${interaction.channelId}/${activePoll.messageId}`;
 
       const embed = new EmbedBuilder()
         .setTitle(`📊 M.E.A.T.-Protokoll: VOTE/MON-${nextMonday}/#${pollNumber} läuft bereits`)
@@ -54,10 +53,10 @@ const command: Command = {
         .setURL(pollUrl);
 
       const buttonEnd = new ButtonBuilder()
-        .setCustomId(`end_poll_fungames_${activePoll.id}`) // Wichtig: Poll-ID drin
+        .setCustomId(`end_poll_fungames_${activePoll.id}`)
         .setLabel('Abstimmung beenden')
         .setStyle(ButtonStyle.Danger)
-        .setDisabled(!hasAccess); // Zugriffsbeschränkung wie bei "Spiel entfernen"
+        .setDisabled(!hasAccess);
 
       const row = new ActionRowBuilder<ButtonBuilder>().addComponents(buttonLink, buttonEnd);
 
@@ -68,7 +67,7 @@ const command: Command = {
       });
     }
 
-    // 🧠 Neues Voting vorbereiten
+    // 🆕 Neues Voting starten
     const pollNumber = await getPollNumber('fungames');
     const lastWinner = await getLastWinner('fungames');
 
@@ -103,7 +102,6 @@ const command: Command = {
         .setStyle(ButtonStyle.Danger)
         .setDisabled(!hasAccess)
     );
-
 
     await interaction.reply({
       embeds: [embed],
