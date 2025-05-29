@@ -26,7 +26,7 @@ import {
       user: interaction.user,
       title: `Feedback-Protokoll #${protocolNo.toString().padStart(4, "0")}`,
       bodyText:
-        "Willkommen im M.E.A.T.-Archiv.\n" +
+        "Willkommen im M.E.A.T.-Archiv!\n" +
         "Hier kannst du Lob, Bugs oder Ideen einreichen.\n" +
         "Nur Mut. Das System notiert alles. Vielleicht.",
       latency: interaction.client.ws.ping,
