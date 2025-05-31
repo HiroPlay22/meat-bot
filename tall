@@ -1,0 +1,173 @@
+[33m2c5fd3a[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m FIX
+[33m4961b33[m fix
+[33maa23cb3[m New CommandLoeader
+[33m990b605[m fix
+[33m1b6f198[m fix
+[33mb5ab4b9[m Fix CommandLoeader
+[33mc121c88[m test
+[33m6063f2c[m TEST
+[33md9bfce8[m test
+[33md1e849c[m merge
+[33m2dc668b[m Merge branch 'main' of https://github.com/HiroPlay22/meat-bot
+[33m6a99004[m 🔥 endgültig alte JS-Dateien entfernt
+[33m72529bb[m again
+[33m1ccb3c3[m delete All Slashcommands
+[33mdf3d612[m FIX
+[33m940aa54[m Fix 9394848
+[33m486b552[m Fix #2323
+[33m5a3d56f[m Fix
+[33m6a90425[m Alle SlashCommands löschen
+[33m089b188[m fix
+[33m98969a8[m Fix
+[33ma415b07[m LOG
+[33m144372d[m FIX: export default {   data,   execute, };
+[33mf00ac07[m feat: Twitch Live-Tracking + API Embed System
+[33ma6c81a6[m Update Problem beheben #1
+[33m0e13f9c[m General FIX
+[33mf6300a8[m fix
+[33m422307b[m feat(events): Monatsansicht mit Navigation & Discord-GuildEvents integriert - Buttons für ⬅️ ➡️ Navigation hinzugefügt - DiscordEvents per API geladen & angezeigt - Logging & Typausgleich für Eventquellen eingebaut
+[33m803dc8d[m FIX const events = await getEventsForMonth(today, interaction.guild!);
+[33m8ed4017[m feat(events): Kalendernavigation eingebaut und Discord-GuildEvents integriert - DiscordEvents werden jetzt im Kalender angezeigt - Monatswechsel über Buttons (⬅️ ➡️) möglich - Typfehler bei gemischten Eventquellen behoben
+[33m847d799[m Alpha Version für /events verfügbar ->erster test
+[33m3b4e39e[m Datenbank Update
+[33m89d39de[m Alle Daen für das Eventmodul vorbereitet
+[33m738205a[m Event Datenmodell anlgelegt
+[33m37c9cfd[m feat(twitch): verbessertes Live-Embed mit Titel-Link, Stream-Thumbnail & Kategorie-Thumbnail
+[33m95be486[m Final Live-Embed
+[33m401d181[m Embed FIX
+[33ma742cdd[m Twitch Embed Update
+[33mcc13392[m LIVE Embed erweitert
+[33m689ed56[m fix(live): Race-Condition bei gleichzeitiger Stream-Erkennung per globalem Lock verhindert
+[33mfd3b6dc[m fix(live): Doppelposts endgültig verhindert durch globalen Cooldown nach erstem Live-Post
+[33m2a8a179[m doppel LIVE Post verhinedert (testDatei)
+[33ma8f4e4e[m fix(live): Doppelpost bei mehreren Guilds durch Cooldown-Verlagerung verhindert
+[33m4fd6e8f[m fix(live): Invalid emoji in stream button entfernt (BUTTON_COMPONENT_INVALID_EMOJI)
+[33m72c1fc8[m ephemeral true für /roll
+[33m505aaaf[m fix(fungames): Doppelstart durch Unknown Interaction gefixt via deferReply
+[33m9fea804[m /fungames doppelpost verhindern
+[33m4a4145e[m ShowPoll Script
+[33m0da1998[m Icon
+[33mb652735[m LIVE-MODULE ENTSTÖRT: Client jetzt wirklich... online.
+[33mbd296a1[m Web Fix
+[33m3177191[m 🎲 Finalisiert: Roll-Flow mit sicheren Interaktionen & Phasen-Buttons abgeschlossen
+[33mfd831f5[m  Doppelte Antworten werden verhindert (interaction.replied || deferred)
+[33m791311e[m Fehlerhandling bei abgelaufenen Interaktionen verbessert (safeReply / safeUpdate)
+[33md103388[m  Fix: clearRollState für Reset-Button importiert
+[33mbabeba7[m UX: Button „Zurück zum Start“ in DnD-Würfelanzahl-Phase eingebaut
+[33m29fd013[m Fix: Button „Neue Würfel wählen“ im DnD-Modus aktiviert und verknüpft
+[33m40e4e0a[m UX-Fix: „Zurück“ ersetzt durch „Neue Würfel wählen“ im DnD-Modus
+[33mada13c0[m Die letzten 3 Änderungen (Commits) rückgägig gemacht!!
+[33me2cdfab[m Fallback eingebaut: update() nutzt bei Timeout nun followUp()
+[33m0378dc6[m Rücksprung verbessert: deferUpdate im Phasenwechsel hinzugefügt für stabile Navigation
+[33mf663d05[m Rücksprungverlauf mit phaseHistory & pushPhase/popLastPhase ergänzt
+[33m72e3e1a[m Fix
+[33m15e31e0[m Anzeige: Würfelergebnisse im Embed ohne Codeblock & mit eigenen Icons dargestellt
+[33m6d5b5d4[m Anzeige: Würfelsymbole im Ergebnis-Embed durch eigene Discord-Emojis ersetzt +  Fix: Wurfergebnis-Zahlen im Embed gleichmäßig mit Leerzeichen ausgerichtet
+[33mf4c3c1d[m /roll Embed feinheiten inkl Icons.
+[33m5be9d12[m Discord-Emojis für Würfel & DnD hinzugefügt und in meatEmojis.ts eingebunden
+[33m5a9fcf6[m /roll Fix: DnD-Würfeltyp-Auswahl wird jetzt korrekt als phase_dnd_select erkannt
+[33m42532d8[m /roll UI: GM-Button neben Würfeln und Zurück in eine Zeile verschoben
+[33m4b26ad4[m /roll Fix: Mehrfachklick und abgelaufene Interaktionen bei /roll abgesichert
+[33mad8893c[m /roll Verbesserung: Zustand beim Zurücksetzen angepasst – Navigation bis Start wieder möglich
+[33md432e6f[m /roll Cleanup: Alte Phase-History aus /roll entfernt – nicht mehr verwendet
+[33m95c3b7b[m /roll Cleanup: pushPhase-Import entfernt – wird nicht mehr verwendet
+[33mcaa2385[m /roll Typ-Fixes: RollPhase exportiert, korrekt importiert und detectCurrentPhase strikt typisiert
+[33mba7d330[m /roll Fix: deferUpdate vor dem Würfeln abgesichert – schützt vor Discord Fehler 10062
+[33m58b265f[m /roll Fix: Buttons reagieren jetzt zuverlässig – Handler vorverlagert
+[33m978f02b[m /roll Fix: Update-Fehler behoben – Interaktion wird nun stabil geprüft und nicht doppelt verarbeitet
+[33mb3fdbc9[m /roll Verbesserung: Buttons jetzt mit stabilem Fallback und Discord-konformem flags=64
+[33m2039493[m /roll FIX: ephemeral: false (öffentliche anzeige), ZurückButton fallback wenn abgelaufen dann -> followUp
+[33m8130eb1[m /roll Update:  Owner korrekt erkennen, Back-Button zuverlässig bis Anfang, Robust gegen leere Phasenhistory
+[33m3f5152c[m /Roll Update: Session je User, für alle anderen disabled. Command ist exklusiv für User. Zurück Button/Fix. Optisches Update.
+[33m05090da[m AKSKASKA
+[33m1d4c62a[m FIX
+[33mc644610[m final Embed weniger abstand
+[33m4557021[m /roll timeout fix + Modal fix
+[33md72f0d2[m /roll Command timeout fix
+[33m629ca8e[m fix
+[33m5588925[m fix final final !
+[33me26aaf4[m fix final final 2
+[33m2033cd0[m fix final 1
+[33mb3ca947[m fix
+[33m45a9751[m Lets go
+[33mf0b404d[m GameMasterChannel eingebunden und fehler behoben + Custom Bilder eingebunden für jede Phase
+[33mb18ba8d[m presenceUpdate deleted
+[33m0753386[m fixed
+[33m59ce686[m delete presenceUpdate
+[33mcfb3982[m Command /roll hinzugefügt
+[33mbb03405[m trackedTwitchUsers Add freshfries & gamingfirends_
+[33m312473a[m Merge branch 'main' of https://github.com/HiroPlay22/meat-bot
+[33m74c9363[m fix: final cleanup after conflict
+[33m594ba84[m twitchTest.ts fixed
+[33me1b3b4f[m Testcommit
+[33m4833c42[m Fixed
+[33m3781526[m ADD teststreamer "Perrick"
+[33m8ae002e[m FIXED
+[33m1a3f272[m Twitch Testdatei relativer Pfad
+[33m2b39856[m Twitch Testdatei
+[33m1679461[m TwitchAPI try 2
+[33m08408a0[m Twitch API
+[33m9394256[m sdsdd
+[33m7530d76[m sdsds
+[33m361d4e2[m asdasd
+[33mf339eba[m sdsds
+[33mc739c39[m adasd
+[33m63eb9c6[m sadsa
+[33m930d319[m adasda
+[33m8d77266[m adasda
+[33mf51dcb5[m ssss
+[33m3fef879[m sdsdsd
+[33mbe979dd[m ddddd
+[33m3e4a3e2[m Jetzt??
+[33m665a36e[m jetzt aber
+[33m0f60d01[m PLS
+[33m13f9ea8[m ddddddd
+[33m8d9d672[m Reale Stats anzeigen
+[33m581881b[m Es geht überall!
+[33m802a9f2[m Juhuuu!
+[33m33b22ca[m Hoffnung!
+[33m2f2387a[m pls...
+[33mb464025[m Jetzt aber!!
+[33m693b1a8[m Really... fixed
+[33m8bb6304[m Now really FIXED
+[33mc089f6b[m FIX BotStatus richtiger Pfad
+[33m5a34a48[m Test344
+[33mc9f1da5[m schema.prisma FIX debian
+[33m7a8cb26[m StartUo FIX
+[33m17bd00b[m Botstatus von Bot setzen lassen
+[33m2da8429[m Echten Bot status anzeigen (vorbereitung)
+[33m1d1937d[m Uhrzeit entfernt
+[33m4d19114[m Update Commut Card
+[33m1ee2765[m commitLoader mit echten Git-Daten füllen
+[33m21edd59[m commitLeader FIX
+[33m943d9e7[m Tes ob Webhook klappt
+[33md507054[m Test
+[33md4c781c[m Update commitLoader für Web Updates
+[33md8a42cb[m Test
+[33m6144ed0[m Update .gitignore
+[33mae9d03d[m Update .gitignore
+[33m89319ad[m Remove .env from repo and ignore it
+[33me5866ae[m Update gitIgnore etc..
+[33ma96b26d[m Updated .gitignore and index layout
+[33m6b229f9[m Remove .env from git and ignore it
+[33meaba917[m Merge branch 'main' of https://github.com/HiroPlay22/meat-bot
+[33ma65d3a2[m WEB / Update-Card hinzugefügt
+[33mab30854[m Webhook TEST push
+[33m294d0cf[m fix: remove invalid escape file
+[33mbd7965f[m Test Webhook Trigger #2
+[33me7c0922[m Test Webhook
+[33mbd1014b[m Aktuelle Version: Manueller Upload + Automatischer Upload
+[33ma1e9599[m /info command + fancy Embed + Buttons
+[33me6d57bc[m Join Message (Variante Human/Bot + DM + Fancy Modals
+[33ma4b00d7[m Stats + Feedback + Bot-DC-Server Iconset für Icons in Embeds
+[33ma56480a[m Echte Stats + Daily Snapshot
+[33mb77f9d8[m Stats eingebunden
+[33m7e6d5a4[m General Update
+[33md1b260f[m Aktueller Stand, funkltioniert Lokal
+[33m779ad49[m Add files via upload
+[33m0507dd8[m Add files via upload
+[33m264eac9[m Add files via upload
+[33m41ff424[m Add files via upload
+[33mf5284e3[m Add files via upload
+[33m8b94495[m Add files via upload
+[33m12c5c30[m Add files via upload

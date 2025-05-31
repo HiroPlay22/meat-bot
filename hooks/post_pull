@@ -1,0 +1,5 @@
+#!/bin/bash
+cd /opt/meat-bot
+npm install
+npx prisma generate
+pm2 restart meat-bot
