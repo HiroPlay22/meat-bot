@@ -36,7 +36,7 @@ import {
   
     const button = new ButtonBuilder()
       .setCustomId("open_feedback_modal")
-      .setLabel("📨 Feedback geben")
+      .setLabel("Feedback geben")
       .setStyle(ButtonStyle.Primary);
   
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(button);
