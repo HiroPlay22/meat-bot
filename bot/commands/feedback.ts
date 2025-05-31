@@ -26,7 +26,7 @@ import {
       user: interaction.user,
       title: `Feedback-Protokoll #${protocolNo.toString().padStart(4, "0")}`,
       bodyText:
-        "Willkommen im M.E.A.T.-Archiv.\n" +
+        "Willkommen im M.E.A.T.-Archiv!\n" +
         "Hier kannst du Lob, Bugs oder Ideen einreichen.\n" +
         "Nur Mut. Das System notiert alles. Vielleicht.",
       latency: interaction.client.ws.ping,
@@ -36,7 +36,7 @@ import {
   
     const button = new ButtonBuilder()
       .setCustomId("open_feedback_modal")
-      .setLabel("📨 Feedback geben")
+      .setLabel("Feedback geben")
       .setStyle(ButtonStyle.Primary);
   
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(button);
