@@ -24,7 +24,7 @@ import {
       module: "feedback",
       moduleName: "Feedback-Protokoll",
       user: interaction.user,
-      title: `Feedback-Protokollxx #${protocolNo.toString().padStart(4, "0")}`,
+      title: `Feedback-ProtokollXX #${protocolNo.toString().padStart(4, "0")}`,
       bodyText:
         "Willkommen im M.E.A.T.-Archiv!\n" +
         "Hier kannst du Lob, Bugs oder Ideen einreichen.\n" +
