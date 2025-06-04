@@ -2,9 +2,9 @@ module.exports = {
   apps: [
     {
       name: 'meat-bot',
+      cwd: '/opt/meat-bot',
       script: 'npx',
       args: 'tsx src/bot/index.ts',
-      cwd: '/opt/meat-bot',
       interpreter: 'none'
     },
     {
@@ -14,4 +14,4 @@ module.exports = {
       interpreter: 'none'
     }
   ]
-}
+};
