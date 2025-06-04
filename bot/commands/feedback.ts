@@ -28,7 +28,7 @@ import {
       bodyText:
         "Willkommen im Ideen-Archiv!\n" +
         "Hier kannst du Lob, Bugs oder Ideen einreichen.\n" +
-        "Nur Mut. Das System notiert alles. Vielleicht.",
+        "Nur Mut Rebell. Das System notiert alles. Vielleicht.",
       latency: interaction.client.ws.ping,
       usageCount,
       botPersona: "M.E.A.T.",
