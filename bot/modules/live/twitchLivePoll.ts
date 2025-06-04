@@ -19,7 +19,7 @@ export function startTwitchLivePoll() {
     try {
       const client = globalThis.discordClient;
       if (!client) {
-        console.error('[LivePoll] ❌ Discord Client ist nicht gesetzt!');
+        console.error('[LivePoll] ❌ Discord Client ist nicht gesetzt');
         return;
       }
 
