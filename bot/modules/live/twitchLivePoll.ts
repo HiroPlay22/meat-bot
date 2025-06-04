@@ -1,9 +1,8 @@
-// modules/live/twitchLivePoll.ts
-
 import { getLiveStreams } from './getLiveStreams.js';
 import { buildStreamEmbed } from './buildStreamEmbed.js';
 import serverSettings from '@config/serverSettings.json' with { type: 'json' };
 import { hasCooldown, setCooldown } from './liveCooldown.js';
+import { withLiveLock } from './liveLocks.js'; // Falls du das Lock-System weiterhin nutzt
 
 const POLL_INTERVAL_MS = 2 * 60 * 1000; // alle 2 Minuten
 
@@ -18,7 +17,7 @@ export function startTwitchLivePoll() {
     try {
       const client = globalThis.discordClient;
       if (!client) {
-        console.error('[LivePoll] Discord Client ist nicht gesetzt!');
+        console.error('[LivePoll] ❌ Discord Client ist nicht gesetzt!');
         return;
       }
 
@@ -29,18 +28,33 @@ export function startTwitchLivePoll() {
       console.log('[LivePoll] Erkannte Live-Streams:', liveStreams.map(s => s.username));
 
       for (const stream of liveStreams) {
-        const cooldownKey = `live_${stream.username.toLowerCase()}`;
-        if (hasCooldown(cooldownKey)) continue;
+        const username = stream.username.toLowerCase();
+        const cooldownKey = `live_${username}`;
+
+        if (hasCooldown(cooldownKey)) {
+          console.log(`[LivePoll] ❄️ Cooldown aktiv für ${username}`);
+          continue;
+        }
 
         let hasPosted = false;
 
         for (const [guildId, guildSettings] of Object.entries(serverSettings.guilds)) {
-          if (!guildSettings.trackedTwitchUsers?.includes(stream.username.toLowerCase())) continue;
+          const tracked = guildSettings.trackedTwitchUsers?.map((u: string) => u.toLowerCase()) ?? [];
+          if (!tracked.includes(username)) continue;
+
+          const guild = client.guilds.cache.get(guildId);
+          if (!guild) {
+            console.warn(`[LivePoll] ⚠️ Guild ${guildId} nicht im Cache – wird übersprungen.`);
+            continue;
+          }
 
           const liveChannel = client.channels.cache.get(guildSettings.liveChannelId);
           const logChannel = client.channels.cache.get(serverSettings.logChannelId);
 
-          if (!liveChannel?.isTextBased()) continue;
+          if (!liveChannel?.isTextBased()) {
+            console.warn(`[LivePoll] ⚠️ Channel ${guildSettings.liveChannelId} ist kein Textkanal.`);
+            continue;
+          }
 
           const embedWithButton = await buildStreamEmbed(stream);
           await liveChannel.send(embedWithButton);
@@ -52,7 +66,8 @@ export function startTwitchLivePoll() {
         }
 
         if (hasPosted) {
-          setCooldown(cooldownKey, 2 * 60 * 60 * 1000); // ✅ Cooldown erst *nach dem ersten* Post
+          setCooldown(cooldownKey, 2 * 60 * 60 * 1000); // 2h Cooldown
+          console.log(`[LivePoll] ✅ Cooldown gesetzt für ${username}`);
         }
       }
 

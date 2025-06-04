@@ -1,5 +1,3 @@
-// modules/live/getLiveStreams.ts
-
 import 'dotenv/config';
 import fetch from 'node-fetch';
 
@@ -42,7 +40,9 @@ export type LiveStream = {
   title: string;
   game: string;
   viewers: number;
-  thumbnail: string;
+  thumbnail: string;        // Vorschau-Bild (mit Fallbacks)
+  categoryImage: string;    // BoxArt (Kategorie)
+  profileImage: string;     // Twitch-Avatar
 };
 
 export async function getLiveStreams(usernames: string[]): Promise<LiveStream[]> {
@@ -51,34 +51,67 @@ export async function getLiveStreams(usernames: string[]): Promise<LiveStream[]>
   const token = await getAccessToken();
   const loginParams = usernames.map(name => `user_login=${name}`).join('&');
 
-  const res = await fetch(`https://api.twitch.tv/helix/streams?${loginParams}`, {
+  // 1. Streams abrufen
+  const streamRes = await fetch(`https://api.twitch.tv/helix/streams?${loginParams}`, {
     headers: {
       'Client-ID': TWITCH_CLIENT_ID,
       Authorization: `Bearer ${token}`
     }
   });
 
-  if (!res.ok) {
-    console.error('[TwitchStreams] Fehlerhafte Antwort:', await res.text());
+  if (!streamRes.ok) {
+    console.error('[TwitchStreams] Fehlerhafte Antwort:', await streamRes.text());
     throw new Error('Twitch Streams konnten nicht geladen werden');
   }
 
-  const data = await res.json();
+  const streamData = await streamRes.json();
+  const streams = streamData.data;
 
-  console.log('[DEBUG] Twitch Live-Streams erkannt:', data.data); // 🐞 DEBUG
+  console.log('[DEBUG] Twitch Live-Streams erkannt:', streams);
 
-  return data.data.map((entry: any) => ({
+  if (!streams.length) return [];
+
+  // 2. Nutzerinfos abrufen (Avatare)
+  const userIds = streams.map((s: any) => `id=${s.user_id}`).join('&');
+  const userRes = await fetch(`https://api.twitch.tv/helix/users?${userIds}`, {
+    headers: {
+      'Client-ID': TWITCH_CLIENT_ID,
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  const userData = await userRes.json();
+  const userMap = Object.fromEntries(userData.data.map((u: any) => [u.id, u.profile_image_url]));
+
+  // 3. Kategorieinfos abrufen (BoxArt)
+  const gameIds = [...new Set(streams.map((s: any) => s.game_id))];
+  const gameParams = gameIds.map(id => `id=${id}`).join('&');
+  const gameRes = await fetch(`https://api.twitch.tv/helix/games?${gameParams}`, {
+    headers: {
+      'Client-ID': TWITCH_CLIENT_ID,
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  const gameData = await gameRes.json();
+  const gameMap = Object.fromEntries(gameData.data.map((g: any) => [
+    g.name,
+    g.box_art_url.replace('{width}', '216').replace('{height}', '288')
+  ]));
+
+  // 4. Streams zurückgeben
+  return streams.map((entry: any) => ({
     username: entry.user_name,
     title: entry.title,
     game: entry.game_name,
     viewers: entry.viewer_count,
-    thumbnail: entry.thumbnail_url
-      .replace('{width}', '640')
-      .replace('{height}', '360')
+    thumbnail: getSafeTwitchThumbnail(entry.user_login),
+    profileImage: userMap[entry.user_id],
+    categoryImage: gameMap[entry.game_name] ?? ''
   }));
 }
 
-export async function getSafeTwitchThumbnail(username: string): Promise<string> {
+export function getSafeTwitchThumbnail(username: string): string {
   const login = username.toLowerCase();
   const raw = `https://static-cdn.jtvnw.net/previews-ttv/live_user_${login}-640x360.jpg`;
 

@@ -1,5 +1,3 @@
-// modules/live/buildStreamEmbed.ts
-
 import {
   EmbedBuilder,
   ActionRowBuilder,
@@ -14,27 +12,43 @@ type StreamData = {
   title: string;
   game: string;
   viewers: number;
-  thumbnail: string;
+  thumbnail: string;        // Live-Vorschau
+  categoryImage: string;    // BoxArt als Thumbnail
+  profileImage: string;     // Avatar oben links
 };
 
 export async function buildStreamEmbed(stream: StreamData) {
   const url = `https://twitch.tv/${stream.username}`;
-  const thumbnail = await getSafeTwitchThumbnail(stream.username); // WICHTIG: await
+  const preview = await getSafeTwitchThumbnail(stream.username);
 
   const embed = new EmbedBuilder()
     .setColor('#9146FF')
+    .setTitle(stream.title)
+    .setURL(url)
     .setAuthor({
       name: `${stream.username} ist jetzt live!`,
-      iconURL: 'https://static.twitchcdn.net/assets/favicon-32-e29e246c157142c94346.png'
+      iconURL: stream.profileImage
     })
-    .setImage(thumbnail)
-    .setDescription(`${emoji.stream} ${stream.title}\n${emoji.text} Stream läuft auf Twitch`)
+    .setThumbnail(stream.categoryImage)
+    .setImage(preview)
+    .setDescription(`${emoji.text} Stream läuft auf Twitch`)
     .addFields([
-      { name: `${emoji.user}`, value: stream.username, inline: true },
-      { name: `${emoji.viewers}`, value: `${stream.viewers} Zuschauer`, inline: true },
-      { name: `${emoji.category} Kategorie`, value: stream.game || '—', inline: true }
-    ])
-    .setFooter({ text: 'Live via Twitch API' });
+      {
+        name: '\u200B',
+        value: `${emoji.user} ${stream.username}`,
+        inline: true
+      },
+      {
+        name: '\u200B',
+        value: `${emoji.viewers} ${stream.viewers} Zuschauer`,
+        inline: true
+      },
+      {
+        name: '\u200B',
+        value: `${emoji.category} ${stream.game || '—'}`,
+        inline: true
+      }
+    ]);
 
   const button = new ButtonBuilder()
     .setLabel(`▶ Zum Stream`)
