@@ -4,7 +4,6 @@ import { getLiveStreams } from './getLiveStreams.js';
 import { buildStreamEmbed } from './buildStreamEmbed.js';
 import serverSettings from '@config/serverSettings.json' with { type: 'json' };
 import { hasCooldown, setCooldown } from './liveCooldown.js';
-import { withLiveLock } from './liveLocks.js';
 
 const POLL_INTERVAL_MS = 2 * 60 * 1000; // alle 2 Minuten
 
