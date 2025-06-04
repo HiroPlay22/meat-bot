@@ -1,3 +1,5 @@
+// modules/live/buildStreamEmbed.ts
+
 import {
   EmbedBuilder,
   ActionRowBuilder,
