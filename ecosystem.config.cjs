@@ -4,7 +4,7 @@ module.exports = {
       name: 'meat-bot',
       cwd: '/opt/meat-bot',
       script: 'bash',
-      args: '-c "npx tsx src/bot/index.ts"',
+      args: '-c "npx tsx bot/index.ts"',
       interpreter: 'none'
     },
     {
