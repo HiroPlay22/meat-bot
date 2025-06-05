@@ -28,7 +28,7 @@ export async function buildStreamEmbed(stream: StreamData) {
     .setTitle(stream.title)
     .setURL(url)
     .setThumbnail(stream.categoryImage)
-    .setImage(preview)
+    .setImage(`${preview}?rand=${Date.now()}`)
     .setDescription(`${emoji.meat_twitch} ${stream.username} ist jetzt live!`)
     .addFields([
       {
