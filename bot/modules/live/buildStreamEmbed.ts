@@ -32,12 +32,12 @@ export async function buildStreamEmbed(stream: StreamData) {
     .setDescription(`${emoji.meat_twitch} ${stream.username} ist jetzt live!`)
     .addFields([
       {
-        name: '\u200B',
+        name: '',
         value: `${emoji.meat_users} ${stream.viewers} Zuschauer`,
         inline: true
       },
       {
-        name: '\u200B',
+        name: '',
         value: `${emoji.meat_game} ${stream.game || '—'}`,
         inline: true
       }
