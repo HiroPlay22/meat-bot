@@ -73,7 +73,7 @@ export function startTwitchLivePoll() {
             hasPosted = true;
 
             if (logChannel?.isTextBased()) {
-              await logChannel.send(`📣 ${stream.username} wurde per Twitch API als 🔴LIVE erkannt.`);
+              await logChannel.send(`[M.E.A.T.-LOG] 📣 ${stream.username} ist LIVE.`);
             }
           }
 

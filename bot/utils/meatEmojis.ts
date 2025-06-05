@@ -37,19 +37,16 @@ export const emoji = {
   meat_fungames: '<:meat_fungames:ID>',
 
   // 📺 Plattformen
-  twitch: '<:twitch:ID>',
-  youtube: '<:youtube:ID>',
+  meat_twitch: '<:meat_twitch:1377296796937748601>',
+  meat_youtube: '<:meat_youtube:1379379864741613648>',
 
   // 🎥 Stream-Embed-Icons
-  stream: '🎥',
-  text: '📝',
-  user: '👤',
-  viewers: '👁️',
-  category: '🗂️',
+  meat_stream: '<:meat_game:1380239036987215962>',
+  meat_game: '<:meat_game:1380239036987215962>',
 
   // 🎲 Roll-System
-  meat_dice: '<:meat_dice:1376947755376705568>',    // ⚀ Klassischer Würfel
-  meat_dnd: '<:meat_dnd:1376947757285380197>',      // ⚔️ DnD-Würfel
+  meat_dice: '<:meat_dice:1376947755376705568>',    // Klassischer Würfel
+  meat_dnd: '<:meat_dnd:1376947757285380197>',      // DnD-Würfel
   meat_gm: '<:meat_boss:ID>',        // 🧙 GM-Channel-Modus
 
   // 🔙 Fallback

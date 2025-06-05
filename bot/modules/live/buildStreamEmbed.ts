@@ -27,33 +27,24 @@ export async function buildStreamEmbed(stream: StreamData) {
     .setColor('#9146FF')
     .setTitle(stream.title)
     .setURL(url)
-    .setAuthor({
-      name: `${stream.username} ist jetzt live!`,
-      iconURL: stream.profileImage
-    })
     .setThumbnail(stream.categoryImage)
     .setImage(preview)
-    .setDescription(`${emoji.text} Stream läuft auf Twitch`)
+    .setDescription(`${emoji.meat_twitch} ${stream.username} ist jetzt live!`)
     .addFields([
       {
         name: '\u200B',
-        value: `${emoji.user} ${stream.username}`,
+        value: `${emoji.meat_users} ${stream.viewers} Zuschauer`,
         inline: true
       },
       {
         name: '\u200B',
-        value: `${emoji.viewers} ${stream.viewers} Zuschauer`,
-        inline: true
-      },
-      {
-        name: '\u200B',
-        value: `${emoji.category} ${stream.game || '—'}`,
+        value: `${emoji.meat_game} ${stream.game || '—'}`,
         inline: true
       }
     ]);
 
   const button = new ButtonBuilder()
-    .setLabel(`▶ Zum Stream`)
+    .setLabel(`Zum Stream`)
     .setStyle(ButtonStyle.Link)
     .setURL(url);
 
