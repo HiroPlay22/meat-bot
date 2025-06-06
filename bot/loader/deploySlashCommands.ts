@@ -1,3 +1,5 @@
+// bot/loader/deploySlashCommands.ts
+
 import { registerSlashCommands } from "./commandLoader.js";
 import { getDiscordToken } from "@config/secrets";
 

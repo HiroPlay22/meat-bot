@@ -1,3 +1,5 @@
+// bot/loader/commandLoader.ts
+
 import { REST, Routes, SlashCommandBuilder } from "discord.js";
 import { readdirSync, statSync } from "fs";
 import path from "path";
