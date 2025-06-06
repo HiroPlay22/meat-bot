@@ -1,4 +1,4 @@
-import Gamedig from 'gamedig';
+import * as Gamedig from 'gamedig';
 import type { GportalServerConfig, LiveServerData } from './types.js';
 
 export async function queryServer(config: GportalServerConfig): Promise<LiveServerData | null> {
