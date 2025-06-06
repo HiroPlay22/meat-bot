@@ -1,0 +1,12 @@
+[
+  {
+    "id": "gfvalheim",
+    "name": "Valheim - GamingFriends x G-Portal <3",
+    "type": "valheim",
+    "host": "161.97.142.242",
+    "queryPort": 29001,
+    "game": "Valheim",
+    "query": true,
+    "display": true
+  }
+]

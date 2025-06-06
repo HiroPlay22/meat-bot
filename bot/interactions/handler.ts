@@ -12,6 +12,7 @@ import {
   TextInputStyle,
   EmbedBuilder,
   StringSelectMenuBuilder,
+  ButtonStyle,
   SelectMenuBuilder
 } from "discord.js";
 
@@ -22,6 +23,14 @@ import { handleFeedbackModal } from "@modules/feedback/handleModal.js";
 import { handleRollButtons } from "@modules/roll/handleRollButtons.js";
 
 import serverSettings from "@config/serverSettings.json" with { type: "json" };
+
+import {
+  loadGportalSettings,
+  getServerById
+} from '../modules/gportal/loadGportalSettings.js';
+import { queryServer } from '../modules/gportal/queryServer.js';
+import { buildServerInfoEmbed } from '../modules/gportal/buildServerInfoEmbed.js';
+import { buildServerOverviewEmbed } from '../modules/gportal/buildServerOverviewEmbed.js';
 
 // Hilfsfunktion für Spiel-Löschseiten
 async function buildGameDeletePage(interaction: Interaction, page: number) {
@@ -181,6 +190,57 @@ export async function registerInteractions(client: Client) {
           }
         }
       }
+
+      // === GPORTAL: Server-Info
+      // BUTTON: view_server_<id>
+      if (interaction.isButton() && interaction.customId.startsWith('view_server_')) {
+        const serverId = interaction.customId.replace('view_server_', '');
+        const config = getServerById(serverId);
+
+        if (!config) {
+          return interaction.reply({ content: 'Serverkonfiguration nicht gefunden.', ephemeral: true });
+        }
+
+        const live = await queryServer(config);
+        const embed = buildServerInfoEmbed(config, live);
+
+        return interaction.update({
+          embeds: [embed],
+          components: [
+            new ActionRowBuilder<ButtonBuilder>().addComponents(
+              new ButtonBuilder()
+                .setCustomId('back_to_overview')
+                .setLabel('⬅️ Zurück zur Übersicht')
+                .setStyle(ButtonStyle.Secondary)
+            )
+          ]
+        });
+      }
+      // BUTTON: back_to_overview
+      if (interaction.isButton() && interaction.customId === 'back_to_overview') {
+        const embed = buildServerOverviewEmbed();
+
+        const servers = loadGportalSettings();
+        const buttons = servers
+          .filter(s => s.query)
+          .map(s =>
+            new ButtonBuilder()
+              .setCustomId(`view_server_${s.id}`)
+              .setLabel(`${s.name}`)
+              .setStyle(ButtonStyle.Primary)
+          );
+
+        const rows: ActionRowBuilder<ButtonBuilder>[] = [];
+        for (let i = 0; i < buttons.length; i += 5) {
+          rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(...buttons.slice(i, i + 5)));
+        }
+
+        return interaction.update({
+          embeds: [embed],
+          components: rows
+        });
+      }
+
 
       // === DinoName: Würfeln
       if (interaction.isButton() && interaction.customId === "dinoname_generate") {

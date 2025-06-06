@@ -1,0 +1,73 @@
+import {
+  SlashCommandBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ChatInputCommandInteraction,
+  EmbedBuilder
+} from 'discord.js';
+
+import { loadGportalSettings } from '../../modules/gportal/loadGportalSettings';
+import { buildServerOverviewEmbed } from '../../modules/gportal/buildServerOverviewEmbed';
+import { queryServer } from '../../modules/gportal/queryServer';
+import { buildServerInfoEmbed } from '../../modules/gportal/buildServerInfoEmbed';
+
+const gameIcons: Record<string, string> = {
+  ark: '🦖',
+  valheim: '🧊',
+  palworld: '🐲',
+  minecraft: '🧱',
+  default: '🎮'
+};
+
+export const data = new SlashCommandBuilder()
+  .setName('server')
+  .setDescription('Zeigt eine Übersicht der aktiven Community-Server');
+
+export async function execute(interaction: ChatInputCommandInteraction) {
+  const servers = loadGportalSettings();
+  const embed = buildServerOverviewEmbed();
+
+  const rows: ActionRowBuilder<ButtonBuilder>[] = [];
+  let currentRow = new ActionRowBuilder<ButtonBuilder>();
+
+  for (const server of servers) {
+    const icon = gameIcons[server.type] || gameIcons.default;
+    let label = `${icon} ${server.name}`;
+
+    let button: ButtonBuilder;
+    if (server.query) {
+      const live = await queryServer(server);
+      if (!live) {
+        label = `❌ ${server.name}`;
+        button = new ButtonBuilder()
+          .setCustomId('offline_placeholder_' + server.id)
+          .setLabel(label)
+          .setStyle(ButtonStyle.Secondary)
+          .setDisabled(true);
+      } else {
+        button = new ButtonBuilder()
+          .setCustomId(`view_server_${server.id}`)
+          .setLabel(label)
+          .setStyle(ButtonStyle.Primary);
+      }
+
+      currentRow.addComponents(button);
+
+      if (currentRow.components.length >= 5) {
+        rows.push(currentRow);
+        currentRow = new ActionRowBuilder<ButtonBuilder>();
+      }
+    }
+  }
+
+  if (currentRow.components.length > 0) {
+    rows.push(currentRow);
+  }
+
+  return interaction.reply({
+    embeds: [embed],
+    components: rows,
+    ephemeral: false
+  });
+}
