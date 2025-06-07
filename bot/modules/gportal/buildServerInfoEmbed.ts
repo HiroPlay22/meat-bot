@@ -28,10 +28,17 @@ export function buildServerInfoEmbed(config: GportalServerConfig, live: LiveServ
   descLines.push(`${emoji.meat_roles} Zugriff: nur mit entsprechender Rolle`);
   embed.setDescription(descLines.join('\n'));
 
-  if (live?.players !== undefined && live?.maxPlayers !== undefined) {
+  // Spieleranzeige nur wenn beide Werte verfügbar sind
+  const hasValidPlayerData = typeof live?.players === 'number' && typeof live?.maxPlayers === 'number';
+
+  if (hasValidPlayerData) {
+    const percentage = (live.players / live.maxPlayers) * 100;
+    const bar = getBarLineOnlyBar(percentage);
+    const valueText = `${live.players.toString().padStart(2, '0')} / ${live.maxPlayers}`;
+
     embed.addFields([
       { name: ' ', value: `${emoji.meat_users} Spieler:`, inline: true },
-      { name: ' ', value: `${getBarLineOnlyBar((live.players / live.maxPlayers) * 100)}  ${live.players.toString().padStart(2, '0')} / ${live.maxPlayers}`, inline: true }
+      { name: ' ', value: `${bar}  ${valueText}`, inline: true }
     ]);
   } else {
     embed.setFooter({ text: 'Server ist aktuell nicht erreichbar.' });
