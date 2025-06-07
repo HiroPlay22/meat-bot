@@ -13,7 +13,7 @@ export async function queryServer(config: GportalServerConfig): Promise<LiveServ
   if (!config.query) return null;
 
   try {
-    const result = await Gamedig.default({ // 💡 DAS ist der entscheidende Punkt!
+    const result = await Gamedig.query({ // ✅ DAS ist korrekt!
       type: config.type,
       host: config.host,
       port: config.queryPort,
