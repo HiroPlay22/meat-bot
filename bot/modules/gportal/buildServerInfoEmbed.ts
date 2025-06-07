@@ -5,10 +5,11 @@ import { emoji } from '@/utils/meatEmojis.js';
 
 export function buildServerInfoEmbed(config: GportalServerConfig, live: LiveServerData | null): EmbedBuilder {
   const embed = new EmbedBuilder()
-    .setTitle(`💾 ${config.name} – ${config.game}`)
+    .setTitle(`${config.name}`)
     .setColor(0x00ff88)
     .setDescription(
       `${emoji.meat_online} Ping: ${live?.ping ?? '??'} ms\n` +
+      `${emoji.meat_game} Map: ${config.game}\n` +
       `${emoji.meat_leer} Map: ${live?.map || 'unbekannt'}\n` +
       `${emoji.meat_roles} Zugriff: nur mit entsprechender Rolle`
     )
