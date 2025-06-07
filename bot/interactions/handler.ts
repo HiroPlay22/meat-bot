@@ -217,15 +217,7 @@ export async function registerInteractions(client: Client) {
 
         return interaction.update({
           embeds: [embed],
-          components: [
-            ...buttons,
-            new ActionRowBuilder<ButtonBuilder>().addComponents(
-              new ButtonBuilder()
-                .setCustomId('back_to_overview')
-                .setLabel('Zurück zur Übersicht')
-                .setStyle(ButtonStyle.Secondary)
-            )
-          ]
+          components: buttons
         });
       }
 
