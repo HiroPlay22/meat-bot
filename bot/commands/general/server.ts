@@ -3,14 +3,14 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  ChatInputCommandInteraction,
-  EmbedBuilder
+  ChatInputCommandInteraction
 } from 'discord.js';
 
-import { loadGportalSettings } from '../../modules/gportal/loadGportalSettings.js';
-import { buildServerOverviewEmbed } from '../../modules/gportal/buildServerOverviewEmbed.js';
-import { queryServer } from '../../modules/gportal/queryServer.js';
-import { buildServerInfoEmbed } from '../../modules/gportal/buildServerInfoEmbed.js';
+import { loadGportalSettings } from '@/modules/gportal/loadGportalSettings.js';
+import { buildServerOverviewEmbed } from '@/modules/gportal/buildServerOverviewEmbed.js';
+import { queryServer } from '@/modules/gportal/queryServer.js';
+import { buildServerInfoEmbed } from '@/modules/gportal/buildServerInfoEmbed.js';
+import { buildServerButtons } from '@/modules/gportal/buildServerButtons.js';
 
 const gameIcons: Record<string, string> = {
   ark: '🦖',
@@ -33,31 +33,33 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   for (const server of servers) {
     const icon = gameIcons[server.type] || gameIcons.default;
-    let label = `${icon} ${server.name}`;
+    const labelRaw = `${icon} ${server.name}`;
+    const label = labelRaw.length > 80 ? labelRaw.slice(0, 77) + '…' : labelRaw;
 
     let button: ButtonBuilder;
+
     if (server.query) {
       const live = await queryServer(server);
-      if (!live) {
-        label = `❌ ${server.name}`;
-        button = new ButtonBuilder()
-          .setCustomId('offline_placeholder_' + server.id)
-          .setLabel(label)
-          .setStyle(ButtonStyle.Secondary)
-          .setDisabled(true);
-      } else {
-        button = new ButtonBuilder()
-          .setCustomId(`view_server_${server.id}`)
-          .setLabel(label)
-          .setStyle(ButtonStyle.Primary);
-      }
 
-      currentRow.addComponents(button);
+      button = new ButtonBuilder()
+        .setCustomId(
+          live ? `view_server_${server.id}` : `offline_placeholder_${server.id}`
+        )
+        .setLabel(live ? label : `❌ ${server.name}`)
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(!live);
+    } else {
+      button = new ButtonBuilder()
+        .setCustomId(`view_server_${server.id}`)
+        .setLabel(label)
+        .setStyle(ButtonStyle.Secondary);
+    }
 
-      if (currentRow.components.length >= 5) {
-        rows.push(currentRow);
-        currentRow = new ActionRowBuilder<ButtonBuilder>();
-      }
+    currentRow.addComponents(button);
+
+    if (currentRow.components.length >= 2) {
+      rows.push(currentRow);
+      currentRow = new ActionRowBuilder<ButtonBuilder>();
     }
   }
 

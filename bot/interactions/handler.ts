@@ -31,6 +31,8 @@ import {
 import { queryServer } from '../modules/gportal/queryServer.js';
 import { buildServerInfoEmbed } from '../modules/gportal/buildServerInfoEmbed.js';
 import { buildServerOverviewEmbed } from '../modules/gportal/buildServerOverviewEmbed.js';
+import { buildServerButtons } from '@/modules/gportal/buildServerButtons.js';
+
 
 // Hilfsfunktion für Spiel-Löschseiten
 async function buildGameDeletePage(interaction: Interaction, page: number) {
@@ -191,8 +193,16 @@ export async function registerInteractions(client: Client) {
         }
       }
 
+      // GPORTAL Icons (evtl. global importieren)
+      const gameIcons: Record<string, string> = {
+        ark: '🦖',
+        valheim: '🧊',
+        palworld: '🐲',
+        minecraft: '🧱',
+        default: '🎮'
+      };
+
       // === GPORTAL: Server-Info
-      // BUTTON: view_server_<id>
       if (interaction.isButton() && interaction.customId.startsWith('view_server_')) {
         const serverId = interaction.customId.replace('view_server_', '');
         const config = getServerById(serverId);
@@ -203,10 +213,12 @@ export async function registerInteractions(client: Client) {
 
         const live = await queryServer(config);
         const embed = buildServerInfoEmbed(config, live);
+        const buttons = buildServerButtons(config);
 
         return interaction.update({
           embeds: [embed],
           components: [
+            ...buttons,
             new ActionRowBuilder<ButtonBuilder>().addComponents(
               new ButtonBuilder()
                 .setCustomId('back_to_overview')
@@ -216,23 +228,35 @@ export async function registerInteractions(client: Client) {
           ]
         });
       }
-      // BUTTON: back_to_overview
+
+      // === GPORTAL: Übersicht wiederherstellen
       if (interaction.isButton() && interaction.customId === 'back_to_overview') {
         const embed = buildServerOverviewEmbed();
-
         const servers = loadGportalSettings();
-        const buttons = servers
-          .filter(s => s.query)
-          .map(s =>
-            new ButtonBuilder()
-              .setCustomId(`view_server_${s.id}`)
-              .setLabel(`${s.name}`)
-              .setStyle(ButtonStyle.Primary)
-          );
 
         const rows: ActionRowBuilder<ButtonBuilder>[] = [];
-        for (let i = 0; i < buttons.length; i += 5) {
-          rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(...buttons.slice(i, i + 5)));
+        let currentRow = new ActionRowBuilder<ButtonBuilder>();
+
+        for (const server of servers) {
+          const icon = gameIcons[server.type] || gameIcons.default;
+          const labelRaw = `${icon} ${server.name}`;
+          const label = labelRaw.length > 80 ? labelRaw.slice(0, 77) + '…' : labelRaw;
+
+          const button = new ButtonBuilder()
+            .setCustomId(`view_server_${server.id}`)
+            .setLabel(label)
+            .setStyle(ButtonStyle.Secondary);
+
+          currentRow.addComponents(button);
+
+          if (currentRow.components.length >= 2) {
+            rows.push(currentRow);
+            currentRow = new ActionRowBuilder<ButtonBuilder>();
+          }
+        }
+
+        if (currentRow.components.length > 0) {
+          rows.push(currentRow);
         }
 
         return interaction.update({
@@ -240,7 +264,6 @@ export async function registerInteractions(client: Client) {
           components: rows
         });
       }
-
 
       // === DinoName: Würfeln
       if (interaction.isButton() && interaction.customId === "dinoname_generate") {
