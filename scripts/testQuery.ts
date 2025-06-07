@@ -1,6 +1,9 @@
-export {}; // ← notwendig, damit die Datei ein Modul ist
+// scripts/testQuery.ts
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 
-const { query } = await import('gamedig');
+// Gamedig ist ein CJS-Modul, also klassisch per require()
+const Gamedig = require('gamedig');
 
 const config = {
   type: 'source',
@@ -10,12 +13,12 @@ const config = {
 
 console.log('🛰️ Starte Query für:', config);
 
-query(config)
-  .then((result) => {
+Gamedig.query(config)
+  .then((result: any) => {
     console.log('✅ Ergebnis:', result);
     process.exit(0);
   })
-  .catch((err) => {
+  .catch((err: any) => {
     console.error('❌ Fehler:', err);
     process.exit(1);
   });
