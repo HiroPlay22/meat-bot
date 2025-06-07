@@ -1,16 +1,16 @@
-export {}; // 👈 macht die Datei zum ES-Modul
+export {}; // ← notwendig, damit die Datei ein Modul ist
 
-const Gamedig = await import('gamedig'); // ESM-kompatibel
+const { query } = await import('gamedig');
 
 const config = {
   type: 'source',
   host: '161.97.142.242',
-  port: 29001
+  port: 29001,
 };
 
 console.log('🛰️ Starte Query für:', config);
 
-Gamedig.default.query(config)
+query(config)
   .then((result) => {
     console.log('✅ Ergebnis:', result);
     process.exit(0);
