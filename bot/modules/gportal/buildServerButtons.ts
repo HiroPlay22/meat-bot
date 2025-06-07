@@ -3,13 +3,13 @@ import type { GportalServerConfig } from './types.js';
 
 /**
  * Erzeugt Buttons unterhalb eines Server-Embeds:
- * - [Mods] (optional)
- * - [Zurück]
+ * - [Mods] (optional, wenn Link vorhanden)
+ * - [Zurück zur Übersicht] (immer)
  */
 export function buildServerButtons(config: GportalServerConfig) {
   const buttons: ButtonBuilder[] = [];
 
-  // Button für Mods (falls Link vorhanden)
+  // Optionaler Mods-Link
   if (config.link) {
     buttons.push(
       new ButtonBuilder()
@@ -19,14 +19,13 @@ export function buildServerButtons(config: GportalServerConfig) {
     );
   }
 
-  // Zurück-Button (immer)
+  // Immer: Zurück zur Übersicht
   buttons.push(
     new ButtonBuilder()
-      .setCustomId(`back_to_server_list`)
+      .setCustomId('back_to_overview')
       .setLabel('Zurück')
       .setStyle(ButtonStyle.Secondary)
   );
 
-  // Rückgabe: max. 5 Buttons pro Row erlaubt – wir haben max. 2
   return [new ActionRowBuilder<ButtonBuilder>().addComponents(...buttons)];
 }
