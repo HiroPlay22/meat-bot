@@ -1,3 +1,5 @@
+// bot/modules/gportal/loadGportalSettings.ts
+
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { readFileSync } from 'fs';
