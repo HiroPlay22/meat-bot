@@ -1,24 +1,33 @@
-import * as Gamedig from 'gamedig';
+// bot/modules/gportal/queryServer.ts
+
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const { query } = require('gamedig');
+
 import type { GportalServerConfig, LiveServerData } from './types.js';
 
+/**
+ * Führt einen Gamedig-Query aus.
+ */
 export async function queryServer(config: GportalServerConfig): Promise<LiveServerData | null> {
+  if (!config.query) return null;
+
   try {
-    const result = await Gamedig.query({
+    const result = await query({
       type: config.type,
       host: config.host,
-      port: config.queryPort
+      port: config.queryPort,
     });
 
     return {
-      serverName: result.name,
+      name: result.name,
       map: result.map,
       players: result.players.length,
       maxPlayers: result.maxplayers,
-      version: result.raw?.version ?? '',
-      ping: result.ping
+      ping: result.ping,
     };
-  } catch (error) {
-    console.warn(`[Query] Server ${config.name} nicht erreichbar:`, error);
+  } catch (err) {
+    console.warn(`[Query] Server ${config.name} nicht erreichbar:`, err);
     return null;
   }
 }
