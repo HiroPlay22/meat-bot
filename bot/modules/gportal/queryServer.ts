@@ -19,13 +19,16 @@ export async function queryServer(config: GportalServerConfig): Promise<LiveServ
       port: config.queryPort,
     });
 
-    return {
-      name: result.name,
+    const liveData: LiveServerData = {
+      serverName: result.name ?? config.name,
       map: result.map,
       players: result.players.length,
       maxPlayers: result.maxplayers,
       ping: result.ping,
+      version: result.raw?.version
     };
+
+    return liveData;
   } catch (err) {
     console.warn(`[Query] Server ${config.name} nicht erreichbar:`, err);
     return null;
