@@ -22,7 +22,7 @@ const gameIcons: Record<string, string> = {
 
 export const data = new SlashCommandBuilder()
   .setName('server')
-  .setDescription('Zeigt eine Übersicht der aktiven Community-Server');
+  .setDescription('Zeigt Community-Server');
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const servers = loadGportalSettings();
