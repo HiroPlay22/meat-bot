@@ -2,7 +2,7 @@
 
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
-const gamedig = require('gamedig'); // kann eine Funktion sein oder ein Objekt
+const Gamedig = require('gamedig');
 
 import type { GportalServerConfig, LiveServerData } from './types.js';
 
@@ -13,15 +13,13 @@ export async function queryServer(config: GportalServerConfig): Promise<LiveServ
   if (!config.query) return null;
 
   try {
-    const queryFn = typeof gamedig === 'function' ? gamedig : gamedig.query;
-
-    const result = await queryFn({
+    const result = await Gamedig.GameDig.query({
       type: config.type,
       host: config.host,
       port: config.queryPort,
     });
 
-    return {
+    const liveData: LiveServerData = {
       serverName: result.name ?? config.name,
       map: result.map,
       players: result.players.length,
@@ -29,6 +27,8 @@ export async function queryServer(config: GportalServerConfig): Promise<LiveServ
       ping: result.ping,
       version: result.raw?.version
     };
+
+    return liveData;
   } catch (err) {
     console.warn(`[Query] Server ${config.name} nicht erreichbar:`, err);
     return null;
