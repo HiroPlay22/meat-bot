@@ -1,11 +1,12 @@
-// bot/modules/gportal/buildServerInfoEmbed.ts
-
 import { EmbedBuilder } from 'discord.js';
 import type { GportalServerConfig, LiveServerData } from './types.js';
 import { getBarLineOnlyBar } from './getBarLine.js';
 import { emoji } from '@/utils/meatEmojis.js';
 
-export function buildServerInfoEmbed(config: GportalServerConfig, live: LiveServerData | null): EmbedBuilder {
+export function buildServerInfoEmbed(
+  config: GportalServerConfig,
+  live: LiveServerData | null
+): EmbedBuilder {
   const embed = new EmbedBuilder()
     .setTitle(`${config.name}`)
     .setColor(0x00ff88)
@@ -23,7 +24,11 @@ export function buildServerInfoEmbed(config: GportalServerConfig, live: LiveServ
     descLines.push(`${emoji.meat_game} Game: ${config.game}`);
   }
 
-  if (live?.map && live.map !== config.name) {
+  // Vermeidet Anzeige der Map, wenn sie im Prinzip gleich ist wie der Servername
+  const clean = (s?: string) =>
+    s?.toLowerCase().replaceAll(' ', '').replaceAll('-', '') || '';
+
+  if (live?.map && clean(live.map) !== clean(config.name)) {
     descLines.push(`${emoji.meat_leer} Map: ${live.map}`);
   }
 
@@ -45,7 +50,9 @@ export function buildServerInfoEmbed(config: GportalServerConfig, live: LiveServ
       { name: ' ', value: `${bar}  ${valueText}`, inline: true }
     ]);
   } else {
-    embed.setFooter({ text: 'Server ist aktuell nicht erreichbar oder nicht vollständig konfiguriert.' });
+    embed.setFooter({
+      text: 'Server ist aktuell nicht erreichbar oder nicht vollständig konfiguriert.'
+    });
   }
 
   return embed;
