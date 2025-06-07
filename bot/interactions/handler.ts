@@ -213,7 +213,7 @@ export async function registerInteractions(client: Client) {
 
         const live = await queryServer(config);
         const embed = buildServerInfoEmbed(config, live);
-        const buttons = buildServerButtons(config);
+        const buttons = buildServerButtons(config); // enthält ggf. Zurück + Mods-Link
 
         return interaction.update({
           embeds: [embed],
@@ -231,8 +231,8 @@ export async function registerInteractions(client: Client) {
 
         for (const server of servers) {
           const icon = gameIcons[server.type] || gameIcons.default;
-          const labelRaw = `${icon} ${server.name}`;
-          const label = labelRaw.length > 80 ? labelRaw.slice(0, 77) + '…' : labelRaw;
+          const rawLabel = `${icon} ${server.name}`;
+          const label = rawLabel.length > 80 ? rawLabel.slice(0, 77) + '…' : rawLabel;
 
           const button = new ButtonBuilder()
             .setCustomId(`view_server_${server.id}`)
@@ -256,6 +256,7 @@ export async function registerInteractions(client: Client) {
           components: rows
         });
       }
+
 
       // === DinoName: Würfeln
       if (interaction.isButton() && interaction.customId === "dinoname_generate") {
