@@ -1,5 +1,8 @@
+// bot/modules/gportal/getBarLine.ts
+
 /**
  * Erstellt eine Zeile mit Label, Balken und rechtem Wert (z. B. „74 %“ oder „08 / 10“)
+ * Fallout-Style: fein abgestufte Unicode-Balken mit ▉▊▋▌▍▎▏
  */
 export function getBarLine(label: string, percent: number, valueLabel: string): string {
   const blocks = ['░', '▏', '▎', '▍', '▌', '▋', '▊', '▉', '█'];
