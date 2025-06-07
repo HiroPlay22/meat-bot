@@ -2,8 +2,7 @@
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-// Gamedig ist ein CJS-Modul, also klassisch per require()
-const Gamedig = require('gamedig');
+const { query } = require('gamedig');
 
 const config = {
   type: 'source',
@@ -13,7 +12,7 @@ const config = {
 
 console.log('🛰️ Starte Query für:', config);
 
-Gamedig.query(config)
+query(config)
   .then((result: any) => {
     console.log('✅ Ergebnis:', result);
     process.exit(0);
