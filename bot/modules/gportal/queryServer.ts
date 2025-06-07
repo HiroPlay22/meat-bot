@@ -2,7 +2,7 @@
 
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
-const Gamedig = require('gamedig'); // 💡 Wichtig: KEIN destructuring
+const Gamedig = require('gamedig');
 
 import type { GportalServerConfig, LiveServerData } from './types.js';
 
@@ -13,7 +13,7 @@ export async function queryServer(config: GportalServerConfig): Promise<LiveServ
   if (!config.query) return null;
 
   try {
-    const result = await Gamedig.query({
+    const result = await Gamedig.default({ // 💡 DAS ist der entscheidende Punkt!
       type: config.type,
       host: config.host,
       port: config.queryPort,
