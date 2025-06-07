@@ -24,11 +24,14 @@ export function buildServerInfoEmbed(
     descLines.push(`${emoji.meat_game} Game: ${config.game}`);
   }
 
-  // Vermeidet Anzeige der Map, wenn sie im Prinzip gleich ist wie der Servername
+  // Vergleich Map vs. Name (fuzzy)
   const clean = (s?: string) =>
-    s?.toLowerCase().replaceAll(' ', '').replaceAll('-', '') || '';
+    s?.toLowerCase().replace(/[^\w]/g, '') || '';
 
-  if (live?.map && clean(live.map) !== clean(config.name)) {
+  if (
+    live?.map &&
+    !clean(live.map).startsWith(clean(config.name).slice(0, 20))
+  ) {
     descLines.push(`${emoji.meat_leer} Map: ${live.map}`);
   }
 
