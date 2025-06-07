@@ -7,10 +7,10 @@ import {
   EmbedBuilder
 } from 'discord.js';
 
-import { loadGportalSettings } from '../../modules/gportal/loadGportalSettings';
-import { buildServerOverviewEmbed } from '../../modules/gportal/buildServerOverviewEmbed';
-import { queryServer } from '../../modules/gportal/queryServer';
-import { buildServerInfoEmbed } from '../../modules/gportal/buildServerInfoEmbed';
+import { loadGportalSettings } from '../../modules/gportal/loadGportalSettings.js';
+import { buildServerOverviewEmbed } from '../../modules/gportal/buildServerOverviewEmbed.js';
+import { queryServer } from '../../modules/gportal/queryServer.js';
+import { buildServerInfoEmbed } from '../../modules/gportal/buildServerInfoEmbed.js';
 
 const gameIcons: Record<string, string> = {
   ark: '🦖',
