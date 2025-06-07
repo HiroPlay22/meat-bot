@@ -12,7 +12,7 @@ export function buildServerInfoEmbed(config: GportalServerConfig, live: LiveServ
       `🗺️ Map: ${live?.map || 'unbekannt'}\n` +
       `🌐 Zugriff: nur mit entsprechender Rolle`
     )
-    .setThumbnail('https://media.discordapp.net/attachments/1374459199181951087/1379485080128585819/ChatGPT_Image_3._Juni_2025_17_18_04.png?ex=68450658&is=6843b4d8&hm=7f6446580d615e1ce6d81abcbf4356c8240d5ea9c5df38db0e03edda2188fc8f&=&format=webp&quality=lossless&width=819&height=819');
+    .setImage('https://media.discordapp.net/attachments/1374459199181951087/1379485079449112606/ChatGPT_Image_3._Juni_2025_17_20_29.png?ex=68450658&is=6843b4d8&hm=02b2016657f1a5ea65d82573da94dced8b94c73dc889d51530bbf896d0755303&=&format=webp&quality=lossless&width=1229&height=819');
 
   if (live) {
     embed.addFields([
