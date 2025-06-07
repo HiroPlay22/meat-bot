@@ -8,7 +8,7 @@ import type { GportalServerConfig } from './types.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const settingsPath = path.resolve(__dirname, '../../config/gportalSettings.json');
+const settingsPath = path.resolve(__dirname, '../../../config/gportalSettings.json');
 
 export function loadGportalSettings(): GportalServerConfig[] {
   const raw = readFileSync(settingsPath, 'utf-8');
