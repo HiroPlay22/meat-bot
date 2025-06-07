@@ -23,14 +23,13 @@ export function buildServerInfoEmbed(config: GportalServerConfig, live: LiveServ
     descLines.push(`${emoji.meat_game} Game: ${config.game}`);
   }
 
-  if (live?.map) {
+  if (live?.map && live.map !== config.name) {
     descLines.push(`${emoji.meat_leer} Map: ${live.map}`);
   }
 
   descLines.push(`${emoji.meat_roles} Zugriff: nur mit entsprechender Rolle`);
   embed.setDescription(descLines.join('\n'));
 
-  // Spieleranzeige nur wenn live.players und config.maxPlayers verfügbar sind
   const hasValidPlayerData =
     typeof live?.players === 'number' &&
     typeof config.maxPlayers === 'number';
