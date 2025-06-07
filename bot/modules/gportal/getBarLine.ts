@@ -24,7 +24,7 @@ export function getBarLineOnlyBar(percent: number): string {
 function getFalloutBar(percent: number): string {
   const blocks = ['░', '▏', '▎', '▍', '▌', '▋', '▊', '▉', '█'];
   const max = 10;
-  const value = Math.round((percent / 100) * max * 8); // bis zu 80 "Stufen"
+  const value = Math.round((percent / 100) * max * 8);
   const full = Math.floor(value / 8);
   const partial = value % 8;
 
