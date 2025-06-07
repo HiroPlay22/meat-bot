@@ -1,8 +1,6 @@
-// bot/modules/gportal/buildServerInfoEmbed.ts
-
 import { EmbedBuilder } from 'discord.js';
 import type { GportalServerConfig, LiveServerData } from './types.js';
-import { getBarLine } from './getBarLine.js';
+import { getBarLineOnlyBar } from './getBarLine.js';
 import { emoji } from '@/utils/meatEmojis.js';
 
 export function buildServerInfoEmbed(config: GportalServerConfig, live: LiveServerData | null): EmbedBuilder {
@@ -30,16 +28,17 @@ export function buildServerInfoEmbed(config: GportalServerConfig, live: LiveServ
   descLines.push(`${emoji.meat_roles} Zugriff: nur mit entsprechender Rolle`);
   embed.setDescription(descLines.join('\n'));
 
-  if (typeof live?.players === 'number' && typeof live?.maxPlayers === 'number') {
-    const percentage = (live.players / live.maxPlayers) * 100;
-    const barLine = getBarLine(`${emoji.meat_users} Spieler:`, percentage, `${live.players.toString().padStart(2, '0')} / ${live.maxPlayers}`);
+  // Spieleranzeige mit Fallback auf config.maxPlayers
+  const maxPlayers = live?.maxPlayers || config.maxPlayers;
+
+  if (typeof live?.players === 'number' && typeof maxPlayers === 'number') {
+    const percentage = (live.players / maxPlayers) * 100;
+    const bar = getBarLineOnlyBar(percentage);
+    const valueText = `${live.players.toString().padStart(2, '0')} / ${maxPlayers}`;
 
     embed.addFields([
-      {
-        name: 'Serverauslastung',
-        value: `\`\`\`diff\n${barLine}\n\`\`\``,
-        inline: false
-      }
+      { name: ' ', value: `${emoji.meat_users} Spieler:`, inline: true },
+      { name: ' ', value: `${bar}  ${valueText}`, inline: true }
     ]);
   } else {
     embed.setFooter({ text: 'Server ist aktuell nicht erreichbar.' });

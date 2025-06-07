@@ -8,6 +8,7 @@
     "game": "Valheim",
     "query": true,
     "display": true,
-    "modsUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=1234567890"
+    "link": "https://example.com/mods",
+    "maxPlayers": 10
   }
 ]
