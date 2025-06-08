@@ -15,10 +15,6 @@ export function buildVideoEmbed(video: YouTubeVideo) {
     .setColor('#FF0000') // YouTube-Rot
     .setTitle(video.title)
     .setURL(url)
-    .setAuthor({
-      name: `${video.channelTitle} hat ein neues Video veröffentlicht!`,
-      iconURL: 'https://www.youtube.com/s/desktop/27cdb1e2/img/favicon_144.png'
-    })
     .addFields([
       {
         name: '',
