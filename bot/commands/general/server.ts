@@ -1,3 +1,5 @@
+// bot/commands/general/server.ts
+
 import {
   SlashCommandBuilder,
   ActionRowBuilder,
@@ -65,6 +67,18 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   if (currentRow.components.length > 0) {
     rows.push(currentRow);
+  }
+
+  // ➕ Ref-Link Button, falls noch Platz
+  if (rows.length < 5) {
+    rows.push(
+      new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+          .setLabel('🎁 10 % Rabatt auf deinen Gameserver')
+          .setStyle(ButtonStyle.Link)
+          .setURL('https://www.g-portal.com/?ref=HiroLive')
+      )
+    );
   }
 
   return interaction.reply({

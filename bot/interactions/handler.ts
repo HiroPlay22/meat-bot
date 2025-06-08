@@ -255,7 +255,7 @@ export async function registerInteractions(client: Client) {
         if (rows.length < 5) {
           const refRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder()
-              .setLabel('🔗 10 % Rabatt auf deinen Gameserver')
+              .setLabel('🎁 10 % Rabatt auf deinen Gameserver')
               .setStyle(ButtonStyle.Link)
               .setURL('https://www.g-portal.com/?ref=HiroLive')
           );
