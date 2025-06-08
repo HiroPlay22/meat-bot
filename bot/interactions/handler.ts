@@ -202,25 +202,6 @@ export async function registerInteractions(client: Client) {
         default: '🎮'
       };
 
-      // === GPORTAL: Server-Info
-      if (interaction.isButton() && interaction.customId.startsWith('view_server_')) {
-        const serverId = interaction.customId.replace('view_server_', '');
-        const config = getServerById(serverId);
-
-        if (!config) {
-          return interaction.reply({ content: 'Serverkonfiguration nicht gefunden.', ephemeral: true });
-        }
-
-        const live = await queryServer(config);
-        const embed = buildServerInfoEmbed(config, live);
-        const buttons = buildServerButtons(config);
-
-        return interaction.update({
-          embeds: [embed],
-          components: buttons
-        });
-      }
-
       // === GPORTAL: Übersicht wiederherstellen
       if (interaction.isButton() && interaction.customId === 'back_to_overview') {
         const embed = buildServerOverviewEmbed();
@@ -250,6 +231,16 @@ export async function registerInteractions(client: Client) {
         if (currentRow.components.length > 0) {
           rows.push(currentRow);
         }
+
+        // GPORTAL Ref-Link als separater Button
+        rows.push(
+          new ActionRowBuilder<ButtonBuilder>().addComponents(
+            new ButtonBuilder()
+              .setLabel('🔗 10 % Rabatt auf deinen Gameserver')
+              .setStyle(ButtonStyle.Link)
+              .setURL('https://www.g-portal.com/?ref=HiroLive')
+          )
+        );
 
         return interaction.update({
           embeds: [embed],
