@@ -12,25 +12,47 @@ export async function runYouTubeCheck(client: Client<true>) {
   for (const [guildId, settings] of Object.entries(serverSettings.guilds)) {
     const { trackedYoutubeChannels, youtubeTargetChannelId } = settings;
 
-    if (!trackedYoutubeChannels || !youtubeTargetChannelId) continue;
+    if (!trackedYoutubeChannels || !youtubeTargetChannelId) {
+      console.log(`[M.E.A.T.-LOG] ⚠️ Keine YouTube-Kanäle oder kein Zielchannel definiert für Guild ${guildId}`);
+      continue;
+    }
+
+    console.log(`[M.E.A.T.-LOG] ➕ ${trackedYoutubeChannels.length} YouTube-Kanäle geladen für Guild ${guildId}`);
 
     for (const channelConfig of trackedYoutubeChannels) {
-      console.log(`[M.E.A.T.-LOG] 📡 Prüfe Kanal: ${channelConfig.channelId}`);
+      console.log(`[M.E.A.T.-LOG] 📡 Prüfe Kanal: ${channelConfig.channelTitle} (${channelConfig.channelId})`);
 
-      const videos = await fetchLatestFromRSS(channelConfig.channelId);
+      let videos = [];
+      try {
+        videos = await fetchLatestFromRSS(channelConfig.channelId);
+      } catch (err) {
+        console.log(`[M.E.A.T.-LOG] ❌ Fehler beim Laden von Videos für ${channelConfig.channelId}:`, err);
+        continue;
+      }
+
+      if (!videos || videos.length === 0) {
+        console.log(`[M.E.A.T.-LOG] ⚠️ Keine Videos gefunden für ${channelConfig.channelTitle}`);
+        continue;
+      }
 
       for (const video of videos) {
         // Shorts ausschließen, wenn gewünscht
-        if (channelConfig.excludeShorts && video.link.includes('shorts')) continue;
+        if (channelConfig.excludeShorts && video.link.includes('shorts')) {
+          console.log(`[M.E.A.T.-LOG] ⏭️ Überspringe Shorts: ${video.title}`);
+          continue;
+        }
 
         const videoTime = new Date(video.publishedAt).getTime();
         const minutesSince = (now - videoTime) / 1000 / 60;
 
-        if (minutesSince > 10) continue; // Nur Videos posten, die in den letzten 10 Min veröffentlicht wurden
+        if (minutesSince > 10) {
+          console.log(`[M.E.A.T.-LOG] ⏱️ Video zu alt (${Math.floor(minutesSince)}min): ${video.title}`);
+          continue;
+        }
 
         const discordChannel = client.channels.cache.get(youtubeTargetChannelId) as TextChannel;
         if (!discordChannel) {
-          console.log(`[M.E.A.T.-LOG] ⚠️ Channel mit ID ${youtubeTargetChannelId} nicht gefunden.`);
+          console.log(`[M.E.A.T.-LOG] ⚠️ Zielchannel nicht gefunden: ${youtubeTargetChannelId}`);
           continue;
         }
 
