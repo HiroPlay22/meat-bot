@@ -1,3 +1,5 @@
+// bot/modules/gportal/buildServerInfoEmbed.ts
+
 import { EmbedBuilder } from 'discord.js';
 import type { GportalServerConfig, LiveServerData } from './types.js';
 import { getBarLineOnlyBar } from './getBarLine.js';
