@@ -1,4 +1,4 @@
-{ 
+{
   "logChannelId": "1373610845761962036",
   "guilds": {
     "271568768268894218": {
@@ -34,7 +34,33 @@
         "1071153394829508628",
         "1070711077840625745"
       ],
-      "trackedTwitchUsers": ["hiro_live", "brinibrinsen", "freshfries", "gamingfriends_", "tinuviel1802", "K3ksiii_", "joegoku"]
+      "trackedTwitchUsers": [
+        "hiro_live",
+        "brinibrinsen",
+        "freshfries",
+        "gamingfriends_",
+        "tinuviel1802",
+        "K3ksiii_",
+        "joegoku"
+      ],
+      "trackedYoutubeChannels": [
+        {
+          "channelId": "UC2c0BRs8-3_H7eLNZMm2iug",
+          "channelTitle": "FreshFries",
+          "excludeShorts": true
+        },
+        {
+          "channelId": "UCU73ur4UFaSWt27pVRzD9Fw",
+          "channelTitle": "GamingFriends",
+          "excludeShorts": true
+        },
+        {
+          "channelId": "UCj_MSOhOaCf2eqMNKaoRgog",
+          "channelTitle": "DeDomeD",
+          "excludeShorts": true
+        }
+      ],
+      "youtubeTargetChannelId": "419487636798046218"
     }
   }
 }

@@ -1,3 +1,5 @@
+// bot/index.ts
+
 import * as Discord from 'discord.js';
 import { registerInteractions } from './interactions/handler.js';
 import { registerPrefixCommands } from '@modules/message/prefixRouter';
@@ -7,6 +9,7 @@ import { handleMemberJoin } from '@modules/join/index.js';
 import { loadSlashCommands } from './loader/commandLoader.js';
 import { writeBotStatus } from "./utils/writeBotStatus.js";
 import { startTwitchLivePoll } from '@/modules/live/twitchLivePoll.js';
+import { runYouTubeCheck } from '@/modules/youtube/youtubeChecker.js';
 
 // 🟢 Initialisierung (nur Konsole)
 logSystem('🟢 M.E.A.T. wird initialisiert...');
@@ -46,7 +49,7 @@ const client = new Discord.Client({
 // ✅ Online-Log
 client.once('ready', async () => {
   globalThis.discordClient = client; // Global verfügbar für API-Routen wie /api/stats
-  
+
   const tag = client.user?.tag ?? 'unbekannt';
   await logSystem(`✅ ${tag} ist online`, client);
 
@@ -61,8 +64,12 @@ client.once('ready', async () => {
 
   // 🔁 Twitch-Poll starten
   startTwitchLivePoll();
-});
 
+  // 🔁 YouTube-Check alle 10 Minuten
+  const readyClient = client as Discord.Client<true>;
+  runYouTubeCheck(readyClient);
+  setInterval(() => runYouTubeCheck(readyClient), 10 * 60 * 1000);
+});
 
 // 🟢 Registriere Join-Handler
 client.on('guildMemberAdd', async (member) => {
