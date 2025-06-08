@@ -5,6 +5,9 @@ import serverSettings from '../../../config/serverSettings.json' with { type: 'j
 
 export async function runYouTubeCheck(client: Client<true>) {
   const now = Date.now();
+  const nowFormatted = new Date(now).toLocaleTimeString();
+
+  console.log(`[M.E.A.T.-LOG] 🔁 Starte YouTube-Check @ ${nowFormatted}`);
 
   for (const [guildId, settings] of Object.entries(serverSettings.guilds)) {
     const { trackedYoutubeChannels, youtubeTargetChannelId } = settings;
@@ -12,6 +15,8 @@ export async function runYouTubeCheck(client: Client<true>) {
     if (!trackedYoutubeChannels || !youtubeTargetChannelId) continue;
 
     for (const channelConfig of trackedYoutubeChannels) {
+      console.log(`[M.E.A.T.-LOG] 📡 Prüfe Kanal: ${channelConfig.channelId}`);
+
       const videos = await fetchLatestFromRSS(channelConfig.channelId);
 
       for (const video of videos) {
@@ -24,13 +29,18 @@ export async function runYouTubeCheck(client: Client<true>) {
         if (minutesSince > 10) continue; // Nur Videos posten, die in den letzten 10 Min veröffentlicht wurden
 
         const discordChannel = client.channels.cache.get(youtubeTargetChannelId) as TextChannel;
-        if (!discordChannel) continue;
+        if (!discordChannel) {
+          console.log(`[M.E.A.T.-LOG] ⚠️ Channel mit ID ${youtubeTargetChannelId} nicht gefunden.`);
+          continue;
+        }
 
         const embed = buildVideoEmbed(video);
         await discordChannel.send(embed);
 
-        console.log(`[M.E.A.T.-LOG] 📺 Neues Video: ${video.title}`);
+        console.log(`[M.E.A.T.-LOG] ✅ Video gepostet: "${video.title}" (${video.link})`);
       }
     }
   }
+
+  console.log(`[M.E.A.T.-LOG] ✅ YouTube-Check abgeschlossen\n`);
 }
