@@ -1,4 +1,7 @@
 import type tmi from 'tmi.js';
+import { createTwitchClip } from '../utils/createClip.js';
+import { postClipToDiscord } from '../utils/postClipToDiscord.js';
+import { discordClient } from '../../bot/index.js';
 
 export function handleChatCommand(
   client: tmi.Client,
@@ -15,8 +18,20 @@ export function handleChatCommand(
       break;
 
     case '!clip':
-      client.say(channel, `🎬 Clip-Funktion wird vorbereitet...`);
-      // Hier bauen wir später die echte Clip-API + Discord-Webhook ein
+      client.say(channel, `🎬 Clip wird erstellt...`);
+      createTwitchClip()
+        .then(async (clipUrl) => {
+          if (clipUrl) {
+            client.say(channel, `✅ Clip erstellt: ${clipUrl}`);
+            await postClipToDiscord(discordClient, clipUrl);
+          } else {
+            client.say(channel, `❌ Clip konnte nicht erstellt werden.`);
+          }
+        })
+        .catch((err) => {
+          console.error('❌ Fehler beim Clip-Erstellen:', err);
+          client.say(channel, `❌ Fehler bei der Clip-Erstellung.`);
+        });
       break;
 
     default:
