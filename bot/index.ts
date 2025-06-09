@@ -30,7 +30,7 @@ process.on("SIGTERM", () => {
 });
 
 // Discord-Client Setup
-const client = new Discord.Client({
+export const discordClient = new Discord.Client({
   intents: [
     Discord.GatewayIntentBits.Guilds,
     Discord.GatewayIntentBits.GuildMembers,
@@ -46,6 +46,7 @@ const client = new Discord.Client({
   ],
   partials: [Discord.Partials.Channel]
 });
+
 
 // ✅ Online-Log
 client.once('ready', async () => {
