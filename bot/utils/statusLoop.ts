@@ -1,11 +1,14 @@
 import { Client, ActivityType } from "discord.js";
 
 const normalStatusFrames = [
-  "🟧🟥⬛⬛⬛",
-  "⬛🟧🟥⬛⬛",
-  "⬛⬛🟧🟥⬛",
-  "⬛⬛⬛🟧🟥",
-  "🟥⬛⬛⬛🟧"
+  "🟧🟥⬛⬛⬛⬛⬛⬛",
+  "⬛🟧🟥⬛⬛⬛⬛⬛",
+  "⬛⬛🟧🟥⬛⬛⬛⬛",
+  "⬛⬛⬛🟧🟥⬛⬛⬛",
+  "⬛⬛⬛⬛🟥🟧⬛⬛",
+  "⬛⬛⬛⬛⬛🟧🟥⬛",
+  "⬛⬛⬛⬛⬛⬛🟧🟥",
+  "🟥⬛⬛⬛⬛⬛⬛🟧"
 ];
 
 export function startNormalStatusLoop(client: Client) {
@@ -13,7 +16,7 @@ export function startNormalStatusLoop(client: Client) {
 
   setInterval(() => {
     const frame = normalStatusFrames[i++ % normalStatusFrames.length];
-    client.user?.setActivity(`${frame} | Systembereit`, {
+    client.user?.setActivity(`${frame}`, {
       type: ActivityType.Playing
     });
   }, 4000); // alle 4 Sekunden neuer Frame
