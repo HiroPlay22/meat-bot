@@ -14,11 +14,11 @@ export function handleChatCommand(
 
   switch (command.toLowerCase()) {
     case '!hello':
-      client.say(channel, `/announce Hey ${username}, willkommen bei M.E.A.T.! 🤖`);
+      client.say(channel, `Hey ${username}, willkommen bei M.E.A.T.! 🤖`);
       break;
 
     case '!clip':
-      client.say(channel, `/announce 🎬 Clip wird erstellt...`);
+      client.say(channel, `🎬 Clip wird erstellt...`);
       createTwitchClip()
         .then(async (clipUrl) => {
           if (clipUrl) {
