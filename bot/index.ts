@@ -30,7 +30,7 @@ process.on("SIGTERM", () => {
 });
 
 // Discord-Client Setup
-export const discordClient = new Discord.Client({
+const client = new Discord.Client({
   intents: [
     Discord.GatewayIntentBits.Guilds,
     Discord.GatewayIntentBits.GuildMembers,
@@ -46,6 +46,9 @@ export const discordClient = new Discord.Client({
   ],
   partials: [Discord.Partials.Channel]
 });
+
+// ✅ Twitch-Bot kann ihn importieren:
+export const discordClient = client;
 
 
 // ✅ Online-Log
