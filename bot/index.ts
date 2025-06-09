@@ -10,6 +10,7 @@ import { loadSlashCommands } from './loader/commandLoader.js';
 import { writeBotStatus } from "./utils/writeBotStatus.js";
 import { startTwitchLivePoll } from '@/modules/live/twitchLivePoll.js';
 import { runYouTubeCheck } from '@/modules/youtube/youtubeChecker.js';
+import { startNormalStatusLoop } from "./utils/statusLoop.js";
 
 // 🟢 Initialisierung (nur Konsole)
 logSystem('🟢 M.E.A.T. wird initialisiert...');
@@ -49,6 +50,10 @@ const client = new Discord.Client({
 // ✅ Online-Log
 client.once('ready', async () => {
   globalThis.discordClient = client; // Global verfügbar für API-Routen wie /api/stats
+
+  // 🟢 Bot ist online
+  console.log(`Bot ist online als ${client.user?.tag}`);
+  startNormalStatusLoop(client);
 
   const tag = client.user?.tag ?? 'unbekannt';
   await logSystem(`✅ ${tag} ist online`, client);
