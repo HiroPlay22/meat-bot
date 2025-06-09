@@ -14,7 +14,7 @@ export function handleChatCommand(
 
   switch (command.toLowerCase()) {
     case '!hello':
-      client.say(channel, `Hey ${username}, willkommen bei M.E.A.T.! 🤖`);
+      client.say(channel, `/announce Hey ${username}, willkommen bei M.E.A.T.! 🤖`);
       break;
 
     case '!clip':
