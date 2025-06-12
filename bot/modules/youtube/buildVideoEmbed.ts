@@ -51,6 +51,6 @@ export async function buildVideoEmbed(video: YouTubeVideo) {
   return {
     embeds: [embed],
     components: [row],
-    allowedMentions: { parse: [] } // ❌ kein Ping bei Mention
+    allowedMentions: { parse: [] } // ❌ kein Ping bei Mention!
   };
 }
