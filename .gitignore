@@ -22,6 +22,9 @@ yarn-error.log*
 *.swp
 .DS_Store
 
+# Prisma SQLite-Datenbank
+database/dev.db
+
 # Sonstiges
 coverage/
 *.log
