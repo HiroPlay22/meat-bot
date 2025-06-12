@@ -23,23 +23,20 @@ export async function buildVideoEmbed(video: YouTubeVideo) {
     .setColor('#FF0000') // YouTube-Rot
     .setTitle(video.title)
     .setURL(url)
-    .setAuthor({
-      name: video.channelTitle,
-      iconURL: profileImage ?? 'https://www.youtube.com/img/desktop/yt_1200.png'
-    })
     .addFields([
       {
-        name: '\u200B',
+        name: '',
         value: `${emoji.meat_youtube} ${displayName}`,
         inline: true
       },
       {
-        name: '\u200B',
+        name: '',
         value: `${emoji.meat_calendar} <t:${Math.floor(new Date(video.publishedAt).getTime() / 1000)}:R>`,
         inline: true
       }
     ])
-    .setImage(thumbnail);
+    .setImage(thumbnail)
+    .setThumbnail(profileImage ?? 'https://www.youtube.com/img/desktop/yt_1200.png');
 
   const videoButton = new ButtonBuilder()
     .setLabel(`Zum Video`)
@@ -59,6 +56,6 @@ export async function buildVideoEmbed(video: YouTubeVideo) {
   return {
     embeds: [embed],
     components: [row],
-    allowedMentions: { parse: [] } // verhindert Ping bei User-Mentions
+    allowedMentions: { parse: [] } // keine pings bei <@>
   };
 }
