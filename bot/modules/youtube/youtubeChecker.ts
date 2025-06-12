@@ -1,6 +1,7 @@
 import { Client, TextChannel } from 'discord.js';
 import { fetchLatestFromRSS } from './fetchLatestFromRSS.js';
 import { buildVideoEmbed } from './buildVideoEmbed.js';
+import { buildShortsEmbed } from './buildShortsEmbed.js';
 import serverSettings from '../../../config/serverSettings.json' with { type: 'json' };
 
 export async function runYouTubeCheck(client: Client<true>) {
@@ -30,22 +31,24 @@ export async function runYouTubeCheck(client: Client<true>) {
       console.log(`[M.E.A.T.-LOG] 📄 ${videos.length} Videos gefunden`);
 
       for (const video of videos) {
-        if (channelConfig.excludeShorts && video.link.includes('shorts')) continue;
+        const isShort = video.link.includes('/shorts');
 
-        // Video-Daten anreichern (Wird später ins Embed übernommen)
+        if (channelConfig.excludeShorts && isShort) continue;
+
         video.channelId = channelConfig.channelId;
         video.discordUserId = channelConfig.discordUserId;
 
         const videoTime = new Date(video.publishedAt).getTime();
         const hoursSince = (now - videoTime) / 1000 / 60 / 60;
 
-        // ❌ Nur Videos aus den letzten 24h posten
         if (hoursSince > 24) continue;
 
         const discordChannel = client.channels.cache.get(youtubeTargetChannelId) as TextChannel;
         if (!discordChannel) continue;
 
-        const { embeds, components, allowedMentions } = await buildVideoEmbed(video);
+        const embedBuilder = isShort ? buildShortsEmbed : buildVideoEmbed;
+        const { embeds, components, allowedMentions } = await embedBuilder(video);
+
         await discordChannel.send({ embeds, components, allowedMentions });
 
         console.log(`[M.E.A.T.-LOG] ✅ Video gepostet: "${video.title}"`);
