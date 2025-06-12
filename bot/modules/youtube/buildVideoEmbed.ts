@@ -1,5 +1,3 @@
-// modules/youtube/buildVideoEmbed.ts
-
 import {
   EmbedBuilder,
   ActionRowBuilder,
@@ -12,11 +10,13 @@ import type { YouTubeVideo } from './fetchLatestFromRSS.js';
 
 export async function buildVideoEmbed(video: YouTubeVideo) {
   const url = video.link;
-
   const channelImage = youtubeChannelImageCache.get(video.channelId)
     ?? 'https://www.youtube.com/img/desktop/yt_1200.png';
-
   const hdThumbnail = `https://i.ytimg.com/vi/${video.videoId}/maxresdefault.jpg`;
+
+  const displayName = video.discordUserId
+    ? `${video.channelTitle} (<@${video.discordUserId}>)`
+    : video.channelTitle;
 
   const embed = new EmbedBuilder()
     .setColor('#FF0000')
@@ -25,7 +25,7 @@ export async function buildVideoEmbed(video: YouTubeVideo) {
     .addFields([
       {
         name: '',
-        value: `${emoji.meat_youtube} ${video.channelTitle}`,
+        value: `${emoji.meat_youtube} ${displayName}`,
         inline: true
       },
       {
@@ -35,7 +35,7 @@ export async function buildVideoEmbed(video: YouTubeVideo) {
       }
     ])
     .setThumbnail(channelImage)
-    .setImage(hdThumbnail); // ⚠️ ohne Balken
+    .setImage(hdThumbnail);
 
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
@@ -51,6 +51,6 @@ export async function buildVideoEmbed(video: YouTubeVideo) {
   return {
     embeds: [embed],
     components: [row],
-    allowedMentions: { users: [], roles: [] }
+    allowedMentions: { parse: [] } // ❌ kein Ping bei Mention
   };
 }
