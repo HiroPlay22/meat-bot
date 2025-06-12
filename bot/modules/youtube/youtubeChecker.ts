@@ -2,7 +2,21 @@ import { Client, TextChannel } from 'discord.js';
 import { fetchLatestFromRSS } from './fetchLatestFromRSS.js';
 import { buildVideoEmbed } from './buildVideoEmbed.js';
 import { buildShortsEmbed } from './buildShortsEmbed.js';
+import { prisma } from '@database/client.js';
 import serverSettings from '../../../config/serverSettings.json' with { type: 'json' };
+
+// 🧹 Alte Einträge (> 7 Tage) bereinigen
+async function cleanOldYouTubePosts() {
+  const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const deleted = await prisma.youTubePost.deleteMany({
+    where: {
+      postedAt: { lt: oneWeekAgo }
+    }
+  });
+
+  console.log(`[M.E.A.T.-CLEANUP] 🧹 Alte YouTubePosts gelöscht: ${deleted.count}`);
+}
 
 export async function runYouTubeCheck(client: Client<true>) {
   const now = Date.now();
@@ -32,7 +46,6 @@ export async function runYouTubeCheck(client: Client<true>) {
 
       for (const video of videos) {
         const isShort = video.link.includes('/shorts');
-
         if (channelConfig.excludeShorts && isShort) continue;
 
         video.channelId = channelConfig.channelId;
@@ -40,8 +53,16 @@ export async function runYouTubeCheck(client: Client<true>) {
 
         const videoTime = new Date(video.publishedAt).getTime();
         const hoursSince = (now - videoTime) / 1000 / 60 / 60;
-
         if (hoursSince > 24) continue;
+
+        const alreadyPosted = await prisma.youTubePost.findUnique({
+          where: { videoId: video.videoId }
+        });
+
+        if (alreadyPosted) {
+          console.log(`[M.E.A.T.-LOG] ⏩ Bereits gepostet: "${video.title}"`);
+          continue;
+        }
 
         const discordChannel = client.channels.cache.get(youtubeTargetChannelId) as TextChannel;
         if (!discordChannel) continue;
@@ -51,10 +72,19 @@ export async function runYouTubeCheck(client: Client<true>) {
 
         await discordChannel.send({ embeds, components, allowedMentions });
 
-        console.log(`[M.E.A.T.-LOG] ✅ Video gepostet: "${video.title}"`);
+        await prisma.youTubePost.create({
+          data: {
+            videoId: video.videoId,
+            guildId
+          }
+        });
+
+        console.log(`[M.E.A.T.-LOG] ✅ Video gepostet & gespeichert: "${video.title}"`);
       }
     }
   }
+
+  await cleanOldYouTubePosts();
 
   console.log(`[M.E.A.T.-LOG] ✅ YouTube-Check abgeschlossen\n`);
 }
