@@ -16,6 +16,8 @@ export async function buildVideoEmbed(video: YouTubeVideo) {
   const channelImage = youtubeChannelImageCache.get(video.channelId)
     ?? 'https://www.youtube.com/img/desktop/yt_1200.png';
 
+  const hdThumbnail = `https://i.ytimg.com/vi/${video.videoId}/maxresdefault.jpg`;
+
   const embed = new EmbedBuilder()
     .setColor('#FF0000')
     .setTitle(video.title)
@@ -33,7 +35,7 @@ export async function buildVideoEmbed(video: YouTubeVideo) {
       }
     ])
     .setThumbnail(channelImage)
-    .setImage(video.thumbnail);
+    .setImage(hdThumbnail); // ⚠️ ohne Balken
 
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()

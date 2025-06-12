@@ -1,3 +1,5 @@
+// modules/youtube/buildShortsEmbed.ts
+
 import {
   EmbedBuilder,
   ActionRowBuilder,
@@ -14,10 +16,8 @@ export async function buildShortsEmbed(video: YouTubeVideo) {
     ? `${video.channelTitle} (<@${video.discordUserId}>)`
     : video.channelTitle;
 
-  // Hochformat-Vorschaubild für Shorts
   const shortThumbnail = `https://i.ytimg.com/vi/${video.videoId}/hq720.jpg`;
 
-  // Shorts-Link & Kanal-Shorts-Seite
   const shortUrl = video.link;
   const shortsOverviewUrl = `https://www.youtube.com/channel/${video.channelId}/shorts`;
 
