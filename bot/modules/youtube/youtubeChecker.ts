@@ -32,15 +32,21 @@ export async function runYouTubeCheck(client: Client<true>) {
       for (const video of videos) {
         if (channelConfig.excludeShorts && video.link.includes('shorts')) continue;
 
+        // Video-Daten anreichern (Wird später ins Embed übernommen)
+        video.channelId = channelConfig.channelId;
+        video.discordUserId = channelConfig.discordUserId;
+
         const videoTime = new Date(video.publishedAt).getTime();
-        const minutesSince = (now - videoTime) / 1000 / 60;
-        if (minutesSince > 10) continue;
+        const hoursSince = (now - videoTime) / 1000 / 60 / 60;
+
+        // ❌ Nur Videos aus den letzten 24h posten
+        if (hoursSince > 24) continue;
 
         const discordChannel = client.channels.cache.get(youtubeTargetChannelId) as TextChannel;
         if (!discordChannel) continue;
 
-        const embed = buildVideoEmbed(video);
-        await discordChannel.send(embed);
+        const { embeds, components, allowedMentions } = await buildVideoEmbed(video);
+        await discordChannel.send({ embeds, components, allowedMentions });
 
         console.log(`[M.E.A.T.-LOG] ✅ Video gepostet: "${video.title}"`);
       }

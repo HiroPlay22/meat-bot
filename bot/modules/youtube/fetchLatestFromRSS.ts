@@ -8,6 +8,8 @@ export type YouTubeVideo = {
   publishedAt: string;
   thumbnail: string;
   channelTitle: string;
+  channelId: string;           // ⬅ für Profilbild & Kanal-Link
+  discordUserId?: string;      // ⬅ optional für Mention im Embed
 };
 
 export async function fetchLatestFromRSS(channelId: string): Promise<YouTubeVideo[]> {
@@ -30,7 +32,8 @@ export async function fetchLatestFromRSS(channelId: string): Promise<YouTubeVide
       link: entry['link']['@_href'],
       publishedAt: entry['published'],
       thumbnail: entry['media:group']['media:thumbnail']['@_url'],
-      channelTitle
+      channelTitle,
+      channelId // ⬅ mitgeben, damit Empfänger weiß, zu welchem Kanal das Video gehört
     }));
   } catch (error) {
     console.error(`Fehler beim Abrufen von YouTube-RSS für ${channelId}:`, error);

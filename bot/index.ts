@@ -1,5 +1,3 @@
-// bot/index.ts
-
 import * as Discord from 'discord.js';
 import { registerInteractions } from './interactions/handler.js';
 import { registerPrefixCommands } from '@modules/message/prefixRouter';
@@ -50,16 +48,14 @@ const client = new Discord.Client({
 // ✅ Twitch-Bot kann ihn importieren:
 export const discordClient = client;
 
-
 // ✅ Online-Log
 client.once('ready', async () => {
-  globalThis.discordClient = client; // Global verfügbar für API-Routen wie /api/stats
-
-  // 🟢 Bot ist online
-  console.log(`Bot ist online als ${client.user?.tag}`);
-  startNormalStatusLoop(client);
+  globalThis.discordClient = client;
 
   const tag = client.user?.tag ?? 'unbekannt';
+  console.log(`Bot ist online als ${tag}`);
+  startNormalStatusLoop(client);
+
   await logSystem(`✅ ${tag} ist online`, client);
 
   // 🔁 Slash-Commands laden & registrieren
@@ -76,8 +72,8 @@ client.once('ready', async () => {
 
   // 🔁 YouTube-Check alle 10 Minuten
   const readyClient = client as Discord.Client<true>;
-  runYouTubeCheck(readyClient);
-  setInterval(() => runYouTubeCheck(readyClient), 10 * 60 * 1000);
+  runYouTubeCheck(readyClient); // Initial sofortiger Check
+  setInterval(() => runYouTubeCheck(readyClient), 10 * 60 * 1000); // Danach alle 10 Min
 });
 
 // 🟢 Registriere Join-Handler
