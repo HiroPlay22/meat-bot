@@ -6,7 +6,7 @@ import serverSettings from '@config/serverSettings.json' with { type: 'json' };
 import { hasCooldown, setCooldown } from './liveCooldown.js';
 import { withLiveLock } from './liveLocks.js';
 
-const POLL_INTERVAL_MS = 2 * 60 * 1000; // alle 2 Minuten
+const POLL_INTERVAL_MS = 10 * 60 * 1000; // alle 10 Minuten
 
 function getTrackedUsernames(): string[] {
   const allUsers = Object.values(serverSettings.guilds)
@@ -78,7 +78,7 @@ export function startTwitchLivePoll() {
           }
 
           if (hasPosted) {
-            setCooldown(cooldownKey, 2 * 60 * 60 * 1000); // 2h Cooldown
+            setCooldown(cooldownKey, (2 * 60 + 30) * 60 * 1000); // 2h 30min Cooldown
             console.log(`[LivePoll] ✅ Cooldown gesetzt für ${username}`);
           }
         });
