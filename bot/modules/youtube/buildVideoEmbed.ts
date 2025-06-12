@@ -1,3 +1,5 @@
+// modules/youtube/buildVideoEmbed.ts
+
 import {
   EmbedBuilder,
   ActionRowBuilder,
@@ -5,28 +7,23 @@ import {
   ButtonStyle
 } from 'discord.js';
 import { emoji } from '@/utils/meatEmojis.js';
+import { youtubeChannelImageCache } from './channelImageCache.js';
 import type { YouTubeVideo } from './fetchLatestFromRSS.js';
-import { getYoutubeProfileImage } from './getYoutubeProfileImage.js';
-import { getBestYoutubeThumbnail } from './getBestYoutubeThumbnail.js';
 
 export async function buildVideoEmbed(video: YouTubeVideo) {
   const url = video.link;
-  const channelUrl = `https://youtube.com/channel/${video.channelId}`;
-  const profileImage = await getYoutubeProfileImage(video.channelId);
-  const thumbnail = getBestYoutubeThumbnail(video.videoId);
 
-  const displayName = video.discordUserId
-    ? `${video.channelTitle} (<@${video.discordUserId}>)`
-    : video.channelTitle;
+  const channelImage = youtubeChannelImageCache.get(video.channelId)
+    ?? 'https://www.youtube.com/img/desktop/yt_1200.png';
 
   const embed = new EmbedBuilder()
-    .setColor('#FF0000') // YouTube-Rot
+    .setColor('#FF0000')
     .setTitle(video.title)
     .setURL(url)
     .addFields([
       {
         name: '',
-        value: `${emoji.meat_youtube} ${displayName}`,
+        value: `${emoji.meat_youtube} ${video.channelTitle}`,
         inline: true
       },
       {
@@ -35,27 +32,23 @@ export async function buildVideoEmbed(video: YouTubeVideo) {
         inline: true
       }
     ])
-    .setImage(thumbnail)
-    .setThumbnail(profileImage ?? 'https://www.youtube.com/img/desktop/yt_1200.png');
-
-  const videoButton = new ButtonBuilder()
-    .setLabel(`Zum Video`)
-    .setStyle(ButtonStyle.Link)
-    .setURL(url);
-
-  const channelButton = new ButtonBuilder()
-    .setLabel(`Zum Kanal`)
-    .setStyle(ButtonStyle.Link)
-    .setURL(channelUrl);
+    .setThumbnail(channelImage)
+    .setImage(video.thumbnail);
 
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    videoButton,
-    channelButton
+    new ButtonBuilder()
+      .setLabel('Zum Video')
+      .setStyle(ButtonStyle.Link)
+      .setURL(url),
+    new ButtonBuilder()
+      .setLabel('Zum Kanal')
+      .setStyle(ButtonStyle.Link)
+      .setURL(`https://www.youtube.com/channel/${video.channelId}`)
   );
 
   return {
     embeds: [embed],
     components: [row],
-    allowedMentions: { parse: [] } // keine pings bei <@>
+    allowedMentions: { users: [], roles: [] }
   };
 }

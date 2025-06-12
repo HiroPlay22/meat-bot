@@ -9,6 +9,7 @@ import { writeBotStatus } from "./utils/writeBotStatus.js";
 import { startTwitchLivePoll } from '@/modules/live/twitchLivePoll.js';
 import { runYouTubeCheck } from '@/modules/youtube/youtubeChecker.js';
 import { startNormalStatusLoop } from "./utils/statusLoop.js";
+import { preloadYoutubeChannelImages } from '@/modules/youtube/fetchYoutubeProfileImages.js';
 
 // 🟢 Initialisierung (nur Konsole)
 logSystem('🟢 M.E.A.T. wird initialisiert...');
@@ -70,11 +71,15 @@ client.once('ready', async () => {
   // 🔁 Twitch-Poll starten
   startTwitchLivePoll();
 
+  // 🖼️ YouTube-Profilbilder laden (Cache)
+  await preloadYoutubeChannelImages();
+
   // 🔁 YouTube-Check alle 10 Minuten
   const readyClient = client as Discord.Client<true>;
-  runYouTubeCheck(readyClient); // Initial sofortiger Check
-  setInterval(() => runYouTubeCheck(readyClient), 10 * 60 * 1000); // Danach alle 10 Min
+  runYouTubeCheck(readyClient);
+  setInterval(() => runYouTubeCheck(readyClient), 10 * 60 * 1000);
 });
+
 
 // 🟢 Registriere Join-Handler
 client.on('guildMemberAdd', async (member) => {
