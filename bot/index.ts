@@ -46,7 +46,7 @@ const client = new Discord.Client({
   partials: [Discord.Partials.Channel]
 });
 
-// ✅ Twitch-Bot kann ihn importieren:
+// ✅ Twitch-Bot kann ihn importieren
 export const discordClient = client;
 
 // ✅ Online-Log
