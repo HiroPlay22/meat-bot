@@ -107,5 +107,5 @@ client.on('messageDelete', async (message) => {
   );
 });
 
-// 🚀 Bot starten
+// 🚀 Bot starten!
 client.login(getDiscordToken());
