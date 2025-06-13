@@ -147,4 +147,3 @@ model YouTubePost {
   guildId   String
   postedAt  DateTime @default(now())
 }
- 
