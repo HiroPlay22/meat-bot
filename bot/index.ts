@@ -76,8 +76,17 @@ client.once('ready', async () => {
 
   // 🔁 YouTube-Check alle 10 Minuten
   const readyClient = client as Discord.Client<true>;
-  runYouTubeCheck(readyClient);
-  setInterval(() => runYouTubeCheck(readyClient), 10 * 60 * 1000);
+  // ✅ Sicherstellen, dass Tabelle existiert (Crash verhindern)
+  try {
+    await runYouTubeCheck(readyClient);
+    setInterval(() => runYouTubeCheck(readyClient), 10 * 60 * 1000);
+  } catch (error: any) {
+    if (error.code === 'P2021') {
+      console.warn("[YouTube] ❌ Tabelle YouTubePost fehlt – Check wird vorerst übersprungen.");
+    } else {
+      throw error;
+    }
+  }
 });
 
 
