@@ -35,7 +35,7 @@ import { buildServerButtons } from '@/modules/gportal/buildServerButtons.js';
 
 
 // Hilfsfunktion für Spiel-Löschseiten
-async function buildGameDeletePage(interaction: Interaction, page: number) {
+async function buildGameDeletePage(interaction: Interaction, page: number, isReply = false) {
   const PAGE_SIZE = 25;
   const allGames = await prisma.funGame.findMany({ orderBy: { name: "asc" } });
   const totalPages = Math.ceil(allGames.length / PAGE_SIZE);
@@ -71,12 +71,16 @@ async function buildGameDeletePage(interaction: Interaction, page: number) {
 
   const navRow = new ActionRowBuilder<ButtonBuilder>().addComponents(backButton, nextButton);
 
-  return {
+  const base = {
     content: `❌ Spiel löschen – Seite ${currentPage} von ${totalPages}`,
-    components: [selectRow, navRow],
-    ephemeral: true
+    components: [selectRow, navRow]
   };
+
+  return isReply
+    ? { ...base, ephemeral: true } // nur bei .reply()
+    : base; // bei .update() KEIN ephemeral
 }
+
 
 export async function registerInteractions(client: Client) {
   const commandMap = await loadSlashCommands();
