@@ -21,7 +21,7 @@ const gameIcons: Record<string, string> = {
   minecraft: '🧱',
   default: '🎮'
 };
-
+ 
 export const data = new SlashCommandBuilder()
   .setName('server')
   .setDescription('Zeigt Community-Server');
