@@ -35,7 +35,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   for (const server of servers) {
     const icon = gameIcons[server.type] || gameIcons.default;
-    const labelRaw = `${icon} ${server.name}`;
+    const baseLabel = server.buttonLabel || server.name;
+    const labelRaw = `${icon} ${baseLabel}`;
     const label = labelRaw.length > 80 ? labelRaw.slice(0, 77) + '…' : labelRaw;
 
     let button: ButtonBuilder;
@@ -47,7 +48,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         .setCustomId(
           live ? `view_server_${server.id}` : `offline_placeholder_${server.id}`
         )
-        .setLabel(live ? label : `❌ ${server.name}`)
+        .setLabel(live ? label : `❌ ${baseLabel}`)
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(!live);
     } else {

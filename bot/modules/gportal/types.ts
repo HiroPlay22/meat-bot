@@ -9,8 +9,11 @@ export interface GportalServerConfig {
   game?: string;
   query?: boolean;
   display?: boolean;
-  link?: string;           // optionaler Link zu Mods
-  maxPlayers?: number;     // fallback für maxPlayers, wenn Query nichts liefert
+  link?: string;            // optionaler Link zu Mods
+  maxPlayers?: number;      // fallback für maxPlayers, wenn Query nichts liefert
+  roleId?: string;          // Discord-Rolle (wird nicht gepingt)
+  modIds?: number[];        // Liste der Mod-IDs
+  buttonLabel?: string;     // Optional: Label für Button in der Übersicht
 }
 
 export interface LiveServerData {

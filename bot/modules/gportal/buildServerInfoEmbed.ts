@@ -10,7 +10,7 @@ export function buildServerInfoEmbed(
   live: LiveServerData | null
 ): EmbedBuilder {
   const embed = new EmbedBuilder()
-    .setTitle(`${config.name}`)
+    .setTitle(config.name) // vollständiger Servername im Embed-Titel
     .setColor(0x00ff88)
     .setImage(
       'https://media.discordapp.net/attachments/1374459199181951087/1379485079449112606/ChatGPT_Image_3._Juni_2025_17_20_29.png?ex=68450658&is=6843b4d8&hm=02b2016657f1a5ea65d82573da94dced8b94c73dc889d51530bbf896d0755303&=&format=webp&quality=lossless&width=1229&height=819'
@@ -37,15 +37,20 @@ export function buildServerInfoEmbed(
     descLines.push(`${emoji.meat_leer} Map: ${live.map}`);
   }
 
-  descLines.push(`${emoji.meat_roles} Zugriff: nur mit entsprechender Rolle`);
+  if (config.roleId) {
+    descLines.push(`${emoji.meat_roles} Zugriff: <@&${config.roleId}>`);
+  } else {
+    descLines.push(`${emoji.meat_roles} Zugriff: nur mit entsprechender Rolle`);
+  }
+
   embed.setDescription(descLines.join('\n'));
 
-  const hasValidPlayerData =
-    typeof live?.players === 'number' &&
-    typeof config.maxPlayers === 'number';
+  const max =
+    typeof config.maxPlayers === 'number'
+      ? config.maxPlayers
+      : live?.maxPlayers;
 
-  if (hasValidPlayerData) {
-    const max = config.maxPlayers!;
+  if (typeof live?.players === 'number' && typeof max === 'number') {
     const percentage = (live.players / max) * 100;
     const bar = getBarLineOnlyBar(percentage);
     const valueText = `${live.players.toString().padStart(2, '0')} / ${max}`;

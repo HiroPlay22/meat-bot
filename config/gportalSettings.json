@@ -9,6 +9,22 @@
     "query": true,
     "display": true,
     "link": "https://example.com/mods",
-    "maxPlayers": 10
+    "maxPlayers": 10,
+    "roleId": "1305480389564956682",
+    "buttonLabel": "Valheim Server"
+  },
+  {
+    "id": "gfarkascended",
+    "name": "GamingFriends Server - by Hiro / HOME / THE CENTER",
+    "type": "asa",
+    "host": "31.214.216.183",
+    "queryPort": 5470,
+    "game": "ARK: Survival Ascended",
+    "query": true,
+    "display": true,
+    "maxPlayers": 20,
+    "modIds": [929420, 940003, 933099, 950914, 944592, 929521, 939604, 957616, 877752],
+    "roleId": "1167505723006136361",
+    "buttonLabel": "ARK Ascended Home-Server"
   }
 ]

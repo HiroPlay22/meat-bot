@@ -272,6 +272,34 @@ export async function registerInteractions(client: Client) {
         });
       }
 
+      // === GPORTAL: Mods anzeigen (Modal mit Mod-IDs)
+      if (interaction.isButton() && interaction.customId.startsWith('show_mods_')) {
+        const serverId = interaction.customId.replace('show_mods_', '');
+        const config = getServerById(serverId);
+
+        if (!config || !config.modIds?.length) {
+          return interaction.reply({ content: '⚠️ Keine Mods konfiguriert.', ephemeral: true });
+        }
+
+        const modal = new ModalBuilder()
+          .setCustomId(`modal_show_mods_${serverId}`)
+          .setTitle('Modliste anzeigen')
+          .addComponents(
+            new ActionRowBuilder<TextInputBuilder>().addComponents(
+              new TextInputBuilder()
+                .setCustomId('mod_ids')
+                .setLabel('Mod-IDs (kopierbar)')
+                .setStyle(TextInputStyle.Paragraph)
+                .setValue(config.modIds.join(', '))
+                .setRequired(false)
+            )
+          );
+
+        await interaction.showModal(modal);
+        return;
+      }
+
+
       // === DinoName: Würfeln
       if (interaction.isButton() && interaction.customId === "dinoname_generate") {
         const { handleDinoGenerate } = await import("@modules/dinos/handleDinoGenerate.js")
