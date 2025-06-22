@@ -502,7 +502,7 @@ export async function registerInteractions(client: Client) {
         const current = parseInt(currentStr);
         const newPage = direction === "next" ? current + 1 : current - 1;
 
-        const data = await buildGameDeletePage(interaction, newPage);
+        const data = await buildGameDeletePage(interaction, newPage, false);
         return interaction.update(data);
       }
 
