@@ -50,3 +50,4 @@ Pfad: `/etc/git-auto-deploy/config.json`
   "http-host": "0.0.0.0",
   "http-port": 9000
 }
+ 
