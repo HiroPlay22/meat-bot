@@ -1,0 +1,29 @@
+{
+  "name": "meat-bot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/bot/index.ts",
+    "build": "tsc",
+    "start": "node dist/bot/index.js",
+    "register:dev": "tsx src/bot/registerCommands.ts",
+    "clear:global": "tsx src/bot/clearGlobalCommands.ts",
+    "prisma:migrate": "prisma migrate dev --name init",
+    "prisma:generate": "prisma generate"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.0.1",
+    "discord.js": "^14.16.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "prisma": "^7.0.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

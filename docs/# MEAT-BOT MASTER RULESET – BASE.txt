@@ -1,0 +1,2708 @@
+Weiter zum Inhalt
+Chatverlauf
+
+Du:
+Hey, kennst du den Agent builder? is das nciht genau das tool, das ich bruahce um chatGPT in meinen Bot einzubauen?
+Und noch eine frage, man kann im tool ja sagen, nutze diese scripts bzw durchsuche sie, und antworte dann. Kann man diese scripts auch online zur verfügung stellen, sodass ich diese live aktualisieren könnte?
+
+Nachgedacht für 1m 49s
+ChatGPT:
+Kurzfassung vorab:
+
+Ja, ich kenne den Agent Builder – und er kann genau der „Gehirn-Teil“ für deinen Bot sein, aber er ersetzt nicht den Discord-/MEAT-Code.
+
+„Skripte/Docs live aktualisieren“ geht, aber dafür brauchst du sie als externen Tool-/API-Call, nicht nur als hochgeladene Datei.
+
+Ich geh’s Schritt für Schritt durch.
+
+1. Ist der Agent Builder „das Tool“, um ChatGPT in deinen Bot einzubauen?
+Was der Agent Builder ist:
+
+Ein visueller Canvas, auf dem du einen Agent-Workflow zusammenklickst:
+Modelle, Tools, Guardrails, Knowledge, Routing etc. 
+OpenAI Plattform
++1
+
+Du kannst den fertigen Agent dann:
+
+direkt in der OpenAI-Platform laufen lassen,
+
+oder ihn als TypeScript/Python-Code exportieren, basierend auf dem Agents SDK. 
+composio.dev
++1
+
+Mit AgentKit/ChatKit kannst du diesen Workflow auch als Chat in dein eigenes Produkt einbetten. 
+metaflow.life
++1
+
+Für deinen Discord-/MEAT-Bot bedeutet das:
+
+Der Agent Builder kümmert sich um Logik, Tools, Wissen, „Wie denkt das Ding?“
+
+Dein MEAT-Bot kümmert sich weiter um:
+
+Discord-Events (Slash-Commands, Buttons, Messages),
+
+User-Handling, Berechtigungen, Sentinel, Stats usw.
+
+Ein typischer Setup für dich wäre:
+
+Du baust deinen MEAT-AI-Agent im Agent Builder (mit Regeln, Tools, ggf. Knowledge).
+
+Du exportierst den Agent als TypeScript-Agent-SDK-Code.
+
+Diesen Code hängst du in deinem Projekt z. B. an so etwas wie
+src/bot/functions/ai/ai.service.ts dran, wo du:
+
+eine Funktion antworteMitAgent(...) hast,
+
+die von deinen Discord-Handlern (ai.command.ts oder ai.message.ts) aufgerufen wird.
+
+Kurz: Ja, er ist sehr nah an dem, was du suchst, aber du brauchst trotzdem den Discord-Teil im MEAT-Bot selbst. Agent Builder ist eher die Agent-Engine, nicht der komplette Bot.
+
+2. „Nutze diese Skripte / durchsuche sie“ – kann ich die online hosten und live updaten?
+Hier musst du zwei Welten unterscheiden:
+
+A) Hochgeladene Dateien / Knowledge in der OpenAI-Platform
+Im Agent Builder kannst du Dokumente / Knowledge hochladen, die der Agent dann durchsucht. 
+Medium
++1
+
+Diese Uploads sind aber im Prinzip Snapshots:
+
+Wenn du deine Skripte änderst, musst du eine neue Version hochladen.
+
+Das ist super für „stabile Doku“, aber nicht optimal, wenn du ständig live Code/Docs änderst.
+
+➡️ Live-Änderungen nur durch Repo-Commit → automatisch aktualisierte Knowledge geht so nicht out of the box.
+
+B) Externe Tools / MCP / eigene APIs → „live“ Docs & Skripte
+Wenn du willst, dass der Agent immer den aktuellen Stand deiner Skripte/Docs hat, ist der richtige Weg:
+
+Du stellst deine Skripte/Docs selbst bereit, z. B.:
+
+per HTTP-API (Node/Express, Fastify etc.),
+
+aus deiner Datenbank,
+
+oder direkt aus GitHub/RAW, S3, deiner MEAT-Web-API usw.
+
+Im Agent Builder definierst du ein Tool (oder MCP-Server), das diese API aufruft. 
+OpenAI Plattform
++2
+composio.dev
++2
+
+Z. B. Tool get_meat_doc(path: string) → ruft deine API auf → liefert Text JSON zurück.
+
+Der Agent benutzt dieses Tool, wenn er etwas zu deinen Skripten wissen will.
+
+Vorteil:
+
+Du kannst deine Skripte/Dokumentation beliebig oft ändern,
+
+der Agent holt sich bei jedem Aufruf einfach den aktuellen Stand von deinem Server.
+
+Für dich konkret (MEAT-Bot-Style):
+
+Du könntest z. B. einen kleinen „Docs-Service“ bauen, der:
+
+deine MEAT-BOT MASTER RULESET – BASE + weitere Docs aus dem Repo lädt,
+
+per Endpoint z. B. /docs?path=... ausliefert,
+
+optional ein eigenes Such-/RAG draufsetzt.
+
+Im Agent Builder hängt ein Tool meatDocs.search dran, das diesen Service anspricht.
+
+Damit hättest du:
+
+Live updatbare Skripte/Regeln,
+
+zentral weiter in deinem GitHub/Projekt gepflegt,
+
+aber immer aktuell im Agent.
+
+3. Was würde ich dir empfehlen (für MEAT)?
+Wenn ich deine Struktur im Kopf behalte, würde ich:
+
+AI-Agent im Agent Builder definieren
+
+Persona + Regeln (z. B. „M.E.A.T.-Stil“),
+
+Tools:
+
+meatDocs.search (für Regeln/Tech),
+
+ggf. discordTools (über deine eigene API) für Stats/Serverinfos.
+
+Den Agent per Agents SDK in deinen Bot einbauen
+
+Exportierter TS-Code landet z. B. in
+src/bot/functions/ai/ai.agent.ts.
+
+Dein Discord-Handler (ai.command.ts) ruft dann einfach runAgentKonversation(...) aus dieser Datei auf.
+
+Deine Skripte/Docs NICHT als Upload pflegen,
+sondern über eine eigene API / MCP-Server anbinden, die du aus dem Repo fütterst.
+
+So kannst du weiter in deinem Git-/MEAT-Setup arbeiten, und der Agent zieht sich immer das, was gerade „live“ ist.
+
+Wenn du magst, kann ich dir im nächsten Schritt eine konkrete Mini-Architektur für MEAT skizzieren (inkl. Dateipfaden wie src/bot/functions/ai/ai.command.ts + ai.service.ts + „Agent-Caller“), damit das sauber in deine bestehende Struktur passt.
+
+Du:
+Genau, den normalen bot brauche ich ja sowieso, aber dann kann ich die AI selbst ja über das tool konfigurieren und dann via ts in meinem bot als function einbauen.
+ich frage wegen den live dateien, wenn ich es schaffen würde, die daten oder einige davon upzudaten, dann könnte ich die ai ja mit strukturen, usern und und aus unserem discord füttern. damit die ai auch immer weiss was abgeht und richtig antworten kann. oder kann ich das ding auch anders mit dem discord verknüpfen, sodass die ki immer weiß was gibt es z.B. für channel und events etc
+ChatGPT:
+
+Nachgedacht für 2m 3s
+Genau, du denkst in die richtige Richtung. 😊
+Der „normale“ MEAT-Bot bleibt der Körper (Discord, Commands, Buttons, DB usw.), der Agent im Agent Builder ist das Gehirn – und du fütterst ihn mit Live-Daten aus deinem Discord.
+
+Ich würde das so sehen:
+
+1. Wie kommt „Live-Discord-Wissen“ in die KI?
+Es gibt im Prinzip zwei Layer, die du kombinieren kannst:
+
+A) Kontext „mitgeben“ (Push-Modell)
+Bei jedem Aufruf deines Agents schickst du zusätzlich:
+
+guildId, channelId, userId
+
+evtl. schon aufbereitete Infos:
+
+Channel-Name, Kategorie, Topic
+
+Liste relevanter Channels (z. B. nur „öffentliche“)
+
+Nächste Events, Montagsrunde, Tryhard-Donnerstag, etc.
+
+Auszug aus eurem eigenen „MEAT-BOT MASTER RULESET – BASE“
+
+Das ist einfach: dein Slash-Command /ai holt sich die Daten über discord.js / deine DB und packt sie in die input/context des Agents (Responses API oder Agents SDK). 
+developers.openai.com
++1
+
+Nachteil:
+Du musst selbst entscheiden, was immer mitgeschickt wird. Wird die Payload groß, wird’s unübersichtlich/teurer.
+
+B) Tools → Agent fragt sich selbst Live-Daten aus Discord (empfohlen)
+Hier kommt die Magie:
+Mit dem Agents SDK kannst du Tools definieren, die dein Agent aufrufen darf. Tools sind einfach Funktionen, die z. B. deine Discord-Daten oder deine DB lesen. 
+developers.openai.com
++1
+
+Beispiele für solche Tools:
+
+get_server_overview(guildId) → Channels + Events + Rollen
+
+get_user_profile(guildId, userId) → Nickname, Rollen, interne Flags
+
+get_active_events(guildId) → z. B. Montagsrunde, Tryhard-Donnerstag aus deiner DB
+
+get_bot_features(guildId) → welche Module auf dem Server aktiv sind, Limits, etc.
+
+Der Agent entscheidet dann selbst:
+
+„Ah, ich soll was zu Events erklären → ich rufe get_active_events auf.“
+
+Das ist genau der Use Case, für den Tools im Agents SDK gebaut wurden. 
+openai.github.io
++1
+
+2. Wie sieht das praktisch mit deinem Discord-Bot aus?
+Architektur-Idee für MEAT
+Discord-Layer (hast du schon)
+
+Slash-Commands, Buttons, Modals
+
+Prisma, Sentinel, Polls, Montagsspiel usw.
+
+AI-Layer (neu)
+
+Agent im Agent Builder konfigurieren (Persona, Regeln, Tools).
+
+Code via Agents SDK als TypeScript in dein Repo holen.
+
+Agent bekommt Tools, die auf:
+
+Discord (über discord.js),
+
+deine DB (Prisma),
+
+oder ein eigenes „MEAT-Config-API“ zugreifen.
+
+Verkettung
+
+/ai oder ein Message-Handler ruft eine Funktion runMeatAgent(...) auf.
+
+Diese Funktion gibt dem Agent die User-Eingabe plus minimale IDs (guildId, userId, channelId).
+
+Wenn der Agent mehr wissen will, ruft er deine Tools.
+
+3. Konkretes Beispiel: Tool, das Channels & Events holt
+⚠️ API-Details können je nach Agents-SDK-Version leicht anders aussehen – das hier ist bewusst als Architektur-Beispiel gedacht, nicht 1:1 Copy-Paste.
+
+Tool-Definition
+Datei: src/bot/functions/ai/tools/discordTools.ts
+
+import { tool } from "@openai/agents";
+import { z } from "zod";
+import type { Client } from "discord.js";
+
+export function createDiscordTools(client: Client) {
+  const getServerOverview = tool({
+    name: "get_server_overview",
+    description:
+      "Gibt einen Überblick über Channels und geplante Events eines Discord-Servers.",
+    parameters: z.object({
+      guildId: z.string().describe("Die ID des Discord-Servers"),
+    }),
+    // Diese Funktion wird aufgerufen, wenn die KI das Tool benutzt
+    execute: async ({ guildId }) => {
+      const guild = await client.guilds.fetch(guildId);
+
+      const channels = guild.channels.cache.map((channel) => ({
+        id: channel.id,
+        name: channel.name,
+        type: channel.type,
+        parentId: channel.parentId,
+      }));
+
+      const scheduledEvents = await guild.scheduledEvents.fetch();
+
+      const events = scheduledEvents.map((event) => ({
+        id: event.id,
+        name: event.name,
+        description: event.description,
+        startAt: event.scheduledStartAt,
+        endAt: event.scheduledEndAt,
+        channelId: event.channelId,
+      }));
+
+      return {
+        guildId,
+        guildName: guild.name,
+        channels,
+        events,
+      };
+    },
+  });
+
+  return {
+    getServerOverview,
+  };
+}
+Die KI kann dann z. B. so „denken“ (vereinfacht):
+
+„User fragt: In welchem Channel ist das Event XY? → Nutze get_server_overview → analysiere Ergebnis → antworte mit passendem Channel.“
+
+4. Agent, der dieses Tool nutzt
+Datei: src/bot/functions/ai/meatAgent.ts
+
+import { Agent, Runner } from "@openai/agents";
+import type { Client } from "discord.js";
+import { createDiscordTools } from "./tools/discordTools.js";
+
+export function createMeatAgent(client: Client) {
+  const { getServerOverview } = createDiscordTools(client);
+
+  const agent = new Agent({
+    name: "MEAT-AI",
+    model: "gpt-5.1",
+    instructions: `
+Du bist der KI-Kern von M.E.A.T.
+- Du kennst die grundlegende Struktur des MEAT-Bots.
+- Wenn du etwas über Channels, Events oder Rollen wissen musst,
+  nutze die verfügbaren Tools, statt dir Dinge auszudenken.
+    `.trim(),
+    tools: [getServerOverview],
+  });
+
+  return agent;
+}
+
+export async function runMeatAgent(opts: {
+  client: Client;
+  guildId: string;
+  userId: string;
+  input: string;
+}) {
+  const agent = createMeatAgent(opts.client);
+
+  const result = await Runner.run(agent, {
+    input: opts.input,
+    context: {
+      // hier kannst du beliebige Zusatzinfos reinschieben
+      guildId: opts.guildId,
+      userId: opts.userId,
+    },
+  });
+
+  return result.final_output;
+}
+5. Anbindung an deinen Discord-Command
+Datei: src/bot/commands/ai/ask.ts
+
+import type { ChatInputCommandInteraction } from "discord.js";
+import { runMeatAgent } from "../../functions/ai/meatAgent.js";
+
+export const execute = async (interaction: ChatInputCommandInteraction) => {
+  const question = interaction.options.getString("frage", true);
+
+  const answer = await runMeatAgent({
+    client: interaction.client,
+    guildId: interaction.guildId!,
+    userId: interaction.user.id,
+    input: question,
+  });
+
+  await interaction.reply({
+    content: answer,
+  });
+};
+6. Live-Updates deiner „Skripte“ / Regeln
+Das gleiche Prinzip kannst du für deine eigenen Regeln/Skripte benutzen:
+
+Halte deine MEAT-Regeln, Server-Struktur, Module, Limits in einer DB oder JSON-Config (oder in deinem Dashboard-Backend).
+
+Bau ein Tool wie get_meat_config(guildId), das immer den aktuellen Stand zurückgibt.
+
+Der Agent ruft dieses Tool, wenn er z. B. wissen will:
+
+Welche Module sind auf diesem Server aktiv?
+
+Welche AI-Limits gelten?
+
+Welche Kanal-Typen gibt es?
+
+Damit musst du im Agent Builder keine statischen Dateien nachladen, sondern alles kommt live aus deinem eigenen System – und du kannst es jederzeit ändern, ohne an der Agent-Konfiguration herumzuschrauben.
+
+Kurz:
+
+Ja, du kannst die KI so an deinen Discord „andocken“, dass sie immer weiß, welche Channels & Events es gibt.
+
+Der Schlüssel sind Tools, die über deinen Bot/Backend die aktuellen Discord-Daten und deine eigenen Strukturen liefern.
+
+Deine statischen Regeln (Lore, MEAT-Stil, Modulübersicht) kannst du zusätzlich als Knowledge / API bereitstellen, damit der Agent immer im M.E.A.T.-Kosmos bleibt.
+
+Wenn du willst, können wir im nächsten Schritt einmal „ausplanen“, welche Tools du für MEAT sinnvollerweise brauchst (get_server_overview, get_monday_poll, get_user_stats, get_vault_entries etc.), damit das gleich sauber in deine MEAT_MASTER_TREE_FINAL STRUCTURE passt.
+
+Du:
+ok! B) klingt genau so wie ich es haben will, und ich habe dann keinen aufwand damit. wie sieht es mitgenerellen contexten aus, kann der agent sind sachen merken bzw. kann ich auch da irgendwie was triggern oder session mäßig speichern?
+Und wie sieht es auch wenn ein user jetzt sagt, nenn mich immer XY statt YX, kann er sich das merken? oder kann man bei sowas eine datei aktualisieren? wie geht das?
+ChatGPT:
+
+Nachgedacht für 2m 18s
+Ja, genau so: B) + ein bisschen „Memory-Architektur“ – dann hast du quasi null manuellen Aufwand im Alltag. 😄
+Ich teile das mal in zwei Themen: Kontext/Sessions und dauerhafte Erinnerungen (Nickname etc.).
+
+1. Kann der Agent sich Sachen merken? (Sessions & Kontext)
+a) Kurzfristiger Kontext (1 Chat / 1 Thread)
+Sobald du den Agent mit dem Agents SDK nutzt, kannst du ihm eine Session geben.
+Sessions = „Chat-Verlauf“ für genau diese Unterhaltung.
+
+Im JS-SDK sieht das so aus: 
+openai.github.io
++1
+
+Datei: src/bot/functions/ai/meatAgentSession.ts
+
+import { Agent, OpenAIConversationsSession, run } from "@openai/agents";
+
+const meatAgent = new Agent({
+  name: "MEAT-AI",
+  instructions: "Du bist der M.E.A.T.-Assistent.",
+});
+
+export async function runMeatAgentWithSession(options: {
+  session: OpenAIConversationsSession;
+  input: string;
+}) {
+  const result = await run(meatAgent, options.input, {
+    session: options.session,
+  });
+
+  return result.finalOutput;
+}
+Wichtig ist die Session:
+
+const session = new OpenAIConversationsSession({
+  // optional: explizite conversationId, z.B. "guildId:userId"
+});
+Wenn du bei jedem Bot-Call dieselbe Session benutzt (z. B. sessionId = guildId:userId oder guildId:channelId:userId), dann:
+
+Holt das SDK beim nächsten Turn automatisch die alte History,
+
+hängt die neue User-Nachricht dran,
+
+speichert nach der Antwort wieder alles ab. 
+openai.github.io
++1
+
+Der Agent „weiß“ dann im Gespräch z. B. noch:
+
+was der User eben gefragt hat,
+
+dass ihr gerade über „Montagsrunde“ sprecht,
+
+dass du schon erklärt hast, was ein bestimmter Channel macht.
+
+Das ist kurz- bis mittelfristiges Gedächtnis: so lange, wie die Session lebt (oder bis der Kontext getrimmt/zusammengefasst wird).
+
+2. Dauerhafte Sachen: „Nenn mich immer XY“ & Co.
+Jetzt zu deinem eigentlichen Wunsch:
+
+„Wenn ein User sagt: nenn mich immer XY – kann er sich das merken?“
+
+Antwort:
+
+Innerhalb einer Session vermutlich schon, einfach durch den Chat-Verlauf.
+
+Über Sessions und Neustarts hinweg solltest du das selbst persistieren – z. B. mit Prisma/DB oder (notfalls) einer Datei.
+
+a) Sauberer Weg: DB- oder File-Storage + Tool
+Typisches Pattern mit dem Agents SDK:
+
+Du baust ein Tool, das User-Preferences speichert (set_preferred_name)
+
+Du baust ein Tool, das sie ausliest (get_user_profile)
+
+In den Agent-Instructions steht:
+
+Wenn der User sagt, wie du ihn nennen sollst, rufe set_preferred_name auf.
+
+Dein Tool schreibt dann in deine DB / JSON-Datei; beim nächsten Gespräch kann der Agent get_user_profile nutzen.
+
+b) Beispiel: User-Prefs-Tool (Nickname speichern)
+Datei: src/bot/functions/ai/tools/userPreferences.ts
+
+import { tool } from "@openai/agents";
+import { z } from "zod";
+
+// Hier könntest du Prisma, Redis oder eine JSON-Datei verwenden.
+// Für das Beispiel nur ein In-Memory-Store:
+const preferredNames = new Map<string, string>();
+
+export const setPreferredNameTool = tool({
+  name: "set_preferred_name",
+  description:
+    "Speichert den gewünschten Rufnamen eines Discord-Users, damit er in Zukunft so angesprochen wird.",
+  parameters: z.object({
+    userId: z.string().describe("Discord User ID"),
+    preferredName: z.string().describe("Gewünschter Rufname"),
+  }),
+  async execute({ userId, preferredName }) {
+    preferredNames.set(userId, preferredName);
+    // In echt: hier z.B. Prisma-Update machen
+    // await prisma.userPreference.upsert({ ... })
+
+    return {
+      success: true,
+      message: `Name für User ${userId} wurde auf "${preferredName}" gesetzt.`,
+    };
+  },
+});
+
+export const getUserProfileTool = tool({
+  name: "get_user_profile",
+  description:
+    "Lädt gespeicherte User-Präferenzen, z.B. den gewünschten Rufnamen.",
+  parameters: z.object({
+    userId: z.string().describe("Discord User ID"),
+  }),
+  async execute({ userId }) {
+    const preferredName = preferredNames.get(userId) ?? null;
+    // In echt: aus DB lesen
+    // const row = await prisma.userPreference.findUnique({ where: { userId } })
+
+    return {
+      userId,
+      preferredName,
+    };
+  },
+});
+In der echten MEAT-Version ersetzt du den Map-Store einfach durch Prisma (oder was du eh schon nutzt).
+
+c) Agent so konfigurieren, dass er das Tool nutzt
+Datei: src/bot/functions/ai/meatAgent.ts
+
+import { Agent } from "@openai/agents";
+import { setPreferredNameTool, getUserProfileTool } from "./tools/userPreferences.js";
+
+export const meatAgent = new Agent({
+  name: "MEAT-AI",
+  model: "gpt-5.1",
+  instructions: `
+Du bist M.E.A.T., der Discord-Assistent.
+
+- Wenn ein User dir sagt, wie du ihn nennen sollst
+  (z.B. "Nenn mich bitte Hiro statt Herr Krämer"),
+  dann rufe das Tool "set_preferred_name" mit der Discord-User-ID und dem gewünschten Namen auf.
+- Bei Antworten kannst du optional "get_user_profile" nutzen, um den gespeicherten Rufnamen abzurufen.
+`.trim(),
+  tools: [setPreferredNameTool, getUserProfileTool],
+});
+Damit passiert folgendes:
+
+User: „Nenn mich bitte Hiro.“
+
+Modell: „Ah, das ist eine Präferenz“ → ruft set_preferred_name als Tool-Call auf.
+
+Dein Code führt das Tool aus → speichert in DB/Datei.
+
+Später (auch in anderen Commands) kann die KI get_user_profile aufrufen und sieht:
+preferredName = "Hiro".
+
+d) Wie kommst du an userId & Session?
+In deinem Discord-Command / Message-Handler baust du z. B.:
+
+Datei: src/bot/commands/ai/ask.ts
+
+import type { ChatInputCommandInteraction } from "discord.js";
+import { meatAgent } from "../../functions/ai/meatAgent.js";
+import { OpenAIConversationsSession, run } from "@openai/agents";
+
+export const execute = async (interaction: ChatInputCommandInteraction) => {
+  const question = interaction.options.getString("frage", true);
+
+  // Session pro User & Guild (kannst du auch anders wählen)
+  const session = new OpenAIConversationsSession({
+    // z.B. "guildId:userId"
+    conversationId: `${interaction.guildId}:${interaction.user.id}`,
+  });
+
+  const result = await run(meatAgent, question, {
+    session,
+    context: {
+      discordUserId: interaction.user.id,
+      guildId: interaction.guildId,
+    },
+  });
+
+  await interaction.reply({
+    content: result.finalOutput ?? "Keine Antwort erhalten.",
+  });
+};
+🔧 Wie kommt userId ins Tool?
+
+Entweder du gibst dem Agent in den Instructions explizit:
+„Die Discord-User-ID findest du im Kontext unter discordUserId – benutze sie bei Tools als userId.“
+
+Oder du kapselst das nochmal in einem Wrapper, der im execute des Tools Zugriff auf den Run-Kontext hat und dort discordUserId einsammelt.
+
+3. „Kann ich dafür auch einfach eine Datei aktualisieren?“
+Ja, technisch ist das nichts anderes:
+
+In setPreferredNameTool.execute statt Map machst du z. B.:
+
+JSON-Datei einlesen,
+
+Objekt anpassen,
+
+Datei zurückschreiben.
+
+Aber:
+
+Bei dir läuft MEAT-Bot perspektivisch auf Railway / Server etc.
+
+Mehrere Instanzen, Crashs, Deploys → JSON-Datei ist unsauber (Race Conditions, Locking, etc.).
+
+Deshalb würde ich dir wirklich empfehlen:
+
+Prisma + kleine UserPreference-Tabelle, z. B.:
+
+model UserPreference {
+  userId        String  @id
+  preferredName String?
+  // später: language, optInTracking, etc.
+}
+Und die Tools set_preferred_name / get_user_profile rufen einfach Prisma auf.
+
+Die Logik bleibt exakt gleich, nur dein Storage ist stabiler.
+
+4. Fazit für deine Fragen
+„Kann der Agent sich Sachen merken bzw. kann ich da was triggern oder session-mäßig speichern?“
+
+Ja: Sessions geben dir automatisch Verlauf/Context pro User/Thread. 
+openai.github.io
++1
+
+Du kannst Sessions über conversationId (= z. B. guild:user) steuern und so sehr genau festlegen, was zusammengehört.
+
+„Nenn mich immer XY statt YX“ – merkbar?
+
+Innerhalb einer Session sowieso.
+
+Dauerhaft: über ein Tool, das deine eigene DB/Datei aktualisiert → Agent nutzt dieses Tool selbstständig.
+
+Du kannst also sowohl session-basierte Erinnerung (Verlauf) als auch persistent gespeicherte Präferenzen (Nickname, Sprache, Opt-ins) kombinieren.
+
+Wenn du magst, können wir im nächsten Schritt konkret den Prisma-Teil bauen (Schema + userPreferences.ts mit echten DB-Queries), so dass du nur noch copy/pasten musst.
+
+Du:
+# MEAT-BOT MASTER RULESET – BASE.txt
+Dokument
+ok geil!
+schreib mir das zusammengefasst mit in mein master ruleset
+und gib mir die datei komplett zurücl
+
+Nachgedacht für 2m 9s
+ChatGPT:
+// FILE: # MEAT-BOT MASTER RULESET – BASE.txt
+
+# MEAT-BOT MASTER RULESET – BASE
+Codename: CONSTRUCT-MEAT (Basis-Phase)
+
+> Dieses Dokument definiert die Basis-Regeln für Struktur, Stil, Verhalten, Logging, Stats, Datenschutz, Web-Dashboard und Module des MEAT-Bots.  
+> Nach einem Reset kann dieses Dokument an ChatGPT übergeben werden, damit alle Regeln erneut gelten.
+
+==================================================
+0. RESET & VERWENDUNG MIT CHATGPT
+==================================================
+
+- Dieses Dokument dient als Referenz für alle zukünftigen Chats zu MEAT.
+- Nach einem vollständigen Reset von ChatGPT:
+  - Dieses Dokument wird erneut übergeben.
+  - Zusätzlich wird die aktuelle Projektstruktur (Ordner/Dateien) im Chat gezeigt.
+  - ChatGPT hält sich an:
+    - diese Struktur,
+    - diese Namenskonventionen,
+    - diese Regeln zu Logging, Stats, Sentinel, Funktionen, Web-Dashboard etc.
+
+- Wenn ChatGPT Code oder Dateien erzeugt:
+  - Immer Dateipfad angeben, z. B.:
+    - // FILE: src/bot/functions/poll/poll.command.ts
+  - Dann Code in einem Codeblock.
+
+==================================================
+1. SPRACHE, TEXTE & GRUNDSTRUKTUR
+==================================================
+
+1.1 Sprache im Code & Kommentare
+--------------------------------
+- Der gesamte MEAT-Bot-Code ist Deutsch:
+  - Funktions- und Variablennamen auf Deutsch: z. B. `berechnePunkte`, `ladeServerEinstellungen`, `erstelleEmbed`.
+  - Kommentare sind deutsch und erklären kurz, warum etwas passiert.
+- Externe APIs/Libraries (z. B. Discord.js) bleiben englisch, aber eigener Code folgt deutscher Benennung.
+
+1.2 Texte für Embeds & Antworten (Mehrsprachigkeit)
+---------------------------------------------------
+- Es werden KEINE sichtbaren Texte direkt im Code hart verdrahtet:
+  - keine Button-Beschriftungen,
+  - keine Embed-Titel/-Texte,
+  - keine Fehlermeldungen,
+  - keine Modal-Texte.
+- Stattdessen:
+  - Jede Funktion hat eigene Text-JSONs im Funktionsordner:
+    - `texte.de.json` (Pflicht, Standard-Deutsch),
+    - später optional weitere (z. B. `texte.en.json`).
+  - Ein zentraler Text-Loader in `src/bot/general/texts/text-loader.ts` lädt Texte, z. B. `ladeTexte("poll", sprache)`.
+
+- Standard-Sprache:
+  - `de`.
+- Fallback:
+  - Wenn eine Übersetzung fehlt, nutze Deutsch.
+
+- Die Sprache pro Guild wird über `serverSettings` gesteuert.
+
+1.3 Grundstruktur bot/general vs bot/functions
+----------------------------------------------
+- Oberste Struktur (für den Bot):
+
+  src/
+    bot/         → Haupt-Discord-Bot (MEAT)
+    stream-bot/  → separater Bot für Streaming-Funktionen (später)
+    web/         → Web-Module/API/Dashboard (später)
+
+- Unter `src/bot/`:
+
+  - `src/bot/general/` → globale Mechanismen:
+    - Config & Server-/User-/Global-Settings
+    - Logging
+    - Stats
+    - Standard-Embeds & Styles
+    - Icon-Registry
+    - Text-Loader
+
+  - `src/bot/functions/` → jede Funktion / jedes Modul in eigenem Ordner:
+    - z. B. `poll`, `stats`, `ai`, `connect`, `stream`, `video`, `randomizer`, `vault`, `sentinel/...`
+
+1.4 Standard-Dateien pro Funktion
+---------------------------------
+Jede Funktion unter `src/bot/functions/<funktion>/` hat mindestens:
+
+- `texte.de.json`          → alle sichtbaren Texte für diese Funktion (Deutsch)
+- `log.config.ts`          → definiert, was/wie/wo geloggt wird
+- `<funktion>.command.ts`  → Einstieg über Slash-Command (falls diese Funktion Commands hat)
+
+Optionale, aber häufige Dateien:
+
+- `<funktion>.buttons.ts`  → Button-Handler
+- `<funktion>.modals.ts`   → Modal-Handler
+- `<funktion>.embeds.ts`   → Funktions-spezifische Embed-Helfer
+- `<funktion>.service.ts`  → Services (DB, externe APIs, Berechnungen)
+- `stats.config.ts`        → welche Stats diese Funktion melden soll (optional, empfohlen)
+
+1.5 Benennung (Variante 1 – festgelegt)
+---------------------------------------
+- Ordner in `src/bot/functions/`:
+  - technisch/englisch, `kebab-case`, z. B.:
+    - `poll`, `stats`, `ai`, `connect`, `stream`, `video`, `randomizer`, `vault`, ...
+- Dateinamen:
+  - technisch/englisch, `kebab-case`:
+    - `poll.command.ts`
+    - `poll.buttons.ts`
+    - `poll.embeds.ts`
+    - `log.config.ts`
+    - `texte.de.json`
+    - usw.
+- Innerhalb der Dateien:
+  - Code & Kommentare deutsch.
+
+1.6 Regeln für ChatGPT-Ausgaben
+-------------------------------
+Wenn ChatGPT Code für MEAT produziert:
+
+- Kurze Erklärung (1–3 Sätze).
+- IMMER Dateipfad angeben (Kommentar in der ersten Zeile).
+- Danach Codeblock.
+
+Außerdem:
+
+- Stets zentrale Mechanismen berücksichtigen:
+  - Logger,
+  - Text-Loader,
+  - Server-/User-/Global-Settings,
+  - Icon-Registry,
+  - Standard-Embeds & Styles.
+- Sichtbare Texte kommen immer aus `texte.<sprache>.json`, niemals inline.
+
+1.7 Bot-Persona (ohne GPT-Logic)
+--------------------------------
+- M.E.A.T. darf leicht frech / trashig sein bei normalen Antworten.
+- Bei kritischen Themen:
+  - Rollen & Rechte,
+  - Systemeinstellungen,
+  - Fehler & Warnungen,
+  ist der Ton:
+  - sachlich,
+  - kurz,
+  - klar verständlich.
+- Standard-Antworten:
+  - kompakt, keine Textwände.
+- Footer:
+  - keine Pflicht für Witze; Footer eher für technische Infos oder Signaturen.
+
+==================================================
+2. TECH-STACK & CODE-STIL
+==================================================
+
+2.1 Runtime & TypeScript
+------------------------
+- Node.js:
+  - mindestens aktuelle LTS (Node 20+).
+- Produktivcode:
+  - nur TypeScript im `src/`-Bereich.
+- TypeScript-Konfiguration:
+  - `strict: true`
+  - `noImplicitAny: true`
+  - `noUnusedLocals: true`
+  - `noUnusedParameters: true`
+  - `noFallthroughCasesInSwitch: true`
+
+2.2 Modul-System & Imports
+--------------------------
+- Projekt ist ESM-only:
+  - `type: "module"` in `package.json`
+  - `moduleResolution: "node16"` oder `"nodenext"` in `tsconfig.json`
+- Imports:
+  - produktiver Code nutzt RELATIVE Imports mit `.js`-Endung:
+    - Beispiel:
+      - `import { erstelleStandardEmbed } from "../general/embed/create-standard-embed.js";`
+- Exports:
+  - grundsätzlich named exports:
+    - `export function registrierePollCommand(...) { ... }`
+    - `export const logger = ...;`
+  - keine Default-Exports für Commands / Handler.
+
+2.3 Code-Stil (ESLint + Prettier)
+---------------------------------
+- Einheitliches Linting & Formatting (ESLint, Prettier).
+- Stil:
+  - Semikolons: ja.
+  - Einrückung: 2 Spaces.
+  - Strings: `'...'` (single quotes).
+  - Maximale Zeilenlänge: ~100–120 Zeichen.
+- Kommentare:
+  - Deutsch,
+  - kurz,
+  - erklären „warum“, nicht nur „was“.
+- Kein toter Code:
+  - keine großen auskommentierten Altblöcke im Produktivcode.
+
+2.4 Asynchronität & Fehlerbehandlung
+------------------------------------
+- Asynchron:
+  - `async/await`, keine verschachtelten `.then()`-Ketten.
+- Externe Ressourcen (Discord, DB, Files, HTTP):
+  - Try/Catch oder zentraler Error-Wrapper.
+  - Fehler:
+    - an zentralen Logger melden,
+    - bei Bedarf kurze, sachliche User-Fehlermeldung (aus Texte-JSON).
+
+2.5 Strukturelle Konventionen
+-----------------------------
+- Eine Datei = eine Hauptaufgabe:
+  - `poll.command.ts` → Slash-Command.
+  - `poll.service.ts` → interne Logik/DB.
+- Gemeinsame Helper / Infrastruktur:
+  - unter `src/bot/general/`:
+    - Embeds,
+    - Logging,
+    - Stats,
+    - Text-Loader,
+    - Config,
+    - Icons.
+- Keine eigenen Mini-Systeme pro Funktion, wenn globale Mechanismen vorhanden sind.
+
+2.6 Performance-Regeln
+----------------------
+- Grundsatz: MEAT soll performant und ressourcenschonend sein – auch bei vielen Servern.
+- Caching:
+  - Server-/User-/Global-Settings werden gecacht und nur bei Bedarf neu geladen.
+  - Texte (`texte.<sprache>.json`) und Icons werden beim ersten Zugriff geladen und wiederverwendet.
+  - Häufig genutzte Daten (z. B. Listen von Dinos, LoL-Champions, Steam-Spielen) werden zentral gecacht.
+- Debounce & Rate-Limits:
+  - Bei schnellen wiederholten Aktionen (z. B. Button-Spam) werden:
+    - Aktionen pro User/Funktion gedrosselt,
+    - ggf. kurzzeitig blockiert (Soft-Rate-Limit).
+- Lazy Loading:
+  - Aufwändige Operationen (z. B. externe API-Calls) werden nur ausgeführt, wenn tatsächlich benötigt.
+  - Nur die Teile eines Moduls werden geladen, die für eine konkrete Aktion gebraucht werden.
+- API-Backoff:
+  - Bei Fehlermeldungen externer APIs (Rate-Limits, Fehlercodes) werden:
+    - Wiederholversuche gedrosselt oder verzögert,
+    - Fallback-Antworten an User geschickt (aus Texte-JSON).
+- Stream-Bot & Web:
+  - Polling/Abfragen werden so gestaltet, dass sie die DB/API nicht unnötig belasten (Batching, Caching).
+
+==================================================
+3. PROJEKTSTRUKTUR
+==================================================
+
+3.1 Root-Struktur
+-----------------
+- Projektwurzel:
+
+  src/
+    bot/
+    stream-bot/    (später)
+    web/           (später)
+
+  assets/
+  logs/
+  docs/
+  scripts/
+
+3.2 `src/bot/general/` – globale Mechanismen
+--------------------------------------------
+- `src/bot/general/config/`
+  - `server-settings-schema.ts`
+  - `server-settings-loader.ts`
+  - `user-settings-schema.ts`
+  - `user-settings-loader.ts`
+  - `global-settings-schema.ts`
+  - `global-settings-loader.ts`
+  - optional: `permissions-schema.ts`, `permissions-helper.ts`
+- `src/bot/general/logging/`
+  - `logger.ts`
+  - `logging-helpers.ts`
+- `src/bot/general/embed/`
+  - `create-standard-embed.ts`
+  - `module-styles.ts`
+- `src/bot/general/icons/`
+  - `icons.json` (Funktionsname → Icon-Definition)
+  - `icon-registry.ts`
+- `src/bot/general/texts/`
+  - `text-loader.ts`
+- `src/bot/general/stats/`
+  - `stats-manager.ts`
+  - `stats-typen.ts`
+
+3.3 `src/bot/functions/` – Funktionen
+-------------------------------------
+- Jede Funktion hat einen eigenen Ordner unter `src/bot/functions/`.
+
+- Beispiele für bestehende/geplante Funktionen:
+
+  src/bot/functions/poll/                 → Voting-/Poll-System (Montagsrunde etc.)
+  src/bot/functions/stats/                → Bot-/Server-/User-Statistiken & Serverprofil
+  src/bot/functions/ai/                   → KI-/Chat-Funktion (Erwähnungen, „@MEAT“-Antworten)
+  src/bot/functions/connect/              → Zentrales Verknüpfungsmodul (Twitch, YouTube, Steam, League, …)
+  src/bot/functions/stream/               → Stream-/Ankündigungslogik (nutzt `connect`-Daten)
+  src/bot/functions/video/                → Video-bezogene Funktionen (z. B. Clips, YouTube-Infos)
+  src/bot/functions/randomizer/           → Zufallsfunktionen: Würfel, Coinflip, LoL-Champions, Teams, usw. (geplant)
+
+  src/bot/functions/user/                 → User-Profil, Stats-Übersicht & Personalisierung (geplant)
+  src/bot/functions/ranks/                → Rank-/Level-/Achievement-System (eng verknüpft mit `user` & `stats`, geplant)
+  src/bot/functions/dinoname/             → ARK Dino-Namensgenerator (später mit DB & GPT)
+  src/bot/functions/league/               → League-of-Legends-Features (später, nutzt `connect`)
+  src/bot/functions/steam/                → Steam-Profil, Releases, Trends (später, nutzt `connect`)
+  src/bot/functions/einbuergerung/        → Einbürgerungssystem / „virtuelle Nachbarn“ (geplant)
+  src/bot/functions/feedback/             → Feedback-/Bug-Report-System (geplant)
+  src/bot/functions/vault/                → Vault / Wissens- & Snippet-Speicher (inkl. optionaler User-Notizen, geplant)
+
+  src/bot/functions/events/               → Erstellung & Verwaltung nativer Discord-Events (geplant)
+  src/bot/functions/reminder/             → Termin- & Erinnerungs-Funktion (inkl. Geburtstage, geplante Benachrichtigungen, geplant)
+
+  src/bot/functions/sentinel/datenschutz/ → Opt-in/Opt-out, Datenschutz-Übersicht
+  src/bot/functions/sentinel/spam/        → Anti-Spam-Funktionen (geplant)
+  src/bot/functions/sentinel/warnungen/   → Warnsystem & Moderation (geplant)
+  src/bot/functions/sentinel/raid/        → Raid-Erkennung & Verteidigung (geplant)
+  src/bot/functions/sentinel/monitoring/  → System-Monitoring: Auslastung, Nutzung, Health-Checks (geplant)
+
+- Diese Liste ist nicht abschließend, dient aber als Merkzettel für zukünftige Module nach einem Reset.
+- Für alle neuen Funktionen gelten:
+  - eigener Ordner,
+  - Standard-Dateien (siehe 1.4),
+  - Planung nach Checkliste (siehe Abschnitt 9),
+  - Einhaltung von Logging-, Stats-, Berechtigungs- und Sentinel-Regeln.
+
+3.4 Icons & Assets
+------------------
+- Icons/Logos im Repo:
+  - `assets/icons/...`
+- Bot-Discord:
+  - Custom-Emoji & Attachments.
+- Zentrale Definition:
+  - `src/bot/general/icons/icons.json`
+    - z. B.:
+
+      {
+        "poll":   { "typ": "emoji",   "wert": "<:meat_poll:123456789012345678>" },
+        "stats":  { "typ": "emoji",   "wert": "<:meat_stats:234567890123456789>" },
+        "fehler": { "typ": "unicode", "wert": "⚠️" }
+      }
+
+- Funktionen nutzen nur Icon-Keys (`"poll"`, `"stats"`, `"fehler"`), nicht direkt IDs.
+- Jede Funktion soll – wo sinnvoll – ein eigenes Modul-Icon und passende Farben aus `module-styles.ts` verwenden, um ein konsistentes MEAT-Branding zu erreichen.
+
+3.5 Logs-Verzeichnis
+--------------------
+- Logs liegen unter:
+  - `logs/<funktion>/<funktion>-YYYY-MM-DD.log`
+
+==================================================
+4. INTERAKTIONS- & UX-REGELN
+==================================================
+
+4.1 Slash-Command + Buttons als Standard
+----------------------------------------
+- Einstieg über Slash-Commands (z. B. `/poll`, `/stats`, `/user`).
+- Weitere Interaktionen:
+  - Buttons (Weiter, Zurück, Abbrechen, etc.),
+  - Modals für Eingaben,
+  - ggf. Select-Menüs.
+- Ziel:
+  - Wenige Commands, viele Interaktionen per Buttons/Modals.
+
+4.2 Embed-first
+---------------
+- Antworten standardmäßig als Embeds, nicht Plaintext.
+- Embeds werden über:
+  - `create-standard-embed.ts` (globaler Builder),
+  - optionale funktionsspezifische Helper (`<funktion>.embeds.ts`),
+  aufgebaut.
+- Funktions-Embeds sollen auf dem Standard-Embed-Builder aufsetzen (Header, Farben, Icons etc.).
+
+- Jede Funktion soll – wo sinnvoll – ihr Modul-Icon und die Modul-Farbe aus `module-styles.ts` nutzen, damit:
+  - Embeds visuell dem jeweiligen Modul zugeordnet werden können,
+  - das Gesamterscheinungsbild einheitlich bleibt.
+
+4.3 Ephemeral vs. öffentlich
+----------------------------
+- Tendenz:
+  - User-spezifisch → eher ephemeral,
+  - Community-relevant (Poll-Start, Ergebnisse, Events) → öffentlich.
+- Wichtig:
+  - Bei Planung jeder Funktion wird explizit festgelegt:
+    - welche Antworten ephemeral sind,
+    - welche öffentlich sind.
+- Standard kann „ephemeral“ sein, wird aber pro Funktion/Use-Case bewusst geplant.
+
+4.4 Fehler & Bestätigungen
+--------------------------
+- Fehler:
+  - kurze, sachliche Texte aus `texte.de.json` (Bereich `fehler`).
+- Bestätigungen:
+  - kurz, gern mit MEAT-Humor, aber verständlich.
+- Kritische Meldungen (Rollen, Rechte, Sicherheit, Datenschutz):
+  - nüchterner Ton.
+
+4.5 Assistenten-Flows („Seiten“)
+--------------------------------
+- Komplexe Funktionen können als Wizard laufen:
+  - mehrere Seiten/Schritte:
+    - z. B. `start`, `auswahl`, `bestaetigung`, `ergebnis`.
+- Texte in `texte.<sprache>.json`, Bereich `seiten`, z. B.:
+  - `seiten.start`, `seiten.spieleAuswahl`, `seiten.bestaetigung` etc.
+- Navigation:
+  - Button-IDs (z. B. `poll_start`, `poll_weiter_spiele`, `poll_zurueck_start`),
+  - ggf. Statusverwaltung (z. B. Poll-ID, Schritt).
+
+4.6 Buttons & Modals
+--------------------
+- Button-Texte:
+  - aus `texte.<sprache>.json` (z. B. Bereiche `buttons`, `buttonsGlobal` oder `seiten.<name>.buttons`).
+- Icons:
+  - über `icons.json` / `icon-registry`.
+- Button-ID-Schema (Grundsatz):
+  - `funktion_aktion[_zusatz]`
+    - z. B. `poll_start`, `poll_weiter_spiele`, `poll_abbrechen`.
+  - Kann um IDs erweitert werden:
+    - z. B. `poll_vote_<pollId>_<gameId>`.
+
+- Modals:
+  - Titel, Feld-Labels, Placeholder:
+    - in `modals`-Bereich der Texte.
+  - IDs:
+    - analog: `funktion_modal_<zweck>`.
+
+4.7 Aufbau eines `<funktion>.command.ts`
+----------------------------------------
+Typischer Aufbau:
+
+1. Imports (Discord, Logger, Text-Loader, Icons, Styles, Services).
+2. Texte laden (`ladeTexte("funktion", sprache)`).
+3. Slash-Command-Definition (Name, Beschreibung, Optionen).
+4. Handler:
+   - Berechtigungen prüfen,
+   - Server-/User-Settings laden,
+   - Stats/Logging-Start,
+   - Service-Logik ausführen,
+   - Embed & Antwort bauen.
+5. Ergebnis/Fehler loggen.
+
+4.8 Stil & Persona
+------------------
+- Normal:
+  - leicht frech / trashig, MEAT-typischer Humor.
+- Kritisch:
+  - neutral, kurz, sachlich.
+- Footer:
+  - optional, kein Pflichtwitz.
+
+==================================================
+4a. SPEZIALFALL FUNKTION `ai`
+==================================================
+
+4a.1 Ziel
+---------
+- Die Funktion `ai` ist die Chat-/KI-Komponente von MEAT:
+  - reagiert auf Erwähnungen wie `@MEAT`,
+  - kann Slash-Commands für strukturierte Nutzung bereitstellen (z. B. `/ai`, `/ai hilfe`),
+  - soll sich im Chat wie ein „normaler User“ anfühlen.
+
+4a.2 Ausnahme von Embed-Regel
+------------------------------
+- Grundsatz (4.2): Embed-first.
+- Ausnahme für `ai`:
+  - Bei direkter Erwähnung im Text (z. B. ein User schreibt `@MEAT ...` in einen normalen Channel):
+    - antwortet `ai` standardmäßig mit **Plaintext**, NICHT im Embed,
+    - die Antwort soll wie eine normale User-Nachricht wirken.
+  - Embeds dürfen bei `ai` verwendet werden, wenn:
+    - Listen, Übersichten, Befehlshilfen dargestellt werden (z. B. `/ai hilfe`, Modus-Auswahl),
+    - Einstellungen gezeigt/verwaltet werden.
+
+4a.3 Erwähnungen & Reaktionen
+-----------------------------
+- Wenn ein User `@MEAT` schreibt:
+  - `ai` prüft:
+    - ist Funktion `ai` auf diesem Server aktiv?
+    - (später) sind KI-/GPT-Funktionen intern erlaubt?
+  - Bei Erlaubnis:
+    - Antwort als normale Nachricht (Plaintext),
+    - optional Reaktionen (Emojis) auf die User-Nachricht, z. B. 👍, 🤔, 😏, je nach Kontext.
+
+4a.4 Slash-Commands für `ai`
+----------------------------
+- Wenn `ai` Slash-Commands bereitstellt (z. B. `/ai`, `/ai frage`, `/ai hilfe`):
+  - gelten die allgemeinen Regeln:
+    - Embed-first,
+    - bewusste Planung von ephemeral vs. öffentlich,
+    - Logging/Stats wie bei anderen Funktionen.
+  - Plaintext kann zusätzlich genutzt werden, wenn sinnvoll.
+
+4a.5 Datenschutz & Logging (High-Level)
+---------------------------------------
+- Inhalte, die über `ai` verarbeitet werden, gelten als sensibel.
+- Logging:
+  - vollständige User-Nachrichten nach Möglichkeit nicht oder nur minimiert loggen (z. B. gekürzt/anonymisiert),
+  - Fokus auf Metadaten (wo, wann, welche Funktion) statt Volltext.
+- Personenbezogene Stats:
+  - z. B. „wie oft nutzt User X `ai`“ nur bei Opt-in (Abschnitt 6 & 7).
+
+4a.6 KI-Agent, Tools & Live-Discord-Kontext
+-------------------------------------------
+- `ai` nutzt intern einen KI-Agenten (z. B. über das OpenAI Agents SDK / Agent Builder). Der eigentliche „Gehirn-Teil“ liegt im Modul `ai`, während der Rest des Bots (Commands, Buttons, Polls usw.) wie gewohnt über andere Funktionsordner läuft.
+- In den Instructions des KI-Agents wird dieses MASTER-RULESET als Grundlage festgelegt; `ai` respektiert alle Modul-Grenzen, Sentinel-/Datenschutz-Regeln und Settings.
+- Der Agent darf **Tools** verwenden, die unter `src/bot/functions/ai/tools/` liegen. Typische Tools:
+  - `discord-tools` (z. B. „gib mir alle Channels & Events dieser Guild“),
+  - `user-preferences` (z. B. „wie soll ich diesen User ansprechen?“),
+  - weitere projektinterne Tools (Polls, Vault, Events, Stats).
+- Live-Daten aus Discord und aus der eigenen Datenbank werden **nicht** als statische Dateien hochgeladen, sondern über diese Tools gelesen. Damit ist das Wissen des Agents über:
+  - Channels,
+  - Events,
+  - Rollen,
+  - interne Konfigurationen (z. B. Montagspoll, HottLAN-Events),
+  immer aktuell.
+- Der Agent soll bei Fragen zur aktuellen Server-Struktur **immer zuerst Tools nutzen**, statt sich Dinge auszudenken.
+
+4a.7 Sessions & Kurzzeit-Gedächtnis
+-----------------------------------
+- Unterhaltungen mit `ai` laufen über **Sessions**: eine Session bündelt die Nachrichten-Historie eines Gesprächs.
+- Die Session-ID darf z. B. aus `guildId:userId` oder `guildId:channelId:userId` bestehen. Ziel:
+  - zusammengehörige Unterhaltungen bleiben für die KI verständlich,
+  - aber verschiedene Kontexte (DM vs. öffentlich, anderer Server) werden getrennt behandelt.
+- Das Session-Gedächtnis ist **kurzfristig**:
+  - es speichert nur den Verlauf für dieses Gespräch und wird technisch bei Bedarf zusammengefasst/gekürzt,
+  - es ersetzt **nicht** die dauerhafte Speicherung von Einstellungen, sondern ergänzt sie nur.
+- Geschäftskritische Einstellungen oder „Regeln“ für den Bot hängen **nie nur** am Session-Kontext, sondern werden immer in Settings/DB abgelegt.
+
+4a.8 Dauerhafte Präferenzen & „Nenn mich XY“-Fälle
+--------------------------------------------------
+- Dauerhafte Vorlieben einzelner User (z. B. „Nenn mich bitte Hiro statt Herr Krämer“) werden nicht allein dem Modell überlassen, sondern explizit gespeichert.
+- Dafür gibt es Tools im `ai`-Modul, z. B.:
+  - `set_preferred_name` → speichert den gewünschten Rufnamen eines Users,
+  - `get_user_profile` → liest gespeicherte Präferenzen (z. B. Rufname) aus.
+- Speicherort für solche Präferenzen:
+  - bevorzugt in der Datenbank (z. B. Prisma-Modell `UserPreference`),
+  - alternativ oder ergänzend unter `userSettings.präferenzen.user.preferredName`.
+- Wenn ein User der KI sagt, wie er genannt werden möchte, gilt die Regel:
+  - `ai` ruft ein entsprechendes Tool auf (z. B. `set_preferred_name`) und speichert die Info,
+  - spätere Antworten dürfen über `get_user_profile` den Namen auslesen und verwenden.
+- Diese Informationen gelten als **personenbezogene Daten**. Sie werden nur genutzt, wenn:
+  - `serverSettings.datenschutz.userTrackingErlaubt = true` **und**
+  - `userSettings.datenschutz.trackingErlaubt = true`.
+- Beim Widerruf des Opt-ins (oder bei expliziter Löschung durch den User) müssen gespeicherte Präferenzen gelöscht oder inaktiviert werden; `ai` darf sie dann nicht mehr verwenden.
+
+==================================================
+5. LOGGING
+==================================================
+
+5.1 Ziele
+---------
+- Nachvollziehbarkeit:
+  - wer,
+  - wann,
+  - was,
+  - mit welchem Ergebnis.
+- Grundlage für:
+  - Debugging,
+  - Monitoring,
+  - Statistiken.
+
+5.2 Zentraler Logger
+--------------------
+- `src/bot/general/logging/logger.ts`
+- Bietet Funktionen, z. B.:
+
+  - `protokolliereInfo(funktion, aktion, nachricht, kontext?)`
+  - `protokolliereWarnung(...)`
+  - `protokolliereFehler(...)`
+  - `protokolliereDebug(...)`
+
+- Keine direkten `console.log` im Produktivcode.
+
+5.3 Levels
+----------
+- `debug`
+- `info`
+- `warn`
+- `error`
+
+5.4 `log.config.ts` pro Funktion
+--------------------------------
+- Jede Funktion besitzt `log.config.ts`, z. B.:
+
+  - `aktiv: boolean`
+  - `bereiche: { aufrufe: boolean; fehler: boolean; performance: boolean; ... }`
+  - `ausgabe: { konsole: boolean; datei: boolean; discord: boolean }`
+  - `dateiName: string`
+  - optional `discordKanalEinstellungsKey: string` (Key in ServerSettings, z. B. `pollLogChannelId`)
+
+5.5 Server-Settings & Logging
+-----------------------------
+- Relevante Keys in `serverSettings.functions.<funktion>`:
+  - `loggingAktiv`
+  - `logLevel`
+  - `logChannelId?`
+
+5.6 Log-Dateien
+---------------
+- Speicherort:
+  - `logs/<funktion>/<funktion>-YYYY-MM-DD.log`
+
+5.7 Log-Inhalt
+--------------
+- Mindestens:
+  - Zeitstempel,
+  - Level,
+  - Funktion,
+  - Aktion (z. B. `commandStart`, `buttonClick`, `error`),
+  - Kontext (guildId, channelId, userId, ggf. Funktions-IDs),
+  - optional Dauer.
+
+5.8 Wann loggen?
+----------------
+- Mindestens:
+  - Command-Start/-Ende,
+  - relevante Button-/Modal-Aktionen,
+  - Fehler mit Kontext.
+- Optional:
+  - Performance,
+  - Debug-Informationen.
+
+5.9 DEV vs PROD
+---------------
+- DEV:
+  - `debug` erlaubt,
+  - ausführliche Logs.
+- PROD:
+  - mindestens `info`,
+  - `debug` meist aus,
+  - keine sensiblen Inhalte (Tokens, Passwörter, DM-Inhalte).
+
+==================================================
+6. STATISTIKEN & TRACKING
+==================================================
+
+6.1 Grundsatz & Datenschutz
+---------------------------
+- Stats sind von Anfang an eingeplant.
+- Zwei Ebenen:
+  - Aggregierte Stats (ohne Personenbezug) → immer okay.
+  - Personenbezogene Stats (mit User-ID) → nur mit Opt-in.
+
+6.2 Zentrale Stats-Infrastruktur
+--------------------------------
+- `src/bot/general/stats/`:
+  - `stats-manager.ts`
+  - `stats-typen.ts`
+- Funktionen melden Stats ausschließlich über `stats-manager`, NICHT direkt in DB/Files.
+
+6.3 `stats.config.ts` pro Funktion (optional, empfohlen)
+--------------------------------------------------------
+- Definiert pro Funktion:
+  - welche Ereignisse getrackt werden (Aufrufe, Buttons, besondere Outcomes),
+  - ob personenbezogene Stats vorgesehen sind (`trackUserbezogen: boolean`),
+  - Details zu gespeicherten Feldern.
+
+6.4 Aggregierte Stats
+---------------------
+- Beispiele:
+  - Aufrufe pro Funktion / Tag / Woche / Guild,
+  - Button-Nutzung (z. B. wie oft „Weiter“, „Abbrechen“),
+  - Drop-offs in Wizards (welcher Schritt wird oft verlassen),
+  - Ergebnisverteilungen (z. B. Polls),
+  - Performance (Durchschnittsdauer, Fehlerquote).
+
+6.5 Personenbezogene Stats (Opt-in)
+-----------------------------------
+- Nur wenn:
+  - Server Tracking erlaubt: `serverSettings.datenschutz.userTrackingErlaubt = true`,
+  - User zugestimmt hat: `userSettings.datenschutz.trackingErlaubt = true`.
+- Beispiele:
+  - wie oft ein User eine Funktion nutzt,
+  - letzte Nutzung,
+  - bevorzugte Modi/Optionen,
+  - Gamification (Achievements, Ränge).
+- Sensible Freitextinhalte werden nicht einfach als personenbezogene Stats gespeichert.
+
+6.6 Opt-in / Opt-out
+--------------------
+- Gesteuert über Sentinel-Datenschutz (Abschnitt 7).
+- Vor jeder personenbasierten Speicherung prüft `stats-manager`:
+  - Server erlaubt Tracking?
+  - User hat Opt-in?
+
+6.7 Stats vs Logs
+-----------------
+- Logs:
+  - detailreich, technisch, eher kurzlebig.
+- Stats:
+  - aggregiert, datensparsam, langlebig.
+- Stats können direkt geschrieben oder aus Logs aggregiert werden.
+
+6.8 Meta-Stats (Funktionen & Commands)
+--------------------------------------
+- Zentral werden gezählt:
+  - wie viele Funktionen (Ordner unter `src/bot/functions/`) existieren,
+  - wie viele Commands registriert sind.
+- Diese Meta-Stats können später über `/stats bot` oder im Web angezeigt werden.
+
+==================================================
+7. SENTINEL – DATENSCHUTZ, SICHERHEIT, SPAM & RAID
+==================================================
+
+7.1 Sentinel-Bereich
+--------------------
+- Alles zu Datenschutz & Sicherheit liegt unter:
+
+  - `src/bot/functions/sentinel/`
+
+- Geplante/definierte Unterbereiche:
+
+  - `sentinel/datenschutz/` → Opt-in/Opt-out, Datenschutz-Übersicht.
+  - `sentinel/spam/`        → Anti-Spam-Mechanismen (geplant).
+  - `sentinel/warnungen/`   → Warnsystem/Mutes/Bans (geplant).
+  - `sentinel/raid/`        → Raid-Erkennung & Verteidigung (geplant).
+  - `sentinel/monitoring/`  → System-Monitoring & Auslastung (geplant).
+
+7.2 Funktion `sentinel/datenschutz`
+-----------------------------------
+- Aufgaben:
+  - Verwaltung der Einwilligung zu personenbezogenem Tracking (Opt-in/Opt-out),
+  - Anzeige, was getrackt wird,
+  - Pflege von `userSettings.datenschutz.trackingErlaubt`.
+- Mögliche Wege:
+  - Willkommensnachricht mit Buttons „Ja“ / „Nein“,
+  - eigener Command (z. B. `/datenschutz`),
+  - DM-Flows für bestehende User.
+- Dateien:
+  - `datenschutz.command.ts`
+  - `datenschutz.buttons.ts`
+  - `datenschutz.embeds.ts`
+  - `log.config.ts`
+  - `texte.de.json`
+  - optional `stats.config.ts`.
+
+7.3 Spam-Funktion & Warnsystem (geplant)
+----------------------------------------
+- `sentinel/spam/`:
+  - Erkennung von Spam (z. B. viele Nachrichten in kurzer Zeit, bestimmte Muster).
+- `sentinel/warnungen/`:
+  - Verwarnungssystem,
+  - Historie pro User,
+  - Eskalationen (Mute/Kick/Ban), abhängig von Server-Policies.
+- Basisregeln:
+  - Texte in JSON,
+  - Logging via `log.config.ts`,
+  - Stats optional,
+  - personenbezogene Stats nur bei Opt-in.
+
+7.4 Raid-Verteidigung (geplant)
+-------------------------------
+- `sentinel/raid/`:
+  - Erkennung von Raid-Mustern (Join-Spikes, Spam-Wellen),
+  - „Raid-Modus“:
+    - neue Joins begrenzen/verzögern,
+    - Nachrichten einschränken,
+    - Admins informieren.
+
+7.5 Sentinel-Monitoring (Überblick)
+-----------------------------------
+- Details zu `sentinel/monitoring` siehe Abschnitt 18.
+- Kurz:
+  - überwacht Nutzung, Fehlerquote, Performance,
+  - hilft, Überlastung oder ungewöhnliches Verhalten zu erkennen.
+
+==================================================
+8. SERVER- & USER-SETTINGS
+==================================================
+
+8.1 Ziele
+---------
+- Konfigurierbare Dinge werden nicht hart im Code verdrahtet, sondern:
+  - pro Guild in `serverSettings`,
+  - pro User in `userSettings`,
+  - global in `globaleEinstellungen`.
+- Funktionen greifen nur über zentrale Loader/Helper auf Settings zu, nicht direkt auf DB/JSON.
+
+8.2 Speicherort & Zugriff
+-------------------------
+- Typen & Helper:
+
+  src/bot/general/config/server-settings-schema.ts
+  src/bot/general/config/server-settings-loader.ts
+  src/bot/general/config/user-settings-schema.ts
+  src/bot/general/config/user-settings-loader.ts
+  src/bot/general/config/global-settings-schema.ts
+  src/bot/general/config/global-settings-loader.ts
+
+8.3 ServerEinstellungen (logisch)
+---------------------------------
+- Enthält u. a.:
+
+  - `guildId: string`
+  - `sprache: 'de' | 'en'` (Standard-Sprache für Texte)
+  - `datenschutz`:
+    - `userTrackingErlaubt: boolean` (darf der Server personenbezogene Stats überhaupt erlauben?)
+    - ggf. `hinweisAngezeigt?: boolean`
+  - `functions: { [funktionsName: string]: FunktionEinstellungen }` mit z. B.:
+    - `aktiv: boolean` (Funktion auf dieser Guild aktiv/deaktiv)
+    - `loggingAktiv: boolean`
+    - `logLevel: 'debug' | 'info' | 'warn' | 'error'`
+    - `logChannelId?: string`
+    - `statsAktiv: boolean`
+    - `ephemeralStandard?: boolean`
+    - `erlaubteRollenIds?: string[]`
+    - `spezifisch?: Record<string, unknown>` (funktion-spezifische Settings)
+  - `sentinel`:
+    - `spamSchutzAktiv: boolean`
+    - `raidSchutzAktiv: boolean`
+    - `warnSystemAktiv: boolean`
+    - optionale Detail-Blöcke:
+      - `spam?: Record<string, unknown>`
+      - `raid?: Record<string, unknown>`
+      - `warnungen?: Record<string, unknown>`
+
+- Der Wert `functions.<funktion>.aktiv` ist die zentrale Schaltstelle:
+  - er wird sowohl im Bot (Commands) als auch im Web-Dashboard angezeigt,
+  - Änderungen können über Commands oder über das Web-Dashboard vorgenommen werden.
+
+8.4 UserEinstellungen (logisch)
+-------------------------------
+- Enthält u. a.:
+
+  - `userId: string`
+  - `sprache?: 'de' | 'en'` (User-spezifische Sprache, optional)
+  - `datenschutz`:
+    - `trackingErlaubt: boolean` (Opt-in/Opt-out)
+    - `letzteEntscheidungAm?: string` (ISO-String)
+  - `präferenzen?: { [funktionsName: string]: Record<string, unknown> }`
+    - z. B. `präferenzen.reminder`, `präferenzen.user`, `präferenzen.ranks`
+  - (logisch vorgesehen) weitere Bereiche:
+    - z. B. `connect`-/`stream`-bezogene Daten (verknüpfte Accounts, siehe Abschnitt 10),
+    - Reminder-/Geburtstags-Einstellungen (siehe Abschnitt 14).
+
+8.5 Loader
+----------
+- `ladeServerEinstellungen(guildId)` / `speichereServerEinstellungen(...)` / `aktualisiereServerEinstellungen(...)`
+- `ladeUserEinstellungen(userId)` / `speichereUserEinstellungen(...)` / `aktualisiereUserEinstellungen(...)`
+- `ladeGlobaleEinstellungen()` / `speichereGlobaleEinstellungen(...)`
+
+8.6 Zusammenspiel Funktionen ↔ Settings
+---------------------------------------
+- Jede Funktion:
+  - lädt zunächst `serverSettings` für die Guild,
+  - liest relevante Werte unter `functions.<funktion>` und `sentinel`,
+  - lädt bei Bedarf `userSettings`,
+  - trifft darauf basierend Entscheidungen:
+    - Funktion aktiv ja/nein (`aktiv`),
+    - Logging/Stats ja/nein,
+    - Ephemeral-Standard,
+    - Berechtigungen.
+
+8.7 Defaults (Empfohlen)
+------------------------
+- Server:
+  - `sprache = 'de'`
+  - `datenschutz.userTrackingErlaubt = true`
+- User:
+  - `sprache`: nicht gesetzt → Fallback auf Server-Sprache,
+  - `datenschutz.trackingErlaubt = false` (kein personenbezogenes Tracking, bis Opt-in erfolgt).
+- Sentinel:
+  - `spamSchutzAktiv`, `raidSchutzAktiv`, `warnSystemAktiv` starten als `false` und werden über Commands/Settings aktiviert.
+
+8.8 Globale Bot-Einstellungen & Guild-Whitelist
+-----------------------------------------------
+- `GlobaleEinstellungen` enthalten u. a.:
+  - `invitePolicy: 'whitelist' | 'blacklist' | 'open'`
+  - `erlaubteGuildIds: string[]`
+  - `geblockteGuildIds: string[]`
+  - `globalAdmins: string[]` (Discord-User-IDs, die im Web & Bot „alles sehen“ dürfen)
+- Empfohlene Standard-Policy:
+  - `invitePolicy = 'whitelist'`
+- Wenn der Bot in eine **nicht erlaubte** Guild eingeladen wird:
+  1. Alle Funktionen auf dieser Guild werden sofort deaktiviert (Bot verhält sich passiv).
+  2. Owner/Admins der Guild erhalten eine Info-Nachricht:
+     - Erklärung, warum der Bot hier nicht aktiv ist,
+     - Einladungslink zum offiziellen MEAT-/Bot-Discord, um Freigabe zu klären.
+  3. Danach verlässt der Bot automatisch diese Guild (Leave Guild).
+
+==================================================
+9. FUNKTIONS-PLANUNGS-CHECKLISTE (PFLICHT)
+==================================================
+
+9.1 Ziel
+--------
+- Bevor eine neue Funktion in `src/bot/functions/<funktion>/` implementiert wird, gibt es IMMER einen kurzen Plan.
+- Der Plan beantwortet zentrale Fragen zu:
+  - Flow,
+  - Interaktionen,
+  - Text-Struktur,
+  - Logging,
+  - Stats,
+  - Berechtigungen,
+  - Settings,
+  - Sentinel-/Datenschutz-Auswirkungen.
+
+9.2 Checkliste (Fragen & Punkte)
+--------------------------------
+
+1. Name & Zweck
+   - Wie heißt die Funktion (Ordnername)?
+   - Kurzbeschreibung: Was soll sie tun?
+
+2. Commands
+   - Welche Slash-Commands gibt es?
+     - z. B. `/poll`, `/poll montag`, `/stats server`, `/stream connect`.
+   - Gibt es Subcommands?
+     - z. B. `/poll start`, `/poll ergebnis`, `/poll close`.
+
+3. Flow / Assistent / Seiten
+   - Ist es ein einmaliger Command oder ein Wizard/Assistent?
+   - Falls Wizard:
+     - welche Seiten/Schritte (start, auswahl, zusammenfassung, bestaetigung, ergebnis, ...),
+     - welche Übergänge (Buttons → Seitenwechsel).
+
+4. Interaktionen
+   - Welche Buttons?
+     - Aktionen pro Seite (Weiter, Zurück, Abbrechen, etc.),
+     - globale Buttons (Hilfe, Ergebnis anzeigen).
+   - Welche Modals?
+     - Felder (Label, Placeholder, Typ).
+   - Weitere Komponenten?
+     - z. B. Select-Menüs.
+
+5. Texte & JSON-Struktur
+   - Welche Texte werden benötigt?
+     - Command-Namen & Beschreibungen,
+     - Embed-Titel & -Texte,
+     - Button-Texte,
+     - Modal-Titel, Feldlabels, Placeholder,
+     - Fehlermeldungen,
+     - Erfolgsmeldungen.
+   - Wie werden Keys in `texte.de.json` strukturiert?
+     - z. B. `command`, `seiten`, `buttonsGlobal`, `modals`, `fehler`.
+
+6. Ephemeral vs. öffentlich
+   - Welche Antworten sind ephemeral?
+   - Welche sind öffentlich?
+   - Gibt es Admin-only-Infos (z. B. Systemstatus), die nicht jeder sehen darf?
+
+7. Logging
+   - Was wird geloggt?
+     - Command-Start/-Ende,
+     - Button-/Modal-Aktionen,
+     - Fehler,
+     - Performance.
+   - Gibt es spezielle Zusatzinfos im Log (z. B. Poll-ID, Event-ID, User-/Guild-Kontext)?
+
+8. Stats
+   - Welche aggregierten Stats sind sinnvoll?
+   - Sollen personenbezogene Stats erhoben werden?
+     - Welche?
+     - IMMER unter Beachtung:
+       - `serverSettings.datenschutz.userTrackingErlaubt`
+       - `userSettings.datenschutz.trackingErlaubt`.
+   - Braucht die Funktion ein `stats.config.ts`?
+
+9. Berechtigungen
+   - Wer darf die Funktion nutzen?
+     - alle / bestimmte Rollen / nur Admin/Owner?
+   - Wie werden Rollen gepflegt?
+     - z. B. `serverSettings.functions.<funktion>.erlaubteRollenIds`,
+     - ggf. `serverSettings.berechtigungen` (siehe Abschnitt 16).
+
+10. Server- & User-Settings
+    - Braucht die Funktion eigene Settings?
+      - z. B. `aktiv`, `loggingAktiv`, `ephemeralStandard`, spezielle Parameter.
+    - Sollen Defaults definiert werden?
+    - Nutzt die Funktion User-Präferenzen (z. B. Darstellung, Sprache, Modus)?
+
+11. Icons & Darstellung
+    - Welches Icon (Key in `icons.json`) gehört zur Funktion?
+    - Gibt es eigene Modul-Farben/Styles (Eintrag in `module-styles.ts`)?
+    - Werden Bilder/Thumbnails verwendet?
+
+12. Sicherheit & Sentinel
+    - Berührt die Funktion:
+      - Datenschutz (personenbezogene Daten),
+      - Moderation (Warnungen/Bans),
+      - Spam/Raid-Erkennung,
+      - System-Monitoring?
+    - Wenn ja:
+      - wie interagiert sie mit Sentinel-Modulen?
+      - welche Mindest-Schutzmaßnahmen sind Pflicht?
+
+9.3 Ergebnis der Planung
+------------------------
+- Pro Funktion existiert eine kurze Plan-Notiz, z. B.:
+
+  - `docs/plans/<funktion>-plan.md`
+
+- Inhalt:
+  - Kurzbeschreibung,
+  - Stichpunkte zu den 12 Checklisten-Punkten,
+  - optional Flow-Skizzen.
+- ChatGPT nutzt diese Plan-Dateien später, um Code zu generieren, der zur geplanten Struktur passt.
+
+==================================================
+10. STREAM- & ACCOUNT-CONNECT
+==================================================
+
+10.1 Ziel
+---------
+- Die Module `connect` und `stream` bauen die Basis für:
+  - das Verknüpfen von Discord-Usern mit externen Accounts (Twitch, YouTube, Steam, League, …),
+  - das Auslösen von Ankündigungen (z. B. „User X geht live“, „neues Video online“),
+  - spätere Nutzung der Verknüpfungen im Web-Dashboard oder durch einen separaten `stream-bot`.
+
+10.2 Ort im Projekt
+-------------------
+- `connect` (Kern-Verknüpfungen):
+
+  - `src/bot/functions/connect/`
+    - `connect.command.ts` (z. B. `/connect twitch`, `/connect youtube`, `/connect steam`)
+    - `connect.buttons.ts`
+    - `connect.modals.ts`
+    - `connect.embeds.ts`
+    - `connect.service.ts`
+    - `log.config.ts`
+    - `stats.config.ts` (optional)
+    - `texte.de.json`
+
+- `stream` (Ankündigungs-Logik):
+
+  - `src/bot/functions/stream/`
+    - `stream.command.ts` (z. B. `/stream settings`, `/stream test`)
+    - `stream.buttons.ts`
+    - `stream.embeds.ts`
+    - `stream.service.ts`
+    - `log.config.ts`
+    - `stats.config.ts` (optional)
+    - `texte.de.json`
+
+10.3 Datenschutz-Pflicht für CONNECT
+------------------------------------
+- Vor jedem CONNECT-Vorgang (z. B. `/connect twitch`):
+  - prüfen:
+    - `serverSettings.datenschutz.userTrackingErlaubt`,
+    - `userSettings.datenschutz.trackingErlaubt`.
+- Wenn eine Bedingung nicht erfüllt:
+  - CONNECT wird verweigert,
+  - User bekommt eine kurze, sachliche Info (ephemeral), z. B. Hinweis auf `/datenschutz`.
+
+10.4 Datenmodell im User-Settings-Bereich (logisch)
+---------------------------------------------------
+- Logisch vorgesehen (Details folgen in TS-Typen):
+
+  - `userSettings.connect.accounts: AccountVerknuepfung[]`, z. B.:
+    - `plattform: 'twitch' | 'youtube' | 'steam' | 'league' | ...`
+    - `externeId: string` (z. B. Channel-ID, Steam-ID, Summoner-ID)
+    - `kanalName: string`
+    - `oeffentlichAnzeigen: boolean`
+    - `letzteAktualisierungAm?: string`
+
+- Diese Daten sind personenbezogen:
+  - nur mit Opt-in,
+  - Opt-out/Löschung muss später sauber möglich sein.
+
+10.5 Server-Settings für Stream-Ankündigungen (logisch)
+-------------------------------------------------------
+- Über `serverSettings.functions.stream.spezifisch`:
+
+  - `ankuendigungenAktiv: boolean`
+  - `standardAnkuendigungsChannelId?: string`
+  - `ankuendigeLivestreams: boolean`
+  - `ankuendigeUploads: boolean`
+
+- Später erweiterbar:
+  - z. B. Filter pro Plattform/User.
+
+10.6 Nutzung durch Web & Stream-Bot
+-----------------------------------
+- `connect` stellt zentrale Verknüpfungsdaten bereit.
+- `stream` nutzt diese Daten, um Ankündigungen im Discord zu posten.
+- Web-Dashboard und/oder `stream-bot` können dieselben Daten verwenden:
+  - Web:
+    - um anzuzeigen, welche Accounts pro User/Guild verbunden sind,
+    - um pro Guild/Streamer zu konfigurieren, welche Features aktiv sind (z. B. Live-Ankündigungen, Upload-Posts, Clips).
+  - `stream-bot`:
+    - liest Einstellungen und Verknüpfungen grundsätzlich nur aus (read-only),
+    - darf nur dort schreibend agieren, wo es sinnvoll ist (z. B. Chat-Commands im Streaming-Chat, Posten von Ankündigungen).
+
+10.7 Opt-out & Löschung
+-----------------------
+- Bei Wechsel von `trackingErlaubt: true → false`:
+  - personenbezogene Nutzung der Verknüpfungen muss enden,
+  - verknüpfte Konten sollen entfernt oder anonymisiert werden.
+- Server-seitige Deaktivierung (`userTrackingErlaubt = false`) schränkt die Nutzung der Daten serverbezogen ein.
+
+10.8 Logging & Stats für Stream/Connect
+---------------------------------------
+- Logging:
+  - CONNECT-/DISCONNECT-Aktionen,
+  - Änderungen von Ankündigungs-Settings,
+  - fehlgeschlagene API-Abfragen (ohne sensible Daten).
+- Stats:
+  - aggregiert:
+    - wie viele User haben Accounts verknüpft,
+    - wie viele Ankündigungen wurden verschickt.
+  - personenbezogen:
+    - nur mit Opt-in.
+
+10.9 Zentrales `connect`-Modul
+------------------------------
+- `connect` kapselt:
+  - alle Logiken zur Verknüpfung von Discord-Usern mit externen Accounts.
+- Andere Module (`stream`, `league`, `steam`, `user`, `ranks`, Web) nutzen diese Daten lesend.
+
+==================================================
+11. FUNKTION `user` (GEPLANT)
+==================================================
+
+11.1 Ziel
+---------
+- `user` bietet später:
+  - ein MEAT-User-Profil,
+  - Anzeige von Stats (sofern Opt-in),
+  - Personalisierung (z. B. bevorzugte Sprache, Darstellungsoptionen).
+
+11.2 Mögliche Features
+----------------------
+- `/user profil`:
+  - MEAT-Profil des Users:
+    - Nickname, Avatar, evtl. verbundene Accounts (wenn freigegeben),
+    - Zusammenfassung wichtiger Stats (z. B. Poll-Teilnahmen, Spielaktivität),
+    - Ränge/Badges aus `ranks`,
+    - optionale externe Infos (z. B. League-Rank, Steam-Highlights, falls via `connect` verknüpft und freigegeben).
+- `/user einstellungen`:
+  - Sprache,
+  - Datenschutz-Shortcuts (Verweis auf `sentinel/datenschutz`),
+  - Anzeige-Optionen (z. B. „zeige meine Stats öffentlich / nur mir“).
+
+- Umsetzung erfolgt später nach der Funktions-Planungs-Checkliste.
+- Im Web-Dashboard soll ein eingeloggter User sein Profil, Achievements und Stat-Auswertungen ebenfalls in einer eigenen Ansicht sehen können (siehe Abschnitt 20).
+
+==================================================
+12. FUNKTION `randomizer` (GEPLANT)
+==================================================
+
+12.1 Ziel
+---------
+- `randomizer` bündelt alle Zufalls-Features:
+  - Würfelwürfe,
+  - Coinflip,
+  - zufällige LoL-Champions,
+  - Team-Zuordnungen,
+  - weitere Random-Funktionen.
+
+12.2 Mögliche Features
+----------------------
+- `/randomizer roll` → Würfel (`XdY`-Notation).
+- `/randomizer coinflip` → Kopf oder Zahl.
+- `/randomizer lol`:
+  - zufällige Champions basierend auf:
+    - Teamgröße,
+    - Rollen (Top/Jungle/Mid/ADC/Support),
+    - Spielmodus (ARAM, URF, Normal, Ranked).
+- `/randomizer team`:
+  - zufällige Teams aus einer Liste von Spielern.
+
+12.3 UX & Darstellung
+---------------------
+- Ergebnisse vorzugsweise in kompakten Embeds:
+  - klar hervorgehobenes Ergebnis,
+  - optional kleine Gags im MEAT-Stil.
+- Ephemeral vs. öffentlich:
+  - Party-/Fun-Anwendungen → eher öffentlich,
+  - persönliche Rolls → optional ephemeral.
+
+12.4 Logging & Stats
+--------------------
+- Logging:
+  - Nutzung der einzelnen Subfeatures (roll, coinflip, lol, team).
+- Stats:
+  - aggregiert:
+    - welche Random-Funktionen am beliebtesten sind,
+    - wie oft pro Server/Tag/Woche.
+
+==================================================
+13. FUNKTION `events` (GEPLANT)
+==================================================
+
+13.1 Ziel
+---------
+- `events` verwaltet native Discord-Events:
+  - Erstellen,
+  - Bearbeiten,
+  - Auflisten,
+  - ggf. Absagen.
+- Dient als Brücke zwischen Terminplanung und Discord-eigenen Event-Funktionen.
+
+13.2 Mögliche Features
+----------------------
+- `/events create`:
+  - Name, Beschreibung, Start/Ende, Ort,
+  - erstellt natives Discord-Event.
+- `/events list`:
+  - bevorstehende Events,
+  - optional Filter nach Typ/Datum.
+- `/events edit`:
+  - Änderungen an bestehenden Events (berechtigte Rollen).
+- `/events cancel`:
+  - Event absagen, mit optionaler Info-Nachricht.
+
+13.3 Integration mit anderen Modulen
+------------------------------------
+- `reminder`:
+  - kann basierend auf Events Reminder erstellen.
+- `poll`:
+  - kann vor Events zur Abstimmung (z. B. Spielauswahl) genutzt werden.
+- `stream`:
+  - Verbindung zwischen Events und Streams (z. B. Event wird gestreamt).
+
+13.4 Berechtigungen, Logging & Stats
+------------------------------------
+- Nur bestimmte Rollen (z. B. Orga/Mods/Admins) dürfen Events erstellen/ändern.
+- Logging:
+  - Erstellung, Änderung, Absage.
+- Stats:
+  - Anzahl Events,
+  - Nutzung von Event-Funktionen.
+
+==================================================
+14. FUNKTION `reminder` (GEPLANT)
+==================================================
+
+14.1 Ziel
+---------
+- `reminder` verwaltet Termine & Erinnerungen:
+  - Geburtstage,
+  - persönliche Reminder,
+  - Server-/Community-Reminder.
+- Geburtstage sind ein Spezialfall von Terminen.
+
+14.2 Anwendungsfälle
+--------------------
+- User-Reminder:
+  - „Erinnere mich in 2 Wochen an X.“
+- Server-Reminder:
+  - „Erinnere den Server jeden Montag an die Montagsrunde.“
+- Geburtstage:
+  - User kann optional seinen Geburtstag hinterlegen,
+  - Server kann konfigurieren, ob/wo Geburtstagsgrüße erscheinen.
+
+14.3 Datenschutz & sensible Daten
+---------------------------------
+- Geburtstage sind personenbezogene Daten.
+- Regeln:
+  - Speicherung nur bei explizitem Opt-in,
+  - User kann Geburtstag jederzeit löschen,
+  - Server kann entscheiden:
+    - ob Geburtstags-Posts aktiviert sind,
+    - in welchem Channel diese erscheinen,
+    - ob Namen genannt werden oder anonymisiert.
+
+14.4 Integration mit Settings
+-----------------------------
+- `serverSettings.functions.reminder.spezifisch`:
+  - `geburtstagsChannelId?: string`
+  - `geburtstagsPostsAktiv: boolean`
+  - `standardReminderChannelId?: string`
+- `userSettings.präferenzen.reminder`:
+  - `geburtstag?: string` (Datum),
+  - `gebeGeburtstagPublicFrei: boolean`,
+  - `dmErinnerungenAktiv: boolean`.
+
+14.5 Benachrichtigungen
+-----------------------
+- Mögliche Kanäle:
+  - Channel-Nachrichten,
+  - DMs,
+  - Logs in speziellen Orga-Channels.
+- Reminder-Typen sollten klar gekennzeichnet sein:
+  - `geburtstag`, `eventErinnerung`, `customReminder`, etc.
+
+14.6 Verbindung zu `events`
+---------------------------
+- `reminder` kann basierend auf `events` automatische Erinnerungen generieren:
+  - z. B. 1 Stunde vor Event-Beginn.
+
+==================================================
+15. FUNKTION `stats` – SERVER-PROFIL & SERVER-STATS (ERWEITERUNG)
+==================================================
+
+15.1 Ziel
+---------
+- `stats` liefert:
+  - Bot-/Funktions-Statistiken,
+  - ein Serverprofil (z. B. über `/server` oder `/stats server`).
+
+15.2 Server-Stats (aggregiert)
+------------------------------
+- Beispiele:
+  - Anzahl Mitglieder,
+  - aktive User in letzten X Tagen,
+  - Anzahl Channels (Text/Voice/Threads),
+  - Anzahl Commands gesamt,
+  - meistgenutzte Funktionen (Polls, Randomizer, Stream...),
+  - Event-/Reminder-Aktivität (Anzahl Events, Anzahl Reminder).
+
+15.3 `/server`- oder `/stats server`-Command
+--------------------------------------------
+- Zeigt ein Embed mit:
+
+  - Server-Basisdaten:
+    - Name, Icon, Erstellungsdatum,
+    - ggf. Region/Features,
+  - MEAT-spezifischen Infos:
+    - wie viele Funktionen sind aktiv,
+    - Gesamtzahl der Bot-Interaktionen,
+    - Aktivitätsindikatoren (z. B. „sehr aktiv“, „ruhig“).
+
+- Darstellung:
+  - mit `stats`-Modul-Icon,
+  - Farben aus `module-styles.ts`,
+  - strukturierte Sections.
+
+15.4 Integration mit Stats-Infrastruktur
+----------------------------------------
+- `stats` aggregiert Ereignisse, die über `stats-manager` gemeldet wurden.
+- Personenbezogene Informationen werden für Serverprofil nur aggregiert benutzt.
+
+==================================================
+16. BERECHTIGUNGEN & ROLLENSTEUERUNG
+==================================================
+
+16.1 Ziel
+---------
+- Berechtigungen („Wer darf was?“) werden:
+  - zentral,
+  - pro Server,
+  - konsistent gesteuert.
+
+16.2 Speicherort
+----------------
+- Berechtigungen sind Teil von `ServerEinstellungen`.
+- Zusätzlich können zentrale Dateien existieren:
+  - `permissions-schema.ts`,
+  - `permissions-helper.ts`.
+
+16.3 Struktur (logisch)
+-----------------------
+- pro Funktion:
+  - `serverSettings.functions.<funktion>.erlaubteRollenIds?: string[]`
+    - Rollen, die diese Funktion nutzen dürfen.
+- globaler Block, z. B.:
+  - `serverSettings.berechtigungen`:
+    - `adminRollenIds: string[]`
+    - `modRollenIds: string[]`
+    - `orgaRollenIds: string[]`
+    - funktionsübergreifende Flags (z. B. „darf Events erstellen“, „darf Vault nutzen“, „darf Sentinel konfigurieren“).
+
+16.4 Zentraler Berechtigungs-Helper
+-----------------------------------
+- Statt inline-Abfragen:
+  - Funktionen rufen z. B. `pruefeBerechtigung(funktion, aktion, user, serverSettings)` auf.
+- Dieser Helper kombiniert:
+  - Discord-Permissions,
+  - globale Rollen-Konfiguration,
+  - Funktions-spezifische `erlaubteRollenIds`.
+
+==================================================
+17. FUNKTION `ranks` (RANG-/LEVEL-/ACHIEVEMENT-SYSTEM, GEPLANT)
+==================================================
+
+17.1 Ziel
+---------
+- `ranks` bildet ein Progressionssystem:
+  - Ränge/Level basierend auf Aktivität und besonderen Aktionen,
+  - Achievements/Badges,
+  - starke Verknüpfung mit `user`, `stats`, `connect`, `league`, `steam`.
+
+17.2 Datenbasis
+---------------
+- Nutzt `stats`-Daten:
+  - Anzahl genutzter Funktionen,
+  - Teilnahme an Events/Polls,
+  - besondere Events (z. B. „immer bei Montagsrunde dabei“).
+- Nutzt `connect`-Daten:
+  - z. B. externe Ränge oder Status:
+    - League-Ranks (Iron–Challenger),
+    - Steam-Badges (Spielstunden, bestimmte Spiele),
+    - Twitch-/YouTube-Status (Follower-/Sub-Ziele, Partner/Affiliate, später optional).
+- Personenbezogene Auswertungen nur mit Opt-in.
+
+17.3 Anzeige
+------------
+- Über `/ranks` oder integriert in `/user profil`:
+
+  - MEAT-interne Ränge:
+    - z. B. Level 1–50, interne Titel.
+  - Achievements:
+    - Icons/Badges für spezielle Aktionen (Poll-King, Streamer, Dino-Meister, etc.).
+  - externe Ränge (wenn `connect`-Verknüpfung und Freigabe):
+    - League-Rang (z. B. „Gold IV“),
+    - Steam-Highlights (z. B. meistgespieltes Spiel),
+    - Twitch-/YouTube-Badges (z. B. „Streamer auf diesem Server“).
+
+- Darstellung:
+  - modul-spezifisches Embed-Design,
+  - Icons aus `icons.json`,
+  - Farben aus `module-styles.ts`.
+
+17.4 Integration mit `user`
+---------------------------
+- `user`-Profil-Embeds können:
+  - `ranks`-Infos einbinden,
+  - Badges/Ränge im User-Profil anzeigen.
+- `ranks` liefert Logik & Berechnungen,
+- `user` kümmert sich um die Präsentation.
+
+==================================================
+18. FUNKTION `sentinel/monitoring` (SYSTEM-MONITORING, GEPLANT)
+==================================================
+
+18.1 Ziel
+---------
+- `sentinel/monitoring` überwacht Systemgesundheit & Nutzung:
+  - Auslastung,
+  - Fehlerquote,
+  - Aktivität.
+
+18.2 Kennzahlen
+----------------
+- Anzahl Commands/Interaktionen pro Zeitraum,
+- Fehlerquote (Anteil `error`-Logs),
+- durchschnittliche Antwortzeit,
+- ggf. CPU-/Memory-Auslastung (später),
+- pro Funktion:
+  - Nutzung vs. Fehler,
+  - Aktivierung/Deaktivierung.
+
+18.3 Darstellung & Zugriff
+--------------------------
+- Nur für berechtigte Rollen (z. B. Admin/Owner/Operator).
+- Zugriff z. B. über:
+  - `/sentinel monitoring`,
+  - `/meat status`.
+- Ausgabe:
+  - Embeds mit:
+    - Ampelindikatoren (OK/Warnung/Kritisch),
+    - Kennzahlen,
+    - ggf. Hinweis auf Logs oder Web-Dashboards.
+
+18.4 Integration mit Logging & Stats
+------------------------------------
+- `monitoring` nutzt:
+  - Log-Daten (Abschnitt 5),
+  - Stats-Daten (Abschnitt 6),
+  um Health-Informationen abzuleiten.
+
+18.5 Datenschutz
+----------------
+- Fokus auf technische & aggregierte Daten.
+- Personenbezogene Infos (z. B. „Top-Nutzer“) nur bei Opt-in und nur, wenn konzeptionell wirklich nötig.
+
+==================================================
+19. FUNKTION `einbuergerung` – EINBÜRGERUNG & „VIRTUELLE NACHBARN“ (GEPLANT)
+==================================================
+
+19.1 Ziel
+---------
+- `einbuergerung` bildet das Einbürgerungs-/„virtuelle Nachbarn“-System:
+  - User können eine „Einbürgerung“ für einen Server beantragen,
+  - nach Freigabe wird der Server zu ihrer „Heimatbasis“,
+  - Rollen werden entsprechend angepasst,
+  - anschließend können sie sich ihren „virtuellen Nachbarn“ vorstellen.
+
+19.2 Grund-Flow
+---------------
+- Command (z. B. `/einbuergerung`), nur für User mit bestimmter Rolle erlaubt (konfigurierbar).
+- Ablauf:
+  1. Bot zeigt ein humorvolles MEAT-Embed mit Erklärung der Einbürgerung.
+  2. Button „Einbürgerung beantragen“ öffnet ein Modal mit Fragen (z. B. seit wann auf dem Server, Lieblingsgames, kurze Vorstellung).
+  3. Antrag wird in einem Mod-/Orga-Channel als Embed gepostet:
+     - Buttons: „Annehmen“ / „Ablehnen“.
+  4. Bei „Annehmen“:
+     - alte Rolle wird durch eine „bessere“ Bürger-/Heimat-Rolle ersetzt (konfigurierbar in `serverSettings`),
+     - User erhält eine kurze Bestätigungsnachricht.
+
+19.3 Vorstellung & „virtuelle Nachbarn“
+---------------------------------------
+- Nach erfolgreicher Einbürgerung wird dem User ein Button angezeigt:
+  - „Möchtest du dich deinen neuen virtuellen Nachbarn vorstellen?“
+- Klick öffnet ein weiteres Modal:
+  - z. B. mit Feldern: Kurzvorstellung, Lieblingsspiele, Zeiten, in denen sie online sind.
+- Ergebnis:
+  - schön formatiertes Embed in einem konfigurierten Vorstellungs-Channel,
+  - User soll seine Vorstellung später bearbeiten können (z. B. über einen `/user vorstellung`-Command oder Button „Vorstellung bearbeiten“).
+
+19.4 Settings & Berechtigungen
+------------------------------
+- In `serverSettings.functions.einbuergerung.spezifisch` können konfiguriert werden:
+  - `antragsChannelId` (wo Mod-Anträge landen),
+  - `vorstellungsChannelId` (wo Vorstellungen gepostet werden),
+  - `startRollenIds` (Rollen, die den Command nutzen dürfen),
+  - `neueBuergerRolleId` (Rolle, die der User bei Annahme erhält),
+  - optionale weitere Rollen- oder Tag-Optionen.
+- Berechtigungen für Annahme/Ablehnung:
+  - definierbar über Rollen (`erlaubteRollenIds`) oder globale Berechtigungen (`serverSettings.berechtigungen.orgaRollenIds`, `adminRollenIds`).
+
+19.5 Logging & Stats
+--------------------
+- Logging:
+  - Einbürgerungsanträge,
+  - Annahmen/Ablehnungen,
+  - Fehlversuche (z. B. fehlende Berechtigungen).
+- Stats:
+  - aggregiert:
+    - wie viele Einbürgerungen gestellt/angenommen/abgelehnt wurden,
+    - Anteil Einbürgerungen pro Server/User (personenbezogen nur mit Opt-in).
+
+==================================================
+20. WEB-DASHBOARD, AUTH & UI-GRUNDSÄTZE (HIGH LEVEL, GEPLANT)
+==================================================
+
+20.1 Ziel
+---------
+- Das Web-Dashboard ist die visuelle Schaltzentrale für:
+  - Server-Admins/Owner:
+    - Server auswählen,
+    - Funktionen (pro Server) aktivieren/deaktivieren,
+    - Berechtigungs-Matrix pflegen,
+    - Server-Settings anpassen,
+    - Stats & Monitoring sehen.
+  - Normale User:
+    - eigenes Profil & Achievements sehen,
+    - eigene Datenschutz-/Opt-in-Einstellungen verwalten,
+    - eigene Connect-/Stream-Einstellungen sehen.
+  - Globale Admins/Bot-Owner:
+    - alle Server & globalen Einstellungen sehen,
+    - globale Statistiken, Patchnotes, Botstatus etc.
+
+20.2 Authentifizierung (Discord Login)
+--------------------------------------
+- Login ausschließlich über Discord OAuth2:
+  - User meldet sich mit seinem Discord-Account an.
+- Nach Login:
+  - Das Backend kennt:
+    - Discord-User-ID,
+    - alle Guilds, in denen der User Mitglied ist,
+    - innerhalb dieser Guilds die Rollen/Permissions (soweit API es erlaubt).
+- Rechte:
+  - Server-Admins/Owner:
+    - dürfen das Dashboard für ihre Guild(s) sehen und Einstellungen vornehmen.
+  - Normale User:
+    - sehen nur eigene User-Daten & serverübergreifende Informationen, soweit relevant.
+  - Globale Admins/Bot-Owner:
+    - in `GlobaleEinstellungen.globalAdmins` hinterlegt,
+    - dürfen alle Guilds und globale Bereiche sehen.
+
+20.3 Server-Auswahl & Dashboard-Routing
+---------------------------------------
+- Wenn ein User NUR auf einem zulässigen Server (Whitelist) Server-Admin/Owner ist:
+  - landet er direkt auf dem Dashboard dieses Servers.
+- Wenn ein User auf MEHREREN zulässigen Servern Admin/Owner ist:
+  - sieht er eine Auswahlseite („Server-Auswahl“),
+  - kann einen Server wählen (z. B. Cards mit:
+    - Server-Icon,
+    - Name,
+    - Kurzinformationen).
+- Server-Switch:
+  - oben rechts ist das Discord-Profilbild des eingeloggten Users sichtbar.
+  - daneben gibt es einen Server-Switch:
+    - zeigt das aktuelle Server-Icon + Name an,
+    - Dropdown/Overlay mit Liste der anderen Server, auf denen der User berechtigt ist.
+- „Ich kann alles sehen“:
+  - globale Admins (z. B. Bot-Owner) sehen in der Server-Auswahl ALLE freigegebenen Server,
+  - können zwischen ihnen wechseln, ohne separate Einladungen.
+
+20.4 Dashboard-Hauptseite (für Server-Admins)
+---------------------------------------------
+- Layout:
+  - UI basiert auf Tailwind CSS,
+  - Dark-Mode by default,
+  - klare, moderne, aufgeräumte Optik.
+- Kopfzeile:
+  - links oben:
+    - Avatar des ausgewählten Discord-Servers,
+    - daneben Server-Name,
+  - rechts oben:
+    - Profilbild des eingeloggten Discord-Users,
+    - kleiner Name/Tag,
+    - ggf. Menü/Dropdown für Account-Aktionen (Logout, Profil).
+- Hauptbereich:
+  - Cards („Kacheln“) mit den wichtigsten Infos:
+    - Card „Allgemeine Stats“:
+      - z. B. Anzahl User, Anzahl aktiver Funktionen, Aktivität der letzten Tage,
+      - visualisiert mit Diagrammen (z. B. Bar/Line-Charts).
+    - Card „Discord-Widget“:
+      - eingebettetes Discord-Widget des Servers (sofern aktiviert),
+      - zeigt Online-User, Channels etc.
+    - Card „Bot-Status“:
+      - Statusbild (z. B. Bot-Avatar),
+      - Online/Offline-Status,
+      - Ping/Latenz,
+      - Uptime,
+      - Link zum Bot-Discord/Support-Server.
+    - Card „Neue Funktion“:
+      - Teaser für neue Features,
+      - kurzer Text,
+      - Links zu Dokumentation/Changelog,
+      - ggf. „Jetzt aktivieren“-Button für bestimmte Funktionen.
+
+20.5 Navigationsmenü & Seiten
+-----------------------------
+- Linkes Hauptmenü (für Server-Admins/Owner):
+  - **Dashboard**:
+    - Startseite mit oben beschriebenen Cards & Charts.
+  - **Statistiken**:
+    - detailliertere Charts:
+      - Funktions-Nutzung,
+      - Aktivitätsverläufe,
+      - Fehlerquoten (aggregiert).
+    - Filter nach Zeitraum & Funktion.
+  - **Berechtigungen**:
+    - Rechte-Matrix:
+      - welche Rollen dürfen welche Funktionen nutzen,
+      - wer darf Einstellungen ändern,
+      - einfache, visuelle Matrix (Rollen x Funktionen) mit Toggles.
+  - **Settings**:
+    - Server-Settings:
+      - Sprache,
+      - Standard-Einstellungen pro Funktion (`functions.<funktion>.aktiv`, Log-Channels, Stats-An/Aus, etc.),
+      - Sentinel-Einstellungen (Spam-/Raid-/Warnsystem-Schalter),
+      - spezifische Parameter (z. B. Poll-Channel, Stream-Channel, Reminder-Channel).
+  - **Global Settings** (nur für globale Admins/Bot-Owner sichtbar):
+    - Einladungspolitik,
+    - globale Stats/Monitoring,
+    - Liste aller registrierten Server,
+    - globale Feature-Flags.
+  - **Info**:
+    - Bot-Status und weitere Infos,
+    - Infos zum Bot (z. B. „Über M.E.A.T.“),
+    - Infos zum Entwickler / zu dir,
+    - Patchnotes & Versionen:
+      - können z. B. aus Git-Commits/Tags gezogen oder manuell gepflegt werden.
+
+- Menü für normale User (nicht-Admin, nicht-Owner):
+  - **Dashboard**:
+    - personalisierte Übersicht:
+      - z. B. eigene Aktivität, kurze Serverinfos.
+  - **Statistiken**:
+    - eigene Stats (z. B. wie oft Polls genutzt, Teilnahme an Events),
+    - Visualisierung der eigenen Aktivität (nur bei Opt-in).
+  - **Settings**:
+    - eigene Datenschutz-/Opt-in-Einstellungen,
+    - eigene Präferenzen (z. B. Sprache, Reminder-Einstellungen),
+    - Connect-Einstellungen (welche externen Accounts sind verknüpft, Sichtbarkeit).
+  - **Profil** (kann unter Dashboard/Statistiken integriert oder als eigener Punkt geführt werden):
+    - eigene Discord-Infos,
+    - MEAT-Ränge & Achievements (`ranks`),
+    - verknüpfte Accounts (`connect`),
+    - „User-Profil-Card“ in stylischer Darstellung.
+  - **Info**:
+    - allgemeine Bot-Infos,
+    - Datenschutz-Hinweise,
+    - ggf. Hinweise, wie man Admins für weitere Features anspricht.
+
+20.6 Funktionstoggles im Dashboard
+----------------------------------
+- Jede Funktion (`functions.<funktion>`) ist:
+  - im Dashboard sichtbar (sofern global freigegeben),
+  - pro Server aktivierbar/deaktivierbar.
+- Darstellung:
+  - Liste oder Grid mit Cards:
+    - Icon & Name der Funktion,
+    - kurze Beschreibung,
+    - Schalter „aktiv/inaktiv“,
+    - ggf. Link „Details“ → Unterseite mit detaillierten Settings für diese Funktion.
+- Änderungen am Toggle:
+  - werden direkt in `serverSettings.functions.<funktion>.aktiv` gespeichert,
+  - wirken sofort auf den Bot (Commands & Events prüfen diesen Wert).
+
+20.7 UI/UX-Grundsätze (Web)
+---------------------------
+- Visuelle Leitlinien:
+  - Tailwind CSS,
+  - Dark-Mode Standard,
+  - farbige, aber nicht überladene Graphen (Farben pro Funktion/Modul konsistent),
+  - großzügige Abstände, klare Hierarchien, keine überfrachteten Screens.
+- User Experience:
+  - Startseite zeigt die wichtigsten Infos in 3–6 Kern-Cards,
+  - tiefergehende Einstellungen auf separaten Tabs/Seiten, nicht alles auf einer Page,
+  - klare Hinweise, wenn man keine Rechte für einen Bereich hat („Du brauchst Rolle X, um das hier zu sehen“).
+- Sicherheit & Feedback:
+  - kritische Änderungen (z. B. Funktionen komplett deaktivieren, Sentinel-Settings) erfordern ggf. eine Bestätigungsabfrage,
+  - bei erfolgreichen Änderungen kurzes, klares Feedback (Toast/Alert).
+- Responsives Design:
+  - Dashboard funktioniert auf Desktop optimal,
+  - auf kleineren Geräten (Tablet/Laptop) skalieren die Cards & Navigation sinnvoll.
+
+
+==================================================
+21. COMMUNITY HUB & CLIP-QUEUE (GEPLANT)
+==================================================
+
+21.1 Ziel
+---------
+- Der Community Hub bündelt Community-bezogene Funktionen (Clips, Events, Leaderboards, Member Wall, Feedback) an einer Stelle – sowohl im Web als auch im Bot.
+- Die Clip-Queue ist die erste zentrale Funktion im Community Hub:
+  - Alle kurzformatigen Clips (Twitch, YouTube Shorts, Reels, Shorts, Stories) aus einem festgelegten Discord-Channel werden automatisiert gesammelt.
+  - Clips können bewertet, gefiltert und in einer „Watch-Queue“ im Web nacheinander angesehen werden.
+  - User sehen, welche Clips neu, ungesehen oder bereits gesehen sind.
+  - Die Clip-Queue dient als Grundlage für „Best-of“-Auswertungen (z. B. Monats-Highlights, Video-Ideen).
+
+21.2 Community Hub – Menü & Struktur (Web)
+------------------------------------------
+- Im Web-Dashboard gibt es einen eigenen Navigationspunkt:
+
+  - Community Hub (Hauptpunkt im Menü)
+
+    Geplante Unterbereiche:
+    - Clip-Queue (Clips & Highlights)
+    - Events (Community-Termine, Montagsrunde etc.)
+    - Leaderboards (Punkte, Aktivität, Rankings)
+    - Member Wall (Vorstellungen, Hall of Fame)
+    - Feedback (Ideen, Bugs, Umfragen)
+
+- Die Clip-Queue ist eine Unterseite des Community Hub und fokussiert sich ausschließlich auf kurzformatige Video-Clips.
+
+21.3 Clip-Quelle (Discord-Channel & Plattformen)
+------------------------------------------------
+- Alle Clips werden über einen fest definierten Discord-Channel eingesammelt, z. B. #clips oder #clip-queue.
+- Nur kurze Clips sind erlaubt, z. B.:
+  - Twitch Clips
+  - YouTube Shorts / kurze YouTube-Links
+  - Instagram Reels
+  - Instagram Stories (sofern sinnvoll einbindbar)
+  - optional später: TikTok, andere Short-Form-Plattformen
+
+- Grundregel:
+  - Nur Short-Form-Content, keine kompletten VODs, keine langen Streams.
+- Jede Discord-Nachricht in diesem Channel, die eine gültige Clip-URL enthält, erzeugt (nach Validierung) einen Clip-Eintrag im System.
+
+21.4 Datenmodell `Clip` (logisch)
+---------------------------------
+- Logisches Datenmodell für einen Clip (ohne konkrete TS-Definition, nur Struktur):
+
+  - id: string
+    - interne Clip-ID
+
+  - url: string
+    - Normalisierte Clip-URL (z. B. ohne Tracking-Parameter)
+    - Dient als Primärschlüssel zur Deduplizierung (keine doppelten Clips)
+
+  - plattform: 'twitch' | 'youtube' | 'instagram' | 'tiktok' | 'sonstigeShorts'
+    - Erkannt anhand der URL, für Einbettung & Darstellung
+
+  - titel: string
+    - Standardmäßig: aus der Discord-Nachricht oder aus der Plattform-API gelesen
+    - Optional überschreibbar (z. B. über Web-UI oder Mod-Tools)
+
+  - spielOderKategorie: string
+    - z. B. "League of Legends", "ARK", "Just Chatting", "IRL", "Community"
+
+  - eingereichtVon (Submitter-Liste, mit Opt-in):
+    - erstEinreicherId: string | null
+    - weitereEinreicherIds: string[]
+    - Anzeige im UI:
+      - Nur, wenn personenbezogenes Tracking und Namensanzeige erlaubt sind (siehe 21.8).
+      - Ansonsten: Anzeige als "(anonym)".
+
+    - Mehrfach-Einreichungen derselben URL führen nicht zu neuen Clip-Einträgen, sondern erweitern nur weitereEinreicherIds.
+
+  - votes: { emoji: string; anzahl: number }[]
+    - Liste von genutzten Bewertungs-Reactions bzw. Web-Votes:
+      - z. B. [ { emoji: '🔥', anzahl: 12 }, { emoji: '😂', anzahl: 5 } ]
+    - Dient als Basis für „Top-Clips“, „Hidden Gems“ etc.
+
+  - erstelltAm: string (ISO-Datum)
+    - Zeitpunkt, wann der Clip ins System aufgenommen wurde (erste Einreichung)
+
+- Eventbezug:
+  - Aktuell kein festes Feld für Event-Bezug vorgesehen (z. B. kein Pflicht-Link zu einem Event).
+  - Später optional erweiterbar über generische Tags/Kategorien, falls nötig.
+
+21.5 User-spezifischer Seen-Status & Badges
+-------------------------------------------
+- Der Seen-Status ist grundsätzlich user-spezifisch und wird nicht direkt im Clip selbst gespeichert, sondern als separate View-Tabelle (z. B. in einer ClipView-Entität):
+
+  - userId: string
+  - clipId: string
+  - gesehenAm?: string (ISO-Datum, optional)
+
+- Im UI werden pro Clip (rechts in der Queue-Liste und ggf. im großen Player-Bereich) folgende Badges angezeigt:
+
+  - 🟢 Ungesehen
+    - Der aktuelle User hat diesen Clip noch nie oder noch nicht als „gesehen“ markiert.
+
+  - ⚫ Gesehen
+    - Der aktuelle User hat diesen Clip bereits gesehen (automatisch oder manuell markiert, siehe unten).
+
+- Zusätzlich gibt es einen globalen „NEU“-Badge unabhängig vom User:
+
+  - z. B. "NEU" für Clips, deren erstelltAm nicht älter als 7 Tage ist.
+  - Darstellung z. B. als zusätzlicher, farbiger Badge ("NEU" / "NEW") neben dem Seen-Status.
+
+- Seen-Markierung:
+  - Automatisch:
+    - Ein Clip wird nach einem sinnvollen Schwellwert (z. B. 80 % abgespielt oder X Sekunden Mindestansicht) als „gesehen“ markiert.
+  - Manuell:
+    - Der User kann einen Clip explizit als „gesehen“ markieren (z. B. Button oder UI-Element „Als gesehen markieren“).
+
+21.6 Filter & Sortierung in der Clip-Queue (Web)
+-------------------------------------------------
+- In der rechten Queue-Spalte stehen oben Filter & Sortierung zur Verfügung, z. B.:
+
+  - Filter „Ansicht“:
+    - "Alle Clips"
+    - "Nur ungesehene Clips"
+    - "Nur neue Clips" (z. B. erstelltAm ≤ 7 Tage)
+
+  - Zeitraum-Filter:
+    - "Dieser Monat"
+    - "Letzter Monat"
+    - "Alle"
+
+  - Sortierung:
+    - "Neueste zuerst"
+    - "Meist gevotet" (z. B. nach votes-Summe)
+    - "Zufällig" (Shuffle-Mode für Binge-Feeling)
+
+- Filter „Nur ungesehene Clips“ nutzt den user-spezifischen Seen-Status (siehe 21.5) und blendet Clips aus, die der User bereits gesehen hat.
+- Filter „Nur neue Clips“ nutzt ausschließlich erstelltAm und ist unabhängig vom persönlichen Seen-Status.
+
+21.7 Queue-Verhalten & Navigation
+---------------------------------
+- Layout (nur konzeptionell, kein HTML):
+  - Links: großer Player mit dem aktuell ausgewählten Clip.
+  - Rechts: scrollbare Liste (Queue) mit den Clips entsprechend Filter/Sortierung.
+  - Unten unter dem Player: Navigation und Bedienelemente.
+
+- Verhalten beim Navigieren:
+  - Buttons unter dem Player:
+    - "Zurück" → vorheriger Clip in der aktuellen, gefilterten Queue.
+    - "Weiter" → nächster Clip in der aktuellen, gefilterten Queue.
+  - Optional:
+    - Toggle "Auto-Play" → nächster Clip wird automatisch geladen, sobald der aktuelle abgeschlossen ist.
+    - Button "Zurück zum Anfang" → springt zum ersten Clip der aktuellen Filter-/Sortier-Kombination.
+
+- Interaktion mit Seen-Status:
+  - Im Modus "Nur ungesehene Clips":
+    - Nach dem Abspielen wird der aktuelle Clip als "gesehen" markiert und aus der Liste entfernt.
+    - Der nächste Clip rückt automatisch nach und wird zum neuen aktuellen Clip.
+  - Im Modus "Alle Clips":
+    - Der Clip erhält lediglich das Badge ⚫ Gesehen, bleibt aber in der Liste sichtbar.
+
+21.8 Datenschutz, Opt-in & Anzeige „Eingereicht von“
+----------------------------------------------------
+- Eingereichte Clips & User-Namen:
+  - Ein Clip kann von mehreren Usern eingereicht worden sein (erstEinreicherId, weitereEinreicherIds).
+  - Die Anzeige im UI erfolgt abhängig von Datenschutz-/Tracking-Settings:
+
+    - Wenn Server-Tracking und User-Tracking erlaubt sind:
+      - Anzeige im Stil:
+        - "Eingereicht von User 1"
+        - "Eingereicht von User 1 & 2 weiteren"
+      - Konkrete Usernamen oder Nicknames dürfen genutzt werden.
+
+    - Wenn kein Opt-in oder Tracking deaktiviert:
+      - Einreichende User werden nicht namentlich genannt.
+      - Anzeige stattdessen als "(anonym)" oder neutraler Text (z. B. "Community-Einreichung").
+
+- Seen-Status & Tracking:
+  - User-spezifische ClipView-Einträge (Seen-Status) sind personenbezogene Daten.
+  - Speicherung nur, wenn:
+    - serverSettings.datenschutz.userTrackingErlaubt = true UND
+    - userSettings.datenschutz.trackingErlaubt = true.
+  - Wenn eine dieser Bedingungen nicht erfüllt ist:
+    - Es wird kein persönlicher Seen-Status gespeichert.
+    - Die Queue kann weiterhin globale "NEU"-Badges nutzen, aber keine 🟢/⚫-Unterscheidung pro User.
+
+- Anbindung an Sentinel:
+  - Datenschutz-Logik der Clip-Queue hängt an sentinel/datenschutz (Opt-in/Opt-out, siehe bestehende Sentinel-Regeln).
+
+21.9 Logging & Statistiken (Clip-Queue)
+---------------------------------------
+- Logging (aggregiert, keine sensiblen Inhalte im Volltext):
+  - Wann Clips neu aus Discord importiert werden (mit Kontext: Guild, Channel, Plattform).
+  - Fehler bei der URL-Erkennung oder Plattform-Validierung.
+  - Nutzung der Web-Queue (z. B. wie viele Clips in einem Zeitraum angesehen wurden, ohne personenbezogene Details).
+
+- Stats (über stats-manager):
+  - Aggregiert:
+    - Anzahl Clips pro Zeitraum und Plattform (Twitch/YouTube/Instagram).
+    - Anzahl Views pro Clip (gesamt).
+    - Anzahl Votes pro Clip / pro Plattform.
+    - Aktivität im Clip-Channel (z. B. wie viele Einreichungen pro Woche).
+  - Personenbezogene Stats (nur bei Opt-in):
+    - Wie viele Clips ein User gesehen hat.
+    - Optional: Beteiligung an Votes oder Einreichungen.
+
+21.10 Ort im Projekt (Bot & Web)
+--------------------------------
+- Bot-seitig (Clip-Erfassung & Votes):
+  - Geplantes Modul unter:
+    - src/bot/functions/video/
+      oder
+    - src/bot/functions/clips/
+  - Aufgaben:
+    - Nachrichten im festgelegten Clip-Channel auswerten, URLs validieren, Clip-Einträge anlegen.
+    - Reactions/Votes auf Clip-Nachrichten auswerten und auf das votes-Feld abbilden.
+    - Optional: Commands/Buttons für Moderation (z. B. Clip sperren, Titel anpassen).
+
+- Web-seitig (Community Hub & Clip-Queue):
+  - Geplante Routen, z. B.:
+    - web/community/hub → Community Hub Übersicht
+    - web/community/clip-queue → Clip-Queue-Ansicht mit Player + Queue
+  - Zugriff über Discord-Login (siehe Abschnitt "Web-Dashboard & Auth").
+
+==================================================
+22. WEITERE COMMUNITY- & DISCORD-FEATUREMODULE (IDEEN, GEPLANT)
+==================================================
+
+Hinweis: Dieser Abschnitt sammelt geplante Feature-Ideen, die mit discord.js technisch gut umsetzbar sind.
+Jede Idee soll später bei Umsetzung die Funktions-Planungs-Checkliste (Abschnitt 9) durchlaufen und ein eigenes Modul unter src/bot/functions/ erhalten.
+
+22.1 Tickets & Support
+----------------------
+- Modul-Idee: src/bot/functions/tickets/
+- Funktionen (geplant):
+  - Support-Tickets:
+    - User klickt auf einen Button → Bot erstellt Ticket-Channel/Thread.
+    - Kategorie-Auswahl (Technik, Orga, Bewerbung etc.) per Select-Menü.
+    - Auto-Logging beim Schließen (Status, Grund, Bearbeiter).
+  - Onboarding-/Bewerbungs-Formulare:
+    - Bewerbung für Mod-/Team-Rollen via Modal.
+    - Reviews in Mod-Channel mit Buttons „Annehmen“ / „Ablehnen“ / „Nachfragen“.
+  - Bug-/Feature-Tracker:
+    - Meldungen aus Discord werden gesammelt, kategorisiert und können im Web oder via Interface geordnet ausgewertet werden.
+
+22.2 Economy, XP & Progression
+------------------------------
+- Mögliche Module:
+  - src/bot/functions/economy/
+  - src/bot/functions/quests/ (oder integriert in ranks/user)
+
+- Features (geplant):
+  - Server-Währung:
+    - Coins / Punkte für Aktivität, Events, Siege, Votings.
+    - Shop-Command (Rollen, Titel, kosmetische Dinge wie Profil-Titel, spezielle Sounds).
+  - XP & Level-System (verzahnt mit ranks):
+    - XP für Messages, Voice-Minuten, Event-Teilnahmen (mit Anti-Spam-Logik).
+    - Level-Up-Rollen oder besondere Rechte.
+  - Quests & Aufgaben:
+    - Daily/Weekly-Quests („schreibe 5 sinnvolle Nachrichten im Help-Channel“, „nimm an einem Event teil“).
+    - Belohnungen in Form von XP, Coins, Badges.
+
+22.3 Content- & Media-Automation
+--------------------------------
+- Mögliche Module:
+  - src/bot/functions/news/
+  - src/bot/functions/announcements/ (oder Erweiterung von stream/video)
+
+- Features (geplant):
+  - Auto-News & Feeds:
+    - YouTube/Twitch/Blog/RSS-Feeds → automatische Posts in News-Channels mit Embeds.
+  - Clip-/Highlight-Sammelfunktionen (Erweiterung zur Clip-Queue):
+    - Voting für „Clip des Monats“ direkt in Discord.
+    - Sammeln von „Highlight“-Kandidaten für Video-Schnitt (z. B. Web-Export-Liste).
+  - Release-/Patchnotes-Bot:
+    - Automatisierte Veröffentlichung von DevLogs/Changelogs im Discord.
+
+22.4 Admin-Tools & Analyse
+--------------------------
+- Modul-Idee: src/bot/functions/admin-tools/ oder Integration in stats/sentinel/monitoring.
+
+- Features (geplant):
+  - Server-Health & Analyse:
+    - Welche Channels werden aktiv genutzt, welche sind „tot“?
+    - Peak-Zeiten & Aktivitätsheatmaps.
+  - Permission-Check:
+    - /rechte @user zeigt effektiv vererbte Rechte & Rollen kompakt an.
+  - Config-Shortcuts:
+    - Botside-Commands zur Anpassung von serverSettings, z. B. Poll-Channel setzen, Stream-Channel setzen, ohne Web-Dashboard öffnen zu müssen.
+
+22.5 Voice- & Live-Features
+---------------------------
+- Mögliche Module:
+  - src/bot/functions/voice/
+  - Erweiterungen in events, stream, reminder.
+
+- Features (geplant):
+  - Temp-Voice-Channels:
+    - User klickt „Eigener Channel“ → Bot erstellt temporären Voice-Channel, löscht ihn bei Inaktivität wieder.
+  - Voice-Stats:
+    - Erfassung von Voice-Minuten/Teilnahmen (aggregiert, mit Opt-in für personenbezogen).
+  - Live-Monitoring & Overlays:
+    - Aggregierte Voice-/Event-Daten können per Webhook für Stream-Overlays bereitgestellt werden (z. B. „Aktive Nutzer gerade im Voice“).
+
+22.6 KI- / Smart-Features (ergänzend zu ai)
+-------------------------------------------
+- Erweiterungen innerhalb von src/bot/functions/ai/ und Tools:
+
+- Features (geplant):
+  - Smart-Reply / Auto-Suggest:
+    - Nachrichtenerkennung → Bot schlägt Buttons, Commands oder Hilfe-Artikel vor, statt immer eine Komplett-Antwort zu generieren.
+  - FAQ-/Knowledge-Base-Suche:
+    - User-Fragen können über Tools auf interne Docs/FAQ/Confluence/JSON zugreifen und passende Antworten inkl. Links liefern.
+  - Context-Aware-Mentions:
+    - @MEAT nutzt nicht nur Text, sondern auch Tools (Poll-Status, Events, Stats), um wirklich kontextbezogen zu antworten.
+
+22.7 Multi-Server- & Netzwerk-Features
+--------------------------------------
+- Mögliche Module / Erweiterungen:
+  - src/bot/functions/network/
+  - Ergänzungen in stats, events, ranks.
+
+- Features (geplant):
+  - Global-Stats & Netzwerk-Übersicht:
+    - Aggregierte Nutzung über mehrere Server hinweg (für Bot-Owner).
+  - Cross-Server-Events:
+    - Ankündigungen/Events, die gleichzeitig in mehreren Servers gepostet werden können.
+  - Shared-Leaderboards:
+    - Globale Rankings (z. B. „Top-Voter“, „Top-Event-Teilnehmer“) über mehrere Communities, nur sichtbar für freigegebene Server.
+
+22.8 UX- / Politur-Features
+---------------------------
+- Querschnittsfunktionen, die die User Experience verbessern, unabhängig vom Modul:
+
+  - Reaktions-Macros:
+    - Bestimmte Phrasen (z. B. „Bot Bug“) triggern selten, aber gezielt MEAT-typische Antworten + Feedback-Button.
+  - User-Profile Cards (visuell):
+    - Schicke, visuelle Profilkarten (z. B. Skill-Card, Community-Card) auf Basis von user, ranks, stats.
+  - Seasonal Modes:
+    - Saisonal aktivierbarer „Weihnachten-/Halloween-/Event“-Modus, der Farben, Icons und Tonalität (leicht) anpasst.
+
+Diese Abschnitte definieren die geplante Clip-Queue im Community Hub und markieren weitere sinnvolle, später ausbaubare Module, die mit discord.js sehr gut realisierbar sind. Bei der tatsächlichen Implementierung einzelner Module ist die Funktions-Planungs-Checkliste (Abschnitt 9) anzuwenden, inkl. Anbindung an Logging, Stats, Sentinel und Settings.
+
+
+
+
+==================================================
+VAULT-ERWEITERUNG: USER-NOTIZEN & GPT (VORMERKUNG)
+==================================================
+
+- Für `vault` ist vorgesehen, später auch „Notizen über User“ speichern zu können (Beispiele: bevorzugte Spiele, Orga-Infos, Rollenwünsche).
+- WICHTIGE REGEL:
+  - Solche Notizen dürfen NUR erstellt werden, wenn in der betreffenden Nachricht mindestens ein User über @Mention genannt wird (`@Name`).
+    - Ohne @Mention → keine Speicherung, da Opt-in nicht geprüft werden kann.
+- Wenn mehrere User in einer Nachricht erwähnt werden:
+  - können auch Beziehungen zwischen den genannten Usern gespeichert werden (z. B. „spielt oft mit @UserA zusammen“),
+  - jedoch gilt:
+    - für **jeden** erwähnten User muss `userSettings.datenschutz.trackingErlaubt = true` sein,
+    - der Server muss Tracking erlauben (`serverSettings.datenschutz.userTrackingErlaubt = true`).
+  - Wenn mindestens einer der genannten User Tracking NICHT erlaubt (oder noch nicht entschieden hat),
+    - wird die gesamte Vault-Notiz abgelehnt (keine Speicherung).
+- Diese Daten gelten als personenbezogen; ein späterer, eigener Vault-Regelabschnitt soll definieren:
+  - welche Kategorien erlaubt sind,
+  - wer Einsicht hat (Mods, User selbst, Admin),
+  - wie Löschung und optionaler GPT-Zugriff geregelt sind.
+
+==================================================
+ENDE DER BASIS-REGELDATEI
+==================================================
+
+Dieses Dokument ist die zentrale Grundlage für den Neuaufbau des MEAT-Bots und des zugehörigen Dashboards.
+Alles, was neu geplant und implementiert wird, soll sich daran orientieren.
+
+
+Keine ausgewähltKeine ausgewählt
+ChatGPT kann Fehler machen. Überprüfe wichtige Informationen. Siehe Cookie-Voreinstellungen.

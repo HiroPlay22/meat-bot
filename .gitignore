@@ -1,0 +1,15 @@
+# Node
+node_modules
+dist
+
+# Env / Secrets
+.env
+.env.*
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea
+
+# VS Code Settings (optional ins Repo, daher hier erstmal ignorieren)
+.vscode

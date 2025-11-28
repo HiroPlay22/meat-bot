@@ -1,0 +1,21 @@
+// FILE: prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Dein Modell:
+model CommandUsage {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+
+  guildId     String?  @db.VarChar(32)
+  channelId   String?  @db.VarChar(32)
+  userId      String?  @db.VarChar(32)
+
+  commandName String
+}
