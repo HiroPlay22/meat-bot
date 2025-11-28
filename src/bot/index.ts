@@ -4,6 +4,7 @@ import 'dotenv/config';
 import { Client, GatewayIntentBits, Events, type Interaction } from 'discord.js';
 import { slashCommands } from './commands/index.js';
 import { logInfo, logWarn, logError } from './general/logging/logger.js';
+import { trackCommandUsage } from './general/stats/statsManager.js';
 
 const token = process.env.DISCORD_TOKEN;
 
@@ -53,6 +54,9 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
   try {
     await command.execute(interaction);
 
+    // 🔹 Command-Usage in der DB tracken
+    await trackCommandUsage(interaction);
+
     logInfo(`Command /${interaction.commandName} erfolgreich beendet`, {
       functionName: 'interaction',
       guildId: interaction.guildId ?? undefined,
@@ -72,7 +76,8 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
 
     try {
       await interaction.reply({
-        content: 'Uff. Da ist was schiefgelaufen. Sag Hiro, er soll mal in die Logs schauen.',
+        content:
+          'Uff. Da ist was schiefgelaufen. Sag Hiro, er soll mal in die Logs schauen.',
         ephemeral: true,
       });
     } catch {
