@@ -37,3 +37,13 @@ model UserTrackingConsent {
 
   @@unique([guildId, userId])
 }
+
+model CommandStatsGuildDaily {
+  id          String   @id @default(cuid())
+  date        DateTime
+  guildId     String   @db.VarChar(32)
+  commandName String
+  totalCount  Int      @default(0)
+
+  @@unique([date, guildId, commandName], name: "date_guildId_commandName")
+}
