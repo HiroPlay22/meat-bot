@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx src/bot/index.ts",
+    "prebuild": "prisma generate",
     "build": "tsc",
     "start": "node dist/bot/index.js",
     "register:dev": "tsx src/bot/registerCommands.ts",
