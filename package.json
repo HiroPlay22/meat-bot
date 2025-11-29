@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "tsx src/bot/index.ts",
-    "prebuild": "prisma generate",
     "build": "tsc && node scripts/copy-texts.cjs",
     "start": "node dist/bot/index.js",
     "register:dev": "tsx src/bot/registerCommands.ts",
     "clear:global": "tsx src/bot/clearGlobalCommands.ts",
     "prisma:migrate": "prisma migrate dev --name init",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+
+    "web:start": "serve src/web -l 8080"
   },
   "engines": {
     "node": ">=24.0.0"
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "prisma": "^7.0.1",
+    "serve": "^14.2.0",
     "tsx": "^4.19.0",
     "typescript": "^5.6.0"
   }
