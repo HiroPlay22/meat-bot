@@ -12,7 +12,7 @@ import type { TrackingStatusTyp } from './datenschutz.service.js';
 const texte = ladeTexte('sentinel/datenschutz', 'de');
 
 // TODO: Später aus Konfiguration / Dashboard laden
-const DATENSCHUTZ_URL = 'https://example.com/meat/datenschutz';
+const DATENSCHUTZ_URL = 'https://www.meatbot.de/datenschutz';
 
 export function baueDatenschutzEmbedUndKomponenten(
   status: TrackingStatusTyp,
