@@ -1,0 +1,27 @@
+{
+  "command": {
+    "name": "stats",
+    "description": "Zeigt M.E.A.T.-Statistiken für diesen Discord-Server."
+  },
+  "views": {
+    "guild": {
+      "title": "Server-Übersicht",
+      "description": "Allgemeine M.E.A.T.-Statistiken für diesen Server."
+    },
+    "commands": {
+      "title": "Befehls-Statistiken",
+      "description": "Nutzung der M.E.A.T.-Befehle auf diesem Server."
+    },
+    "me": {
+      "title": "Deine M.E.A.T.-Stats",
+      "noTracking": "Ich kann dir aktuell keine persönlichen Statistiken anzeigen, weil du kein Tracking erlaubt hast.",
+      "noData": "Es liegen noch keine Daten zu deinen Befehlen vor.",
+      "hintDatenschutz": "Du kannst deine Datenschutz-Einstellungen jederzeit über den Button unten anpassen."
+    }
+  },
+  "buttons": {
+    "viewGuild": "Allgemein",
+    "viewCommands": "Commands",
+    "viewMe": "Meine Stats"
+  }
+}

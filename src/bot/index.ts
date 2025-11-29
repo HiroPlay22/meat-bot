@@ -6,12 +6,15 @@ import {
   Events,
   GatewayIntentBits,
   type Interaction,
-  type ButtonInteraction,
 } from 'discord.js';
 import { slashCommands } from './commands/index.js';
-import { logError, logInfo, logWarn } from './general/logging/logger.js';
+import {
+  logError,
+  logInfo,
+  logWarn,
+} from './general/logging/logger.js';
 import { trackCommandUsage } from './general/stats/statsManager.js';
-import { bearbeiteDatenschutzButton } from './functions/sentinel/datenschutz/datenschutz.buttons.js';
+import { handleStatsButtonInteraction } from './functions/stats/overview/stats.buttons.js';
 
 const token = process.env.DISCORD_TOKEN;
 
@@ -34,33 +37,32 @@ client.once(Events.ClientReady, (readyClient) => {
   });
 });
 
+// Einfacher zentraler Handler – später wandert das in eine eigene handler.ts
 client.on(Events.InteractionCreate, async (interaction: Interaction) => {
-  try {
-    // 1) Slash-Commands
-    if (interaction.isChatInputCommand()) {
-      const command = slashCommands.get(interaction.commandName);
-      if (!command) {
-        logWarn(`Unbekannter Command: /${interaction.commandName}`, {
-          functionName: 'interaction',
-          guildId: interaction.guildId ?? undefined,
-          channelId: interaction.channelId,
-          userId: interaction.user.id,
-          commandName: interaction.commandName,
-        });
-        return;
-      }
-
-      logInfo(`Starte Command /${interaction.commandName}`, {
+  // Slash-Commands
+  if (interaction.isChatInputCommand()) {
+    const command = slashCommands.get(interaction.commandName);
+    if (!command) {
+      logWarn(`Unbekannter Command: /${interaction.commandName}`, {
         functionName: 'interaction',
         guildId: interaction.guildId ?? undefined,
         channelId: interaction.channelId,
         userId: interaction.user.id,
         commandName: interaction.commandName,
       });
+      return;
+    }
 
+    logInfo(`Starte Command /${interaction.commandName}`, {
+      functionName: 'interaction',
+      guildId: interaction.guildId ?? undefined,
+      channelId: interaction.channelId,
+      userId: interaction.user.id,
+      commandName: interaction.commandName,
+    });
+
+    try {
       await command.execute(interaction);
-
-      // Nach erfolgreicher Ausführung: Stats-Tracking
       await trackCommandUsage(interaction);
 
       logInfo(`Command /${interaction.commandName} erfolgreich beendet`, {
@@ -70,42 +72,45 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
         userId: interaction.user.id,
         commandName: interaction.commandName,
       });
+    } catch (error) {
+      logError(`Fehler bei /${interaction.commandName}`, {
+        functionName: 'interaction',
+        guildId: interaction.guildId ?? undefined,
+        channelId: interaction.channelId,
+        userId: interaction.user.id,
+        commandName: interaction.commandName,
+        extra: { error },
+      });
 
-      return;
-    }
-
-    // 2) Buttons
-    if (interaction.isButton()) {
-      const buttonInteraction = interaction as ButtonInteraction;
-
-      if (buttonInteraction.customId.startsWith('sentinel_datenschutz_')) {
-        await bearbeiteDatenschutzButton(buttonInteraction);
-        return;
-      }
-
-      // andere Button-Typen kommen später hierhin
-      return;
-    }
-
-    // Weitere Interaktionstypen (Modals etc.) später
-  } catch (error) {
-    logError('Fehler im Interaction-Handler', {
-      functionName: 'interactionRoot',
-      extra: { error },
-    });
-
-    if (interaction.isRepliable() && !(interaction as any).replied) {
       try {
-        await interaction.reply({
-          content:
-            'Uff. Irgendetwas ist im Interaktions-Handler schiefgelaufen. Bitte versuche es später erneut.',
-          ephemeral: true,
-        });
+        if (interaction.replied || interaction.deferred) {
+          await interaction.followUp({
+            content:
+              'Uff. Da ist was schiefgelaufen. Sag Hiro, er soll mal in die Logs schauen.',
+            ephemeral: true,
+          });
+        } else {
+          await interaction.reply({
+            content:
+              'Uff. Da ist was schiefgelaufen. Sag Hiro, er soll mal in die Logs schauen.',
+            ephemeral: true,
+          });
+        }
       } catch {
         // Ignorieren
       }
     }
+
+    return;
   }
+
+  // Buttons (erstmal nur /stats-Buttons)
+  if (interaction.isButton()) {
+    await handleStatsButtonInteraction(interaction);
+    return;
+  }
+
+  // Andere Interaction-Typen lassen wir vorerst liegen (Selects, Modals, ...).
 });
 
 client

@@ -38,7 +38,7 @@ export function baueDatenschutzEmbedUndKomponenten(
       new ButtonBuilder()
         .setCustomId('sentinel_datenschutz_allow')
         .setLabel(texte.buttons.allow)
-        .setStyle(ButtonStyle.Primary),
+        .setStyle(ButtonStyle.Success),
       new ButtonBuilder()
         .setCustomId('sentinel_datenschutz_deny')
         .setLabel(texte.buttons.deny)
@@ -61,7 +61,7 @@ export function baueDatenschutzEmbedUndKomponenten(
       new ButtonBuilder()
         .setCustomId('sentinel_datenschutz_allow')
         .setLabel(texte.buttons.allow)
-        .setStyle(ButtonStyle.Primary),
+        .setStyle(ButtonStyle.Success),
       new ButtonBuilder()
         .setCustomId('sentinel_datenschutz_denied')
         .setLabel(texte.buttons.denied)
