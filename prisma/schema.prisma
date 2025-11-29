@@ -8,7 +8,6 @@ datasource db {
   provider = "postgresql"
 }
 
-// Dein Modell:
 model CommandUsage {
   id          String   @id @default(cuid())
   createdAt   DateTime @default(now())
@@ -18,4 +17,23 @@ model CommandUsage {
   userId      String?  @db.VarChar(32)
 
   commandName String
+}
+
+enum TrackingStatus {
+  NONE
+  ALLOWED
+  DENIED
+}
+
+model UserTrackingConsent {
+  id        String         @id @default(cuid())
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  guildId   String         @db.VarChar(32)
+  userId    String         @db.VarChar(32)
+  status    TrackingStatus
+  version   String?        @db.VarChar(32)
+
+  @@unique([guildId, userId])
 }

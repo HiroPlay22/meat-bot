@@ -1,0 +1,30 @@
+{
+  "command": {
+    "name": "datenschutz",
+    "description": "Verwalte deine Datenschutz- und Tracking-Einstellungen."
+  },
+  "embed": {
+    "title": "Sentinel-M.E.A.T. – Datenschutz & Tracking",
+    "statusLabel": "Dein aktueller Status auf diesem Server:",
+    "status": {
+      "none": "Standard: Nur anonyme Statistiken (keine User-ID gespeichert).",
+      "allowed": "Tracking AKTIV – deine User-ID darf für Statistiken verwendet werden.",
+      "denied": "Tracking ABGELEHNT – es werden nur anonyme Statistiken gespeichert."
+    },
+    "description": "M.E.A.T. sammelt Nutzungsdaten, um Befehle zu verbessern, Statistiken zu erstellen und Features für diesen Server anzupassen.\n\nStandardmäßig werden deine Aktionen nur anonym gezählt.\n\nWenn du zustimmst, darf M.E.A.T. deine Discord-User-ID pro Befehl speichern, um:\n• persönliche Statistiken und Achievements zu ermöglichen,\n• Fehlersuche zu erleichtern,\n• serverbezogene Auswertungen genauer zu machen.\n\nDu kannst deine Entscheidung jederzeit ändern oder widerrufen. Weitere Details findest du auf der verlinkten Datenschutz-Seite."
+  },
+  "buttons": {
+    "allow": "Tracking zulassen",
+    "deny": "Tracking ablehnen",
+    "revoke": "Tracking widerrufen",
+    "active": "Tracking aktiv",
+    "denied": "Tracking abgelehnt",
+    "openPage": "Datenschutz-Infos öffnen"
+  },
+  "responses": {
+    "changedToAllowed": "Alles klar – ab jetzt darf M.E.A.T. deine User-ID für Statistiken verwenden. Du kannst das jederzeit wieder ändern.",
+    "changedToDenied": "Tracking wurde deaktiviert. Ab jetzt werden deine Aktionen nur noch anonym gezählt.",
+    "noChange": "Deine Einstellung war bereits so gesetzt.",
+    "error": "Uff. Da ist etwas schiefgelaufen beim Speichern deiner Einstellung. Bitte versuche es später erneut."
+  }
+}
