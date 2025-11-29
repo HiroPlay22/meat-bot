@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx src/bot/index.ts",
     "prebuild": "prisma generate",
-    "build": "tsc",
+    "build": "tsc && node scripts/copy-texts.cjs",
     "start": "node dist/bot/index.js",
     "register:dev": "tsx src/bot/registerCommands.ts",
     "clear:global": "tsx src/bot/clearGlobalCommands.ts",
