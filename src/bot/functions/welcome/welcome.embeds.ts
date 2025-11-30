@@ -29,20 +29,24 @@ function ersetzePlatzhalter(
 }
 
 /**
- * Datum hübsch auf DE formatieren, z. B. "20. Juni 2025 18:14"
+ * Datum hübsch auf DE formatieren, z. B. "20. Juni 2025"
+ * (ohne Uhrzeit)
  */
 function formatiereBeitrittsDatum(date: Date): string {
   return new Intl.DateTimeFormat('de-DE', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
   }).format(date);
 }
 
 /**
  * Erstellt das Willkommens-Embed für einen neuen User oder Bot.
+ * Layout:
+ *  - Zeile: (Icon) Willkommen @username
+ *  - Zitatblock mit Random-Text
+ *  - Dreispaltige Infozeile ohne Überschriften:
+ *      [user-icon] Name   |   [users-icon] #Nummer   |   [calendar-icon] Datum
  */
 export function erstelleWillkommensEmbed(
   member: GuildMember,
@@ -77,22 +81,10 @@ export function erstelleWillkommensEmbed(
     platzhalter,
   );
 
-  // wird jetzt wirklich benutzt → kein TS-Warning mehr
-  const memberCountZeile = ersetzePlatzhalter(
-    texte.embed.memberCountZeile,
-    platzhalter,
-  );
-
-  // Titel mit Platzhaltern, z.B.:
-  // "Scanner meldet Anwesenheit von {displayName} auf {serverName}."
-  const titelVorlage = istBot ? texte.embed.titelBot : texte.embed.titelUser;
-  const titel = ersetzePlatzhalter(titelVorlage, platzhalter);
-
   const nameIcon = safe(emoji.meat_members);
   const nummerIcon = safe(emoji.meat_users);
   const datumIcon = safe(emoji.meat_calendar);
   const headerIcon = safe(emoji.meat_avatar);
-  const memberCountFooterIcon = safe(emoji.meat_users);
 
   // Header-Zeile + Zitatblock
   const headerLine = `${headerIcon} **Willkommen ${platzhalter.mention}**`;
@@ -109,7 +101,7 @@ ${quoteBlock}
 
   const embed = new EmbedBuilder()
     .setColor(0x5865f2) // später via Style-System
-    .setTitle(titel)
+    // kein Title mehr – Überschrift ist jetzt rein in der Description
     .setDescription(beschreibung)
     .setThumbnail(
       member.user.displayAvatarURL({
@@ -119,24 +111,24 @@ ${quoteBlock}
     )
     .addFields(
       {
-        name: `${nameIcon} Name`,
-        value: platzhalter.displayName || platzhalter.username,
+        // kein "Name"-Header – wir nutzen einen Zero-Width-Space
+        name: '\u200b',
+        value: `${nameIcon} ${platzhalter.displayName || platzhalter.username}`,
         inline: true,
       },
       {
-        name: `${nummerIcon} Nummer`,
-        value: `#${platzhalter.memberNumber}`,
+        name: '\u200b',
+        value: `${nummerIcon} #${platzhalter.memberNumber}`,
         inline: true,
       },
       {
-        name: `${datumIcon} Beitritt`,
-        value: joinDateText,
+        name: '\u200b',
+        value: `${datumIcon} ${joinDateText}`,
         inline: true,
       },
-    )
-    .setFooter({
-      text: `${memberCountFooterIcon} ${memberCountZeile}`,
-    });
+    );
+
+  // kein Footer mehr
 
   return embed;
 }
