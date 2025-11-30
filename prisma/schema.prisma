@@ -6,6 +6,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  // url = env("DATABASE_URL")  // ← falls bei dir schon vorhanden, wieder einsetzen
 }
 
 model CommandUsage {
@@ -46,4 +47,37 @@ model CommandStatsGuildDaily {
   totalCount  Int      @default(0)
 
   @@unique([date, guildId, commandName], name: "date_guildId_commandName")
+}
+
+// 🔹 Polls für Montags-Runde
+
+enum PollType {
+  MONTAG
+}
+
+enum PollStatus {
+  ACTIVE
+  CLOSED
+}
+
+model Poll {
+  id               String     @id @default(cuid())
+  guildId          String     @db.VarChar(32)
+
+  type             PollType
+  status           PollStatus @default(ACTIVE)
+
+  question         String
+  discordChannelId String     @db.VarChar(32)
+  discordMessageId String     @db.VarChar(32)
+
+  startedAt        DateTime   @default(now())
+  endsAt           DateTime?
+  createdByUserId  String     @db.VarChar(32)
+  closedAt         DateTime?
+
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  @@index([guildId, type, status])
 }

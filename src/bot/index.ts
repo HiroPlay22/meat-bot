@@ -18,6 +18,7 @@ import {
 import { trackCommandUsage } from './general/stats/statsManager.js';
 import { handleStatsButtonInteraction } from './functions/stats/overview/stats.buttons.js';
 import { bearbeiteDatenschutzButton } from './functions/sentinel/datenschutz/datenschutz.buttons.js';
+import { handlePollButtonInteraction } from './functions/polls/poll.buttons.js';
 
 const token = process.env.DISCORD_TOKEN;
 
@@ -122,7 +123,13 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
         return;
       }
 
-      // 2) Alle anderen Buttons → Stats-Handler (wie vorher)
+      // 2) Poll-Buttons (alles mit "poll_")
+      if (customId.startsWith('poll_')) {
+        await handlePollButtonInteraction(buttonInteraction);
+        return;
+      }
+
+      // 3) Alle anderen Buttons → Stats-Handler (wie vorher)
       await handleStatsButtonInteraction(buttonInteraction);
       return;
     } catch (error) {
@@ -131,7 +138,7 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
         guildId: interaction.guildId ?? undefined,
         channelId: interaction.channelId,
         userId: interaction.user.id,
-        extra: { error },
+        extra: { error, customId },
       });
 
       try {

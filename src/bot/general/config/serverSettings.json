@@ -5,7 +5,7 @@
       "userTrackingErlaubt": false
     },
     "logging": {
-      "aktiv": true,
+      "aktiv": false,
       "logLevel": "info",
       "logChannelId": null
     },
@@ -15,12 +15,25 @@
         "loggingAktiv": true,
         "logLevel": "info",
         "logChannelId": "1444665947431501998",
+        "statsAktiv": false,
+        "ephemeralStandard": false,
+        "spezifisch": {
+          "welcomeChannelId": "1363882924557992169",
+          "begruesseBots": true
+        }
+      },
+      "polls": {
+        "montag": {
+          "aktiv": true,
+          "loggingAktiv": true,
+          "logLevel": "info",
+          "logChannelId": "1444665947431501998",
           "statsAktiv": false,
-          "ephemeralStandard": false,
+          "ephemeralStandard": true,
           "spezifisch": {
-            "welcomeChannelId": "1363882924557992169",
-            "begruesseBots": true
+            "announcementChannelId": "1444685242165366989"
           }
+        }
       }
     }
   }

@@ -142,6 +142,8 @@ async function sendeInGuildLogChannel(
     const settings = await ladeServerEinstellungen(guildId);
     const logging = settings.logging;
 
+    // 🔒 TS-safe: erst checken, dann benutzen
+    if (!logging) return;
     if (!logging.aktiv || !logging.logChannelId) return;
     if (!levelErlaubt(level, logging.logLevel)) return;
     if (!discordClient) return;

@@ -2,6 +2,12 @@
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
+export interface GlobalLoggingSettings {
+  aktiv: boolean;
+  logLevel: LogLevel;
+  logChannelId: string | null;
+}
+
 export interface FunktionsBasisEinstellungen {
   aktiv: boolean;
   loggingAktiv: boolean;
@@ -13,6 +19,8 @@ export interface FunktionsBasisEinstellungen {
   spezifisch?: Record<string, any>;
 }
 
+// 🔹 Welcome-Funktion
+
 export interface WelcomeSpezifischSettings {
   welcomeChannelId?: string;
   begruesseBots?: boolean;
@@ -23,26 +31,38 @@ export interface WelcomeFunktionsEinstellungen
   spezifisch?: WelcomeSpezifischSettings;
 }
 
-export interface FunktionenSettings {
-  // weitere Funktionen später ergänzen
-  welcome?: WelcomeFunktionsEinstellungen;
+// 🔹 Polls / Montags-Runde
+
+export interface PollMontagSpezifischSettings {
+  announcementChannelId?: string | null;
 }
+
+export interface PollMontagFunktionsEinstellungen
+  extends FunktionsBasisEinstellungen {
+  spezifisch?: PollMontagSpezifischSettings;
+}
+
+export interface PollsFunktionsEinstellungen {
+  montag?: PollMontagFunktionsEinstellungen;
+}
+
+export interface FunktionenSettings {
+  welcome?: WelcomeFunktionsEinstellungen;
+  polls?: PollsFunktionsEinstellungen;
+}
+
+// 🔹 Datenschutz
 
 export interface DatenschutzSettings {
   userTrackingErlaubt: boolean;
 }
 
-// 🔹 NEU: Globales Logging pro Server (Ruleset-Style, aber schlank)
-export interface LoggingSettings {
-  aktiv: boolean;
-  logLevel: LogLevel;
-  logChannelId: string | null;
-}
+// 🔹 ServerSettings – GLOBAL
 
 export interface ServerSettings {
   sprache: 'de' | 'en';
   datenschutz: DatenschutzSettings;
-  logging: LoggingSettings;
+  logging?: GlobalLoggingSettings;      // 👈 wichtig für logger.ts
   functions: FunktionenSettings;
 }
 

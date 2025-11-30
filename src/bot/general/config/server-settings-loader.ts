@@ -6,13 +6,13 @@ import type {
   AlleServerSettings,
   ServerSettings,
   WelcomeFunktionsEinstellungen,
-  LoggingSettings,
+  PollMontagFunktionsEinstellungen,
+  GlobalLoggingSettings,
 } from './server-settings-schema.js';
 
 let cache: AlleServerSettings | null = null;
 
 // Pfad relativ zum Projekt-Root (process.cwd())
-// → funktioniert lokal (src) und auf dem Server (dist), solange src mitdeployt wird.
 const SERVER_SETTINGS_RELATIVE_PATH = join(
   'src',
   'bot',
@@ -34,6 +34,16 @@ async function ladeRohServerSettings(): Promise<AlleServerSettings> {
   return json;
 }
 
+// 🔹 Defaults
+
+function baueGlobalLoggingDefaults(): GlobalLoggingSettings {
+  return {
+    aktiv: false,
+    logLevel: 'info',
+    logChannelId: null,
+  };
+}
+
 function baueWelcomeDefaults(): WelcomeFunktionsEinstellungen {
   return {
     aktiv: false,
@@ -49,12 +59,17 @@ function baueWelcomeDefaults(): WelcomeFunktionsEinstellungen {
   };
 }
 
-// 🔹 NEU: Globales Logging-Default pro Server
-function baueLoggingDefaults(): LoggingSettings {
+function bauePollMontagDefaults(): PollMontagFunktionsEinstellungen {
   return {
     aktiv: false,
+    loggingAktiv: true,
     logLevel: 'info',
     logChannelId: null,
+    statsAktiv: false,
+    ephemeralStandard: true,
+    spezifisch: {
+      announcementChannelId: null,
+    },
   };
 }
 
@@ -64,9 +79,12 @@ function baueServerDefaults(): ServerSettings {
     datenschutz: {
       userTrackingErlaubt: false,
     },
-    logging: baueLoggingDefaults(),
+    logging: baueGlobalLoggingDefaults(),
     functions: {
       welcome: baueWelcomeDefaults(),
+      polls: {
+        montag: bauePollMontagDefaults(),
+      },
     },
   };
 }
@@ -84,7 +102,6 @@ export async function ladeServerEinstellungen(
   const defaults = baueServerDefaults();
 
   if (!settings) {
-    // Noch nichts konfiguriert → Default, später kann man das vom Dashboard aus speichern.
     return defaults;
   }
 
@@ -92,15 +109,23 @@ export async function ladeServerEinstellungen(
     ...defaults,
     ...settings,
     logging: {
-      ...defaults.logging,
-      ...(settings as Partial<ServerSettings>).logging,
+      ...defaults.logging!,
+      ...(settings.logging ?? {}),
     },
     functions: {
       ...defaults.functions,
       ...settings.functions,
       welcome: {
         ...defaults.functions.welcome!,
-        ...settings.functions.welcome,
+        ...settings.functions?.welcome,
+      },
+      polls: {
+        ...defaults.functions.polls,
+        ...settings.functions?.polls,
+        montag: {
+          ...defaults.functions.polls?.montag!,
+          ...settings.functions?.polls?.montag,
+        },
       },
     },
   };

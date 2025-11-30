@@ -6,6 +6,7 @@ import { pingCommand } from './general/ping.js';
 import { datenschutzCommand } from '../functions/sentinel/datenschutz/datenschutz.command.js';
 import { statsCommand } from '../functions/stats/overview/stats.command.js';
 import { welcomeTestCommand } from './dev/welcomeTest.js';
+import { pollCommand } from '../functions/polls/poll.command.js';
 
 // Map: commandName -> Command-Objekt
 export const slashCommands = new Collection<string, SlashCommand>();
@@ -16,6 +17,7 @@ const alleCommands: SlashCommand[] = [
   datenschutzCommand,
   statsCommand,
   welcomeTestCommand,
+  pollCommand,          // 👈 NEU
 ];
 
 for (const command of alleCommands) {
