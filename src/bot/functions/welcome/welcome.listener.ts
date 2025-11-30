@@ -5,7 +5,7 @@ import {
   GuildMember,
   TextChannel,
   NewsChannel,
-  ThreadChannel
+  ThreadChannel,
 } from 'discord.js';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -14,6 +14,7 @@ import { dirname, join } from 'node:path';
 import { ladeServerEinstellungen } from '../../general/config/server-settings-loader.js';
 import type { WelcomeTexte } from './welcome.embeds.js';
 import { erstelleWillkommensEmbed } from './welcome.embeds.js';
+import { reagiereMitWelcomeEmotes } from './welcome.reactions.js';
 
 type TextChannelLike = TextChannel | NewsChannel | ThreadChannel;
 
@@ -38,8 +39,8 @@ async function ladeWelcomeTexte(): Promise<WelcomeTexte> {
 
 /**
  * Registriert den Listener für guildMemberAdd und versendet bei neuen
- * Mitgliedern ein Embed in den konfigurierten Welcome-Channel.
- * Bots werden getrennt behandelt (eigene Texte, oder komplett deaktiviert).
+ * Mitgliedern ein Embed in den konfigurierten Welcome-Channel +
+ * reagiert mit Hype-Emotes.
  */
 export function registriereWelcomeListener(client: Client): void {
   client.on('guildMemberAdd', async (member: GuildMember) => {
@@ -81,11 +82,14 @@ export function registriereWelcomeListener(client: Client): void {
       const texte = await ladeWelcomeTexte();
       const embed = erstelleWillkommensEmbed(member, texte);
 
-      await channel.send({ embeds: [embed] });
+      const message = await channel.send({ embeds: [embed] });
+
+      // Direkt mit Gaming-/Hype-Reactions reagieren
+      await reagiereMitWelcomeEmotes(message);
     } catch (error) {
       console.error(
         '[WELCOME] Fehler beim Versenden der Willkommensnachricht:',
-        error
+        error,
       );
     }
   });

@@ -29,8 +29,7 @@ function ersetzePlatzhalter(
 }
 
 /**
- * Datum hübsch auf DE formatieren, z. B. "20. Juni 2025"
- * (ohne Uhrzeit)
+ * Datum hübsch auf DE formatieren, z. B. "20. Juni 2025" (ohne Uhrzeit)
  */
 function formatiereBeitrittsDatum(date: Date): string {
   return new Intl.DateTimeFormat('de-DE', {
@@ -43,7 +42,7 @@ function formatiereBeitrittsDatum(date: Date): string {
 /**
  * Erstellt das Willkommens-Embed für einen neuen User oder Bot.
  * Layout:
- *  - Zeile: (Icon) Willkommen @username
+ *  - Titel (aus texte.de.json: titelUser / titelBot)
  *  - Zitatblock mit Random-Text
  *  - Dreispaltige Infozeile ohne Überschriften:
  *      [user-icon] Name   |   [users-icon] #Nummer   |   [calendar-icon] Datum
@@ -81,27 +80,25 @@ export function erstelleWillkommensEmbed(
     platzhalter,
   );
 
+  // Titel aus den Texten (kann {displayName} / {serverName} etc. enthalten)
+  const titelVorlage = istBot ? texte.embed.titelBot : texte.embed.titelUser;
+  const titel = ersetzePlatzhalter(titelVorlage, platzhalter);
+
   const nameIcon = safe(emoji.meat_members);
   const nummerIcon = safe(emoji.meat_users);
   const datumIcon = safe(emoji.meat_calendar);
-  const headerIcon = safe(emoji.meat_avatar);
 
-  // Header-Zeile + Zitatblock
-  const headerLine = `${headerIcon} **Willkommen ${platzhalter.mention}**`;
-
+  // Zitatblock (ohne extra "Willkommen"-Zeile)
   const quoteBlock = begruessungsText
     .split('\n')
     .map((line) => `> ${line}`)
     .join('\n');
 
-  const beschreibung = `${headerLine}
-
-${quoteBlock}
-`;
+  const beschreibung = `${quoteBlock}`;
 
   const embed = new EmbedBuilder()
     .setColor(0x5865f2) // später via Style-System
-    // kein Title mehr – Überschrift ist jetzt rein in der Description
+    .setTitle(titel)
     .setDescription(beschreibung)
     .setThumbnail(
       member.user.displayAvatarURL({
@@ -111,7 +108,6 @@ ${quoteBlock}
     )
     .addFields(
       {
-        // kein "Name"-Header – wir nutzen einen Zero-Width-Space
         name: '\u200b',
         value: `${nameIcon} ${platzhalter.displayName || platzhalter.username}`,
         inline: true,
@@ -127,8 +123,6 @@ ${quoteBlock}
         inline: true,
       },
     );
-
-  // kein Footer mehr
 
   return embed;
 }

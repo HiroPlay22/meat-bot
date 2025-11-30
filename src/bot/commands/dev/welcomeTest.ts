@@ -23,6 +23,7 @@ import {
   erstelleWillkommensEmbed,
   type WelcomeTexte,
 } from '../../functions/welcome/welcome.embeds.js';
+import { reagiereMitWelcomeEmotes } from '../../functions/welcome/welcome.reactions.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -52,11 +53,6 @@ export const welcomeTestCommand: SlashCommand = {
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .setDMPermission(false),
 
-  /**
-   * Führt den Test-Command aus.
-   * Nutzt die Welcome-Settings und -Texte und sendet ein Embed,
-   * als wärst du gerade frisch gejoint.
-   */
   async execute(interaction: ChatInputCommandInteraction) {
     if (!interaction.guild) {
       await interaction.reply({
@@ -112,7 +108,8 @@ export const welcomeTestCommand: SlashCommand = {
       }
 
       if (zielChannel) {
-        await zielChannel.send({ embeds: [embed] });
+        const message = await zielChannel.send({ embeds: [embed] });
+        await reagiereMitWelcomeEmotes(message);
 
         logInfo(
           'welcome-test: Test-Embed im konfigurierten Welcome-Channel gesendet.',
@@ -129,7 +126,6 @@ export const welcomeTestCommand: SlashCommand = {
           ephemeral: true,
         });
       } else {
-        // Fallback: aktueller Channel (mit Type-Cast nach Text-Check)
         if (!interaction.channel || !interaction.channel.isTextBased()) {
           await interaction.reply({
             content:
@@ -141,7 +137,8 @@ export const welcomeTestCommand: SlashCommand = {
 
         const fallbackChannel = interaction.channel as TextChannelLike;
 
-        await fallbackChannel.send({ embeds: [embed] });
+        const message = await fallbackChannel.send({ embeds: [embed] });
+        await reagiereMitWelcomeEmotes(message);
 
         logWarn(
           'welcome-test: Kein gültiger Welcome-Channel konfiguriert, Fallback auf aktuellen Channel.',
