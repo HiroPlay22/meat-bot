@@ -13,7 +13,6 @@ import {
   logError,
   logInfo,
   logWarn,
-  logDebug,
   setDiscordClient,
 } from './general/logging/logger.js';
 import { trackCommandUsage } from './general/stats/statsManager.js';
