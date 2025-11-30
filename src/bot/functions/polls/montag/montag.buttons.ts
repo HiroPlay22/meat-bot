@@ -28,6 +28,7 @@ import {
   beendeMontagPoll,
   findeAktivenMontagPoll,
   legeMontagPollAn,
+  setMontagWinner,
 } from '../poll.db.js';
 import { ladeServerEinstellungen } from '../../../general/config/server-settings-loader.js';
 import { logError, logInfo } from '../../../general/logging/logger.js';
@@ -47,6 +48,10 @@ function ermittleNaechstenMontag19Uhr(): string {
 
   return `${wt}, ${tagNum}.${monatNum}. um 19:00 Uhr`;
 }
+
+// Merkt sich bei Gleichstand die Kandidaten pro Poll,
+// damit wir später per Button einen Zufalls-Gewinner ziehen können.
+const tieCandidatesPerPoll = new Map<string, string[]>();
 
 export async function handleMontagPollButton(
   interaction: ButtonInteraction,
@@ -181,7 +186,7 @@ export async function handleMontagPollButton(
       return;
     }
 
-    // 🔹 NEU: "Spiel hinzufügen" → Modal öffnen
+    // 🔹 "Spiel hinzufügen" → Modal öffnen
     if (customId === 'poll_montag_add_game') {
       const ok = await checkPermissions();
       if (!ok) return;
@@ -403,6 +408,7 @@ export async function handleMontagPollButton(
         const textChannel = channel as GuildTextBasedChannel;
         const message = await textChannel.messages.fetch(aktiverPoll.messageId);
 
+        // Poll im Client beenden (keine weiteren Stimmen)
         if (message.poll) {
           const anyPoll = message.poll as any;
           if (anyPoll.end && typeof anyPoll.end === 'function') {
@@ -410,34 +416,191 @@ export async function handleMontagPollButton(
           }
         }
 
+        // Versuch, das Ergebnis auszulesen
+        let winnerNames: string[] = [];
+
+        try {
+          const refreshed = await message.fetch();
+          const pollAny = (refreshed.poll ?? message.poll) as any;
+
+          const answers: any[] = pollAny?.answers ?? [];
+          const countsRaw: any[] =
+            pollAny?.results?.answer_counts ??
+            pollAny?.results?.answerCounts ??
+            [];
+
+          if (answers.length && countsRaw.length) {
+            const countsById = new Map<number, number>();
+
+            for (const c of countsRaw) {
+              const id = Number(
+                c.id ?? c.answer_id ?? c.answerId ?? c.option_id ?? c.optionId,
+              );
+              const count = Number(c.count ?? c.votes ?? 0);
+
+              if (!Number.isNaN(id)) {
+                countsById.set(id, count);
+              }
+            }
+
+            let maxVotes = 0;
+            for (const answer of answers) {
+              const aId = Number(
+                answer.id ??
+                  answer.answer_id ??
+                  answer.answerId ??
+                  answer.option_id ??
+                  answer.optionId,
+              );
+              const votes = countsById.get(aId) ?? 0;
+              if (votes > maxVotes) maxVotes = votes;
+            }
+
+            if (maxVotes > 0) {
+              winnerNames = answers
+                .filter((answer) => {
+                  const aId = Number(
+                    answer.id ??
+                      answer.answer_id ??
+                      answer.answerId ??
+                      answer.option_id ??
+                      answer.optionId,
+                  );
+                  const votes = countsById.get(aId) ?? 0;
+                  return votes === maxVotes;
+                })
+                .map((answer) =>
+                  String(
+                    answer.text ?? answer.answer_text ?? answer.label ?? '',
+                  ).trim(),
+                )
+                .filter((txt) => txt.length > 0);
+            }
+          }
+        } catch (err) {
+          logError('Konnte Montags-Poll-Ergebnis nicht auslesen', {
+            functionName: 'handleMontagPollButton',
+            guildId,
+            userId,
+            extra: { error: err, pollId: aktiverPoll.id },
+          });
+        }
+
+        // Poll in der DB als beendet markieren (unabhängig vom Gewinner)
         await beendeMontagPoll(aktiverPoll.id);
 
         const pollUrl = `https://discord.com/channels/${guildId}/${aktiverPoll.channelId}/${aktiverPoll.messageId}`;
 
+        // Fall 1: keine Stimmen / kein Ergebnis lesbar
+        if (!winnerNames.length) {
+          await interaction.update({
+            embeds: [
+              new EmbedBuilder()
+                .setTitle('Montags-Umfrage geschlossen')
+                .setDescription(
+                  [
+                    'Die aktive Montags-Runde-Umfrage wurde beendet.',
+                    '',
+                    'Es konnten keine gültigen Stimmen ermittelt werden.',
+                    '',
+                    `🔗 [Zur ehemaligen Umfrage](${pollUrl})`,
+                  ].join('\n'),
+                )
+                .setColor(0xed4245),
+            ],
+            components: [],
+          });
+
+          return;
+        }
+
+        // Fall 2: eindeutiger Gewinner
+        if (winnerNames.length === 1) {
+          const winnerName = winnerNames[0];
+
+          const { game } = await setMontagWinner({
+            pollId: aktiverPoll.id,
+            winnerGameName: winnerName,
+          });
+
+          await interaction.update({
+            embeds: [
+              new EmbedBuilder()
+                .setTitle('Montags-Umfrage geschlossen')
+                .setDescription(
+                  [
+                    'Die aktive Montags-Runde-Umfrage wurde beendet.',
+                    '',
+                    `🎉 Gewonnen hat: **${winnerName}**`,
+                    game
+                      ? `(_${game.isFree ? 'kostenlos' : 'kostenpflichtig'} • max. ${
+                          game.maxPlayers ?? 'unbegrenzt'
+                        } Spieler_)`
+                      : '',
+                    '',
+                    `🔗 [Zur ehemaligen Umfrage](${pollUrl})`,
+                  ]
+                    .filter((line) => line.length > 0)
+                    .join('\n'),
+                )
+                .setColor(0x57f287),
+            ],
+            components: [],
+          });
+
+          logInfo('Montags-Poll geschlossen (eindeutiger Gewinner)', {
+            functionName: 'handleMontagPollButton',
+            guildId,
+            userId,
+            extra: {
+              pollId: aktiverPoll.id,
+              winnerName,
+            },
+          });
+
+          return;
+        }
+
+        // Fall 3: Gleichstand → Kandidaten merken + Button zum Zufalls-Gewinner
+        tieCandidatesPerPoll.set(aktiverPoll.id, winnerNames);
+
+        const winnerList = winnerNames.map((n) => `• ${n}`).join('\n');
+
+        const embed = new EmbedBuilder()
+          .setTitle('Montags-Umfrage geschlossen – Gleichstand')
+          .setDescription(
+            [
+              'Die aktive Montags-Runde-Umfrage wurde beendet.',
+              '',
+              'Folgende Spiele haben gleich viele Stimmen:',
+              winnerList,
+              '',
+              'Klicke auf **„Zufalls-Gewinner ziehen“**, um einen Gewinner festzulegen.',
+              '',
+              `🔗 [Zur ehemaligen Umfrage](${pollUrl})`,
+            ].join('\n'),
+          )
+          .setColor(0xfee75c);
+
+        const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId(`poll_montag_pick_winner_${aktiverPoll.id}`)
+            .setStyle(ButtonStyle.Primary)
+            .setLabel('Zufalls-Gewinner ziehen'),
+        );
+
         await interaction.update({
-          embeds: [
-            new EmbedBuilder()
-              .setTitle('Montags-Umfrage geschlossen')
-              .setDescription(
-                [
-                  'Die aktive Montags-Runde-Umfrage wurde beendet.',
-                  '',
-                  `🔗 [Zur ehemaligen Umfrage](${pollUrl})`,
-                ].join('\n'),
-              )
-              .setColor(0x57f287),
-          ],
-          components: [],
+          embeds: [embed],
+          components: [row],
         });
 
-        logInfo('Montags-Poll über Button geschlossen', {
+        logInfo('Montags-Poll geschlossen (Gleichstand)', {
           functionName: 'handleMontagPollButton',
           guildId,
           userId,
           extra: {
             pollId: aktiverPoll.id,
-            messageId: aktiverPoll.messageId,
-            channelId: aktiverPoll.channelId,
+            candidates: winnerNames,
           },
         });
 
@@ -466,6 +629,82 @@ export async function handleMontagPollButton(
 
         return;
       }
+    }
+
+    // 4b) Gleichstand auflösen: Zufalls-Gewinner ziehen
+    if (customId.startsWith('poll_montag_pick_winner_')) {
+      const ok = await checkPermissions();
+      if (!ok) return;
+
+      const pollId = customId.substring('poll_montag_pick_winner_'.length);
+
+      const candidates = tieCandidatesPerPoll.get(pollId);
+
+      if (!candidates || !candidates.length) {
+        await interaction.update({
+          embeds: [
+            new EmbedBuilder()
+              .setTitle('Keine Gleichstandsdaten gefunden')
+              .setDescription(
+                'Ich habe keine gespeicherten Kandidaten mehr. Bitte wähle manuell einen Gewinner aus.',
+              )
+              .setColor(0xed4245),
+          ],
+          components: [],
+        });
+        return;
+      }
+
+      // Einmal verwenden, dann verwerfen
+      tieCandidatesPerPoll.delete(pollId);
+
+      const winnerName =
+        candidates[Math.floor(Math.random() * candidates.length)];
+
+      const { poll, game } = await setMontagWinner({
+        pollId,
+        winnerGameName: winnerName,
+      });
+
+      const pollUrl = `https://discord.com/channels/${poll.guildId}/${poll.channelId}/${poll.messageId}`;
+
+      await interaction.update({
+        embeds: [
+          new EmbedBuilder()
+            .setTitle('Montags-Umfrage – Gewinner gezogen')
+            .setDescription(
+              [
+                'Der Gleichstand wurde per Zufall aufgelöst.',
+                '',
+                `🎉 Gewinner: **${winnerName}**`,
+                game
+                  ? `(_${game.isFree ? 'kostenlos' : 'kostenpflichtig'} • max. ${
+                      game.maxPlayers ?? 'unbegrenzt'
+                    } Spieler_)`
+                  : '',
+                '',
+                `🔗 [Zur Umfrage](${pollUrl})`,
+              ]
+                .filter((line) => line.length > 0)
+                .join('\n'),
+            )
+            .setColor(0x57f287),
+        ],
+        components: [],
+      });
+
+      logInfo('Gleichstand per Zufalls-Gewinner aufgelöst', {
+        functionName: 'handleMontagPollButton',
+        guildId,
+        userId,
+        extra: {
+          pollId,
+          winnerName,
+          candidates,
+        },
+      });
+
+      return;
     }
 
     // 5) Start-Button

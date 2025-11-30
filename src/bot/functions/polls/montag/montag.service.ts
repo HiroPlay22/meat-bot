@@ -1,7 +1,8 @@
 // FILE: src/bot/functions/polls/montag/montag.service.ts
 
 import type { GuildTextBasedChannel, Message } from 'discord.js';
-import type { PollGame } from '@prisma/client';
+import type { Poll, PollGame } from '@prisma/client';
+import { PollType } from '@prisma/client';
 import { prisma } from '../../../general/db/prisma.js';
 
 export interface MontagGameView {
@@ -77,6 +78,10 @@ function mische<T>(items: T[]): T[] {
 
 /**
  * Lädt aktive Spiele aus der Datenbank und wählt bis zu maxOptions zufällig aus.
+ *
+ * NEU:
+ * - Gewinner der letzten 2 Montags-Polls (pro Guild) werden ausgeschlossen,
+ *   damit sie nicht direkt wieder auftauchen.
  */
 export async function prepareRandomGamesForState(
   guildId: string,
@@ -85,9 +90,49 @@ export async function prepareRandomGamesForState(
 ): Promise<MontagSetupState> {
   const state = getOrInitSetupState(guildId, userId);
 
-  const games: PollGame[] = await prisma.pollGame.findMany({
-    where: { isActive: true },
+  // Gewinner der letzten 2 Montags-Polls für diese Guild ermitteln
+  const letzteGewinnerPolls: Poll[] = await prisma.poll.findMany({
+    where: {
+      guildId,
+      type: PollType.MONTAG,
+      endedAt: { not: null },
+      winnerGameId: { not: null },
+    },
+    orderBy: {
+      endedAt: 'desc',
+    },
+    take: 2,
   });
+
+  const excludedGameIds: string[] = letzteGewinnerPolls
+    .map((p: Poll) => p.winnerGameId)
+    .filter((id: string | null): id is string => !!id);
+
+  let games: PollGame[];
+
+  if (excludedGameIds.length) {
+    // Alle aktiven Spiele außer den letzten zwei Gewinnern
+    games = await prisma.pollGame.findMany({
+      where: {
+        isActive: true,
+        id: {
+          notIn: excludedGameIds,
+        },
+      },
+    });
+
+    // Falls dadurch nichts mehr übrig bleibt → Fallback: alle aktiven Spiele
+    if (!games.length) {
+      games = await prisma.pollGame.findMany({
+        where: { isActive: true },
+      });
+    }
+  } else {
+    // Es gibt noch keine Gewinner-Historie → alle aktiven Spiele
+    games = await prisma.pollGame.findMany({
+      where: { isActive: true },
+    });
+  }
 
   if (!games.length) {
     state.selectedGames = [];
@@ -97,7 +142,7 @@ export async function prepareRandomGamesForState(
   const shuffled = mische<PollGame>(games);
   const selection = shuffled.slice(0, maxOptions);
 
-  state.selectedGames = selection.map<MontagGameView>((game) => ({
+  state.selectedGames = selection.map<MontagGameView>((game: PollGame) => ({
     id: game.id,
     name: game.name,
     isFree: game.isFree,
