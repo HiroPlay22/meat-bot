@@ -1,7 +1,7 @@
 {
   "embed": {
-    "titelUser": "Neues Crewmitglied eingetroffen",
-    "titelBot": "Neuer Bot im System",
+    "titelUser": "Scanner meldet Anwesenheit von {displayName} auf {serverName}.",
+    "titelBot": "Scanner meldet neuen Bot {displayName} im System {serverName}.",
     "memberCountZeile": "Du bist Nutzer Nummer {memberNumber} auf diesem Server."
   },
   "messages": {

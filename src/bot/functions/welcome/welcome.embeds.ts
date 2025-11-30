@@ -20,7 +20,7 @@ export interface WelcomeTexte {
  */
 function ersetzePlatzhalter(
   vorlage: string,
-  werte: Record<string, string>
+  werte: Record<string, string>,
 ): string {
   return Object.entries(werte).reduce((text, [schluessel, wert]) => {
     const regex = new RegExp(`{${schluessel}}`, 'g');
@@ -29,21 +29,40 @@ function ersetzePlatzhalter(
 }
 
 /**
+ * Datum hübsch auf DE formatieren, z. B. "20. Juni 2025 18:14"
+ */
+function formatiereBeitrittsDatum(date: Date): string {
+  return new Intl.DateTimeFormat('de-DE', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+}
+
+/**
  * Erstellt das Willkommens-Embed für einen neuen User oder Bot.
  */
 export function erstelleWillkommensEmbed(
   member: GuildMember,
-  texte: WelcomeTexte
+  texte: WelcomeTexte,
 ): EmbedBuilder {
   const istBot = member.user.bot;
 
   const memberNummer = member.guild.memberCount;
 
+  const joinDate =
+    member.joinedAt instanceof Date ? member.joinedAt : new Date();
+  const joinDateText = formatiereBeitrittsDatum(joinDate);
+
   const platzhalter = {
     mention: `<@${member.id}>`,
     username: member.user.username,
+    displayName: member.displayName,
     tag: member.user.tag,
-    memberNumber: memberNummer.toString()
+    memberNumber: memberNummer.toString(),
+    serverName: member.guild.name,
   };
 
   const nachrichtenListe = istBot ? texte.messages.bot : texte.messages.user;
@@ -55,31 +74,69 @@ export function erstelleWillkommensEmbed(
 
   const begruessungsText = ersetzePlatzhalter(
     begruessungsTextVorlage,
-    platzhalter
+    platzhalter,
   );
 
+  // wird jetzt wirklich benutzt → kein TS-Warning mehr
   const memberCountZeile = ersetzePlatzhalter(
     texte.embed.memberCountZeile,
-    platzhalter
+    platzhalter,
   );
 
-  const titel = istBot ? texte.embed.titelBot : texte.embed.titelUser;
+  // Titel mit Platzhaltern, z.B.:
+  // "Scanner meldet Anwesenheit von {displayName} auf {serverName}."
+  const titelVorlage = istBot ? texte.embed.titelBot : texte.embed.titelUser;
+  const titel = ersetzePlatzhalter(titelVorlage, platzhalter);
 
-  // Icon aus deiner emoji-Datei für "wie viele User bist du?"
-  const memberCountIcon = safe(emoji.meat_members);
+  const nameIcon = safe(emoji.meat_members);
+  const nummerIcon = safe(emoji.meat_users);
+  const datumIcon = safe(emoji.meat_calendar);
+  const headerIcon = safe(emoji.meat_avatar);
+  const memberCountFooterIcon = safe(emoji.meat_users);
+
+  // Header-Zeile + Zitatblock
+  const headerLine = `${headerIcon} **Willkommen ${platzhalter.mention}**`;
+
+  const quoteBlock = begruessungsText
+    .split('\n')
+    .map((line) => `> ${line}`)
+    .join('\n');
+
+  const beschreibung = `${headerLine}
+
+${quoteBlock}
+`;
 
   const embed = new EmbedBuilder()
-    .setColor(0x5865f2) // später gern durch dein zentrales Style-System ersetzen
+    .setColor(0x5865f2) // später via Style-System
     .setTitle(titel)
-    .setDescription(
-      `${begruessungsText}\n\n${memberCountIcon} ${memberCountZeile}`
-    )
+    .setDescription(beschreibung)
     .setThumbnail(
       member.user.displayAvatarURL({
         extension: 'png',
-        size: 256
-      })
-    );
+        size: 256,
+      }),
+    )
+    .addFields(
+      {
+        name: `${nameIcon} Name`,
+        value: platzhalter.displayName || platzhalter.username,
+        inline: true,
+      },
+      {
+        name: `${nummerIcon} Nummer`,
+        value: `#${platzhalter.memberNumber}`,
+        inline: true,
+      },
+      {
+        name: `${datumIcon} Beitritt`,
+        value: joinDateText,
+        inline: true,
+      },
+    )
+    .setFooter({
+      text: `${memberCountFooterIcon} ${memberCountZeile}`,
+    });
 
   return embed;
 }
