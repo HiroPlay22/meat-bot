@@ -52,11 +52,19 @@ async function ladeGuildCommandStats(
   });
 
   return rows
-    .map((row) => ({
-      commandName: row.commandName,
-      count: row._count._all,
-    }))
-    .sort((a, b) => b.count - a.count);
+    .map(
+      (row: {
+        commandName: string;
+        _count: { _all: number };
+      }): CommandStatItem => ({
+        commandName: row.commandName,
+        count: row._count._all,
+      }),
+    )
+    .sort(
+      (a: CommandStatItem, b: CommandStatItem): number =>
+        b.count - a.count,
+    );
 }
 
 // Aggregierte Befehls-Stats für einen User in einer Guild
@@ -76,11 +84,19 @@ async function ladeMeineCommandStats(
   });
 
   return rows
-    .map((row) => ({
-      commandName: row.commandName,
-      count: row._count._all,
-    }))
-    .sort((a, b) => b.count - a.count);
+    .map(
+      (row: {
+        commandName: string;
+        _count: { _all: number };
+      }): CommandStatItem => ({
+        commandName: row.commandName,
+        count: row._count._all,
+      }),
+    )
+    .sort(
+      (a: CommandStatItem, b: CommandStatItem): number =>
+        b.count - a.count,
+    );
 }
 
 // Öffnet das Datenschutz-Panel (wie /datenschutz), ausgelöst aus /stats
@@ -292,7 +308,6 @@ export async function handleStatsButtonInteraction(
       await interaction.reply({
         content:
           'Uff. Irgendwas ist mit den Stats schiefgelaufen. Versuch es gleich nochmal.',
-        ephemeral: true,
       });
     }
   }
