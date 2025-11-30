@@ -7,10 +7,15 @@
     "dev": "tsx src/bot/index.ts",
     "build": "tsc && node scripts/copy-texts.cjs",
     "start": "node dist/bot/index.js",
+
+    "web:start": "serve src/web -l 8080",
+
     "register:dev": "tsx src/bot/registerCommands.ts",
     "clear:global": "tsx src/bot/clearGlobalCommands.ts",
+
     "prisma:migrate": "prisma migrate dev --name init",
     "prisma:generate": "prisma generate",
+
     "postinstall": "prisma generate"
   },
   "engines": {
@@ -21,11 +26,12 @@
     "@prisma/client": "^7.0.1",
     "discord.js": "^14.16.0",
     "dotenv": "^16.4.5",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "serve": "^14.2.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "@types/pg": "^8.10.0",
+    "@types/pg": "^8.15.6",
     "prisma": "^7.0.1",
     "tsx": "^4.19.0",
     "typescript": "^5.6.0"
