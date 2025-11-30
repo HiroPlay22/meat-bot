@@ -28,8 +28,8 @@ export interface WelcomeFunktionsEinstellungen
 // 🔹 Polls – Montags-Runde
 
 export interface PollMontagSpezifischSettings {
-  allowedRoleIds?: string[];
   announcementChannelId?: string | null;
+  allowedRoleIds?: string[];
 }
 
 export interface PollMontagFunktionsEinstellungen

@@ -5,6 +5,9 @@ import {
   ButtonBuilder,
   ButtonStyle,
   EmbedBuilder,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
   type ButtonInteraction,
   type GuildTextBasedChannel,
 } from 'discord.js';
@@ -64,7 +67,6 @@ export async function handleMontagPollButton(
   const serverName = guild.name;
   const nextMontagText = ermittleNaechstenMontag19Uhr();
 
-  // ServerSettings (inkl. Rollen & Announcement-Channel)
   const settings = await ladeServerEinstellungen(guildId);
   const montagSettings = settings.functions.polls?.montag;
   const spezifisch = montagSettings?.spezifisch;
@@ -73,7 +75,6 @@ export async function handleMontagPollButton(
 
   try {
     async function checkPermissions(): Promise<boolean> {
-      // Wenn keine Rollen konfiguriert sind → jeder darf
       if (!allowedRoleIds.length) return true;
 
       const g = interaction.guild;
@@ -128,10 +129,6 @@ export async function handleMontagPollButton(
 
         const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
           new ButtonBuilder()
-            .setLabel('Zum Poll')
-            .setStyle(ButtonStyle.Link)
-            .setURL(pollUrl),
-          new ButtonBuilder()
             .setCustomId('poll_montag_close_active')
             .setStyle(ButtonStyle.Danger)
             .setLabel('Umfrage schließen'),
@@ -184,12 +181,46 @@ export async function handleMontagPollButton(
       return;
     }
 
+    // 🔹 NEU: "Spiel hinzufügen" → Modal öffnen
     if (customId === 'poll_montag_add_game') {
-      await interaction.reply({
-        content:
-          'Das Hinzufügen neuer Spiele läuft später über ein Modal. Aktuell bitte per DB (z.B. Prisma Studio) pflegen.',
-        ephemeral: true,
-      });
+      const ok = await checkPermissions();
+      if (!ok) return;
+
+      const modal = new ModalBuilder()
+        .setCustomId('poll_montag_add_game_modal')
+        .setTitle('Neues Spiel – Montags-Runde');
+
+      const nameInput = new TextInputBuilder()
+        .setCustomId('poll_montag_add_game_name')
+        .setLabel('Spielname')
+        .setPlaceholder('z.B. Gartic Phone')
+        .setRequired(true)
+        .setMaxLength(100)
+        .setStyle(TextInputStyle.Short);
+
+      const isFreeInput = new TextInputBuilder()
+        .setCustomId('poll_montag_add_game_is_free')
+        .setLabel('Kostenlos spielbar? (ja/nein)')
+        .setPlaceholder('ja oder nein')
+        .setRequired(true)
+        .setMaxLength(10)
+        .setStyle(TextInputStyle.Short);
+
+      const maxPlayersInput = new TextInputBuilder()
+        .setCustomId('poll_montag_add_game_max_players')
+        .setLabel('Max. Spieler (optional)')
+        .setPlaceholder('z.B. 4, 8, 16 – leer lassen, falls egal')
+        .setRequired(false)
+        .setMaxLength(10)
+        .setStyle(TextInputStyle.Short);
+
+      modal.addComponents(
+        new ActionRowBuilder<TextInputBuilder>().addComponents(nameInput),
+        new ActionRowBuilder<TextInputBuilder>().addComponents(isFreeInput),
+        new ActionRowBuilder<TextInputBuilder>().addComponents(maxPlayersInput),
+      );
+
+      await interaction.showModal(modal);
       return;
     }
 
@@ -344,9 +375,7 @@ export async function handleMontagPollButton(
           embeds: [
             new EmbedBuilder()
               .setTitle('Keine aktive Montags-Umfrage')
-              .setDescription(
-                'Es ist aktuell keine Montags-Runde-Umfrage aktiv.',
-              )
+              .setDescription('Es ist aktuell keine Montags-Runde-Umfrage aktiv.')
               .setColor(0xed4245),
           ],
           components: [],
@@ -539,16 +568,13 @@ export async function handleMontagPollButton(
         },
       });
 
-      // Announcement-Channel pingen (wenn konfiguriert)
       if (announcementChannelId && announcementChannelId !== message.channelId) {
         try {
           const announceChannel = await guild.channels.fetch(
             announcementChannelId,
           );
           if (announceChannel && announceChannel.isTextBased()) {
-            const announceTextChannel =
-              announceChannel as GuildTextBasedChannel;
-            await announceTextChannel.send({
+            await announceChannel.send({
               content: [
                 '📢 **Neue Montags-Runde Umfrage gestartet!**',
                 '',
@@ -557,7 +583,7 @@ export async function handleMontagPollButton(
             });
           }
         } catch {
-          // nice-to-have, kein Hard-Fail
+          // nice-to-have
         }
       }
 

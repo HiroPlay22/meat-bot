@@ -7,6 +7,7 @@ import {
   GatewayIntentBits,
   type Interaction,
   type ButtonInteraction,
+  type ModalSubmitInteraction,
 } from 'discord.js';
 import { slashCommands } from './commands/index.js';
 import {
@@ -19,6 +20,7 @@ import { trackCommandUsage } from './general/stats/statsManager.js';
 import { handleStatsButtonInteraction } from './functions/stats/overview/stats.buttons.js';
 import { bearbeiteDatenschutzButton } from './functions/sentinel/datenschutz/datenschutz.buttons.js';
 import { handlePollButtonInteraction } from './functions/polls/poll.buttons.js';
+import { handleMontagAddGameModal } from './functions/polls/montag/montag.modals.js';
 
 const token = process.env.DISCORD_TOKEN;
 
@@ -33,6 +35,7 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds],
 });
 
+// Discord-Client dem Logger bekannt machen
 setDiscordClient(client);
 
 client.once(Events.ClientReady, (readyClient) => {
@@ -42,13 +45,14 @@ client.once(Events.ClientReady, (readyClient) => {
 });
 
 client.on(Events.InteractionCreate, async (interaction: Interaction) => {
+  // 🔹 Slash-Commands
   if (interaction.isChatInputCommand()) {
     const command = slashCommands.get(interaction.commandName);
     if (!command) {
       logWarn(`Unbekannter Command: /${interaction.commandName}`, {
         functionName: 'interaction',
         guildId: interaction.guildId ?? undefined,
-        channelId: interaction.channelId,
+        channelId: interaction.channelId ?? undefined, // <- FIX
         userId: interaction.user.id,
         commandName: interaction.commandName,
       });
@@ -58,7 +62,7 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
     logInfo(`Starte Command /${interaction.commandName}`, {
       functionName: 'interaction',
       guildId: interaction.guildId ?? undefined,
-      channelId: interaction.channelId,
+      channelId: interaction.channelId ?? undefined, // <- FIX
       userId: interaction.user.id,
       commandName: interaction.commandName,
     });
@@ -70,7 +74,7 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
       logInfo(`Command /${interaction.commandName} erfolgreich beendet`, {
         functionName: 'interaction',
         guildId: interaction.guildId ?? undefined,
-        channelId: interaction.channelId,
+        channelId: interaction.channelId ?? undefined, // <- FIX
         userId: interaction.user.id,
         commandName: interaction.commandName,
       });
@@ -78,7 +82,7 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
       logError(`Fehler bei /${interaction.commandName}`, {
         functionName: 'interaction',
         guildId: interaction.guildId ?? undefined,
-        channelId: interaction.channelId,
+        channelId: interaction.channelId ?? undefined, // <- FIX
         userId: interaction.user.id,
         commandName: interaction.commandName,
         extra: { error },
@@ -106,28 +110,32 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
     return;
   }
 
+  // 🔹 Buttons
   if (interaction.isButton()) {
     const buttonInteraction = interaction as ButtonInteraction;
     const customId = buttonInteraction.customId;
 
     try {
+      // 1) Sentinel / Datenschutz
       if (customId.startsWith('sentinel_datenschutz_')) {
         await bearbeiteDatenschutzButton(buttonInteraction);
         return;
       }
 
+      // 2) Poll-System (inkl. Montags-Runde)
       if (customId.startsWith('poll_') || customId === 'poll_type_montag') {
         await handlePollButtonInteraction(buttonInteraction);
         return;
       }
 
+      // 3) Stats / andere Buttons
       await handleStatsButtonInteraction(buttonInteraction);
       return;
     } catch (error) {
       logError('Fehler bei der Button-Verarbeitung', {
         functionName: 'interactionButton',
         guildId: interaction.guildId ?? undefined,
-        channelId: interaction.channelId,
+        channelId: interaction.channelId ?? undefined, // <- FIX
         userId: interaction.user.id,
         extra: { error, customId },
       });
@@ -143,6 +151,49 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
           await interaction.reply({
             content:
               'Uff. Da ist was bei einem Button schiefgelaufen. Sag Hiro, er soll mal in die Logs schauen.',
+            ephemeral: true,
+          });
+        }
+      } catch {
+        // ignorieren
+      }
+    }
+
+    return;
+  }
+
+  // 🔹 Modals (z.B. "Spiel hinzufügen" für Montags-Runde)
+  if (interaction.isModalSubmit()) {
+    const modalInteraction = interaction as ModalSubmitInteraction;
+    const customId = modalInteraction.customId;
+
+    try {
+      if (customId === 'poll_montag_add_game_modal') {
+        await handleMontagAddGameModal(modalInteraction);
+        return;
+      }
+
+      // hier später weitere Modals einhängen
+    } catch (error) {
+      logError('Fehler bei der Modal-Verarbeitung', {
+        functionName: 'interactionModal',
+        guildId: interaction.guildId ?? undefined,
+        channelId: interaction.channelId ?? undefined, // <- FIX
+        userId: interaction.user.id,
+        extra: { error, customId },
+      });
+
+      try {
+        if (interaction.replied || interaction.deferred) {
+          await interaction.followUp({
+            content:
+              'Uff. Beim Verarbeiten des Formulars ist etwas schiefgelaufen. Sag Hiro, er soll mal in die Logs schauen.',
+            ephemeral: true,
+          });
+        } else {
+          await interaction.reply({
+            content:
+              'Uff. Beim Verarbeiten des Formulars ist etwas schiefgelaufen. Sag Hiro, er soll mal in die Logs schauen.',
             ephemeral: true,
           });
         }
