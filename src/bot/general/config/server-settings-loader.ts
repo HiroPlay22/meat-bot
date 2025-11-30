@@ -1,23 +1,30 @@
 // FILE: src/bot/general/config/server-settings-loader.ts
 
 import { readFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 import type {
   AlleServerSettings,
   ServerSettings,
-  WelcomeFunktionsEinstellungen
+  WelcomeFunktionsEinstellungen,
 } from './server-settings-schema.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 let cache: AlleServerSettings | null = null;
+
+// Pfad relativ zum Projekt-Root (process.cwd())
+// → funktioniert lokal (src) und auf dem Server (dist), solange src mitdeployt wird.
+const SERVER_SETTINGS_RELATIVE_PATH = join(
+  'src',
+  'bot',
+  'general',
+  'config',
+  'serverSettings.json',
+);
 
 async function ladeRohServerSettings(): Promise<AlleServerSettings> {
   if (cache) return cache;
 
-  const dateiPfad = join(__dirname, 'serverSettings.json');
+  const projektRoot = process.cwd();
+  const dateiPfad = join(projektRoot, SERVER_SETTINGS_RELATIVE_PATH);
 
   const inhalt = await readFile(dateiPfad, 'utf-8');
   const json = JSON.parse(inhalt) as AlleServerSettings;
@@ -36,8 +43,8 @@ function baueWelcomeDefaults(): WelcomeFunktionsEinstellungen {
     ephemeralStandard: false,
     spezifisch: {
       welcomeChannelId: undefined,
-      begruesseBots: true
-    }
+      begruesseBots: true,
+    },
   };
 }
 
@@ -45,11 +52,11 @@ function baueServerDefaults(): ServerSettings {
   return {
     sprache: 'de',
     datenschutz: {
-      userTrackingErlaubt: false
+      userTrackingErlaubt: false,
     },
     functions: {
-      welcome: baueWelcomeDefaults()
-    }
+      welcome: baueWelcomeDefaults(),
+    },
   };
 }
 
@@ -58,7 +65,7 @@ function baueServerDefaults(): ServerSettings {
  * Wenn keine Einträge vorhanden sind, wird ein Default-Objekt zurückgegeben.
  */
 export async function ladeServerEinstellungen(
-  guildId: string
+  guildId: string,
 ): Promise<ServerSettings> {
   const alleSettings = await ladeRohServerSettings();
 
@@ -69,7 +76,6 @@ export async function ladeServerEinstellungen(
     return baueServerDefaults();
   }
 
-  // Fallbacks zusammenführen (falls Felder fehlen)
   const defaults = baueServerDefaults();
 
   return {
@@ -80,8 +86,8 @@ export async function ladeServerEinstellungen(
       ...settings.functions,
       welcome: {
         ...defaults.functions.welcome!,
-        ...settings.functions.welcome
-      }
-    }
+        ...settings.functions.welcome,
+      },
+    },
   };
 }
