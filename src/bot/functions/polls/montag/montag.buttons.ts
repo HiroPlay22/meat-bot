@@ -17,7 +17,6 @@ import {
 } from './montag.embeds.js';
 import {
   createNativeMontagPoll,
-  ermittleAusgeschlosseneGewinner,
   ermittleGesamtGameCount,
   getOrInitSetupState,
   getSetupState,
@@ -44,8 +43,8 @@ function ermittleNaechstenMontag19Uhr(): string {
 
   const wochentage = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
   const wt = wochentage[ziel.getDay()];
-  const tagNum = ziel.getDate().toString().padStart(2, '0');
-  const monatNum = (ziel.getMonth() + 1).toString().padStart(2, '0');
+  const tagNum = jetzt.getDate().toString().padStart(2, '0');
+  const monatNum = (jetzt.getMonth() + 1).toString().padStart(2, '0');
 
   return `${wt}, ${tagNum}.${monatNum}. um 19:00 Uhr`;
 }
@@ -150,17 +149,12 @@ export async function handleMontagPollButton(
 
       const state = getOrInitSetupState(guildId, userId);
       const gameCount = await ermittleGesamtGameCount();
-      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
-        guildId,
-        2,
-      );
 
       const { embed, components } = baueMontagSetupView({
         serverName,
         nextMontagText,
         gameCount,
         state,
-        excludedGameNames,
       });
 
       await interaction.update({
@@ -252,17 +246,12 @@ export async function handleMontagPollButton(
       state.allowMultiselect = !state.allowMultiselect;
 
       const gameCount = await ermittleGesamtGameCount();
-      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
-        guildId,
-        2,
-      );
 
       const { embed, components } = baueMontagSetupView({
         serverName,
         nextMontagText,
         gameCount,
         state,
-        excludedGameNames,
       });
 
       await interaction.update({
@@ -281,17 +270,12 @@ export async function handleMontagPollButton(
       state.durationHours = Math.max(1, state.durationHours - 1);
 
       const gameCount = await ermittleGesamtGameCount();
-      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
-        guildId,
-        2,
-      );
 
       const { embed, components } = baueMontagSetupView({
         serverName,
         nextMontagText,
         gameCount,
         state,
-        excludedGameNames,
       });
 
       await interaction.update({
@@ -310,17 +294,12 @@ export async function handleMontagPollButton(
       state.durationHours = Math.min(32 * 24, state.durationHours + 1);
 
       const gameCount = await ermittleGesamtGameCount();
-      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
-        guildId,
-        2,
-      );
 
       const { embed, components } = baueMontagSetupView({
         serverName,
         nextMontagText,
         gameCount,
         state,
-        excludedGameNames,
       });
 
       await interaction.update({
@@ -338,17 +317,12 @@ export async function handleMontagPollButton(
 
       const state = getOrInitSetupState(guildId, userId);
       const gameCount = await ermittleGesamtGameCount();
-      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
-        guildId,
-        2,
-      );
 
       const { embed, components } = baueMontagSetupView({
         serverName,
         nextMontagText,
         gameCount,
         state,
-        excludedGameNames,
       });
 
       await interaction.update({
@@ -434,80 +408,74 @@ export async function handleMontagPollButton(
         const textChannel = channel as GuildTextBasedChannel;
         const message = await textChannel.messages.fetch(aktiverPoll.messageId);
 
-        // Poll im Client beenden (keine weiteren Stimmen)
-        if (message.poll) {
-          const anyPoll = message.poll as any;
-          if (anyPoll.end && typeof anyPoll.end === 'function') {
-            await anyPoll.end();
+        let pollAny = message.poll as any;
+
+        // Versuche den Poll manuell zu beenden.
+        // Wenn Discord "Poll expired" (520001) meldet, ignorieren wir das
+        // und lesen trotzdem die (finalen) Ergebnisse aus.
+        if (pollAny && typeof pollAny.end === 'function') {
+          try {
+            await pollAny.end();
+
+            // nach dem Beenden neu einlesen, damit Ergebnisse final sind
+            const refreshed = await message.fetch();
+            pollAny = (refreshed.poll ?? message.poll) as any;
+          } catch (err: any) {
+            const code = err?.code ?? err?.rawError?.code;
+            if (code === 520001) {
+              // Poll ist laut API bereits abgelaufen → einfach Ergebnis verwenden
+              logInfo('Montags-Poll war beim Schließen bereits abgelaufen', {
+                functionName: 'handleMontagPollButton',
+                guildId,
+                userId,
+                extra: { pollId: aktiverPoll.id },
+              });
+
+              const refreshed = await message.fetch();
+              pollAny = (refreshed.poll ?? message.poll) as any;
+            } else {
+              throw err;
+            }
           }
         }
 
-        // Versuch, das Ergebnis auszulesen
         let winnerNames: string[] = [];
 
         try {
-          const refreshed = await message.fetch();
-          const pollAny = (refreshed.poll ?? message.poll) as any;
-
           const answers: any[] = pollAny?.answers ?? [];
-          const countsRaw: any[] =
-            pollAny?.results?.answer_counts ??
-            pollAny?.results?.answerCounts ??
-            [];
 
-          if (answers.length && countsRaw.length) {
-            const countsById = new Map<number, number>();
-
-            for (const c of countsRaw) {
-              const id = Number(
-                c.id ??
-                  c.answer_id ??
-                  c.answerId ??
-                  c.option_id ??
-                  c.optionId,
-              );
-              const count = Number(c.count ?? c.votes ?? 0);
-
-              if (!Number.isNaN(id)) {
-                countsById.set(id, count);
-              }
-            }
-
+          if (Array.isArray(answers) && answers.length > 0) {
             let maxVotes = 0;
-            for (const answer of answers) {
-              const aId = Number(
-                answer.id ??
-                  answer.answer_id ??
-                  answer.answerId ??
-                  answer.option_id ??
-                  answer.optionId,
+
+            for (const ans of answers) {
+              const votes = Number(
+                ans.voteCount ??
+                  ans.votes ??
+                  ans.results?.count ??
+                  0,
               );
-              const votes = countsById.get(aId) ?? 0;
               if (votes > maxVotes) maxVotes = votes;
             }
 
             if (maxVotes > 0) {
               winnerNames = answers
-                .filter((answer) => {
-                  const aId = Number(
-                    answer.id ??
-                      answer.answer_id ??
-                      answer.answerId ??
-                      answer.option_id ??
-                      answer.optionId,
+                .filter((ans) => {
+                  const votes = Number(
+                    ans.voteCount ??
+                      ans.votes ??
+                      ans.results?.count ??
+                      0,
                   );
-                  const votes = countsById.get(aId) ?? 0;
                   return votes === maxVotes;
                 })
-                .map((answer) =>
+                .map((ans) =>
                   String(
-                    answer.text ??
-                      answer.answer_text ??
-                      answer.label ??
+                    ans.pollMedia?.text ??
+                      ans.text ??
                       '',
                   ).trim(),
                 )
-                .filter((txt) => txt.length > 0);
+                .filter((name) => name.length > 0);
             }
           }
         } catch (err) {
