@@ -1,7 +1,7 @@
 // FILE: src/bot/functions/polls/montag/montag.service.ts
 
 import type { GuildTextBasedChannel, Message } from 'discord.js';
-import type { Poll, PollGame } from '@prisma/client';
+import type { PollGame } from '@prisma/client';
 import { PollType } from '@prisma/client';
 import { prisma } from '../../../general/db/prisma.js';
 
@@ -67,6 +67,47 @@ export async function ermittleGesamtGameCount(): Promise<number> {
 // Alias, falls irgendwo noch der alte Name verwendet wird
 export const getGesamtGameCount = ermittleGesamtGameCount;
 
+/**
+ * Ermittelt die letzten Gewinner-Spiele (per winnerGameId) für diese Guild
+ * und gibt sowohl IDs als auch Namen zurück.
+ *
+ * Wird genutzt für:
+ *  - Ausschluss in der Spieleauswahl
+ *  - Anzeige im Setup-Embed ("zuletzt gespielt")
+ */
+export async function ermittleAusgeschlosseneGewinner(
+  guildId: string,
+  limit = 2,
+): Promise<{ excludedGameIds: string[]; excludedGameNames: string[] }> {
+  const polls = await prisma.poll.findMany({
+    where: {
+      guildId,
+      type: PollType.MONTAG,
+      endedAt: { not: null },
+      winnerGameId: { not: null },
+    },
+    orderBy: { endedAt: 'desc' },
+    take: limit,
+    include: {
+      winnerGame: true,
+    },
+  });
+
+  const excludedGameIds: string[] = [];
+  const excludedGameNames: string[] = [];
+
+  for (const poll of polls) {
+    if (poll.winnerGameId) {
+      excludedGameIds.push(poll.winnerGameId);
+    }
+    if (poll.winnerGame?.name) {
+      excludedGameNames.push(poll.winnerGame.name);
+    }
+  }
+
+  return { excludedGameIds, excludedGameNames };
+}
+
 function mische<T>(items: T[]): T[] {
   const arr = [...items];
   for (let i = arr.length - 1; i > 0; i -= 1) {
@@ -74,75 +115,6 @@ function mische<T>(items: T[]): T[] {
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
-}
-
-/**
- * Hilfsfunktion: ermittelt die IDs der zuletzt gewonnenen Spiele
- * (limit = wie viele Gewinner berücksichtigt werden, Standard: 2).
- * Duplikate werden entfernt, Reihenfolge bleibt erhalten.
- */
-async function ermittleExcludedGameIds(
-  guildId: string,
-  limit = 2,
-): Promise<string[]> {
-  const letzteGewinnerPolls: Poll[] = await prisma.poll.findMany({
-    where: {
-      guildId,
-      type: PollType.MONTAG,
-      endedAt: { not: null },
-      winnerGameId: { not: null },
-    },
-    orderBy: {
-      endedAt: 'desc',
-    },
-    take: limit,
-  });
-
-  const ids = letzteGewinnerPolls
-    .map((p) => p.winnerGameId)
-    .filter((id): id is string => !!id);
-
-  // Duplikate entfernen, Reihenfolge beibehalten
-  return Array.from(new Set(ids));
-}
-
-/**
- * Liefert die Namen der zuletzt gewonnenen Spiele,
- * die aktuell für die Montags-Runde ausgeschlossen werden.
- * (max. "limit" Spiele, Standard: 2)
- */
-export async function ermittleZuletztGewonneneMontagSpiele(
-  guildId: string,
-  limit = 2,
-): Promise<string[]> {
-  const excludedGameIds = await ermittleExcludedGameIds(guildId, limit);
-
-  if (!excludedGameIds.length) {
-    return [];
-  }
-
-  const games: PollGame[] = await prisma.pollGame.findMany({
-    where: {
-      id: {
-        in: excludedGameIds,
-      },
-    },
-  });
-
-  const nameById = new Map<string, string>();
-  for (const game of games) {
-    nameById.set(game.id, game.name);
-  }
-
-  const names: string[] = [];
-  for (const id of excludedGameIds) {
-    const name = nameById.get(id);
-    if (name) {
-      names.push(name);
-    }
-  }
-
-  return names;
 }
 
 /**
@@ -159,12 +131,12 @@ export async function prepareRandomGamesForState(
 ): Promise<MontagSetupState> {
   const state = getOrInitSetupState(guildId, userId);
 
-  const excludedGameIds = await ermittleExcludedGameIds(guildId, 2);
+  const { excludedGameIds } = await ermittleAusgeschlosseneGewinner(guildId, 2);
 
   let games: PollGame[];
 
   if (excludedGameIds.length) {
-    // Alle aktiven Spiele außer den letzten Gewinnern
+    // Alle aktiven Spiele außer den letzten zwei Gewinnern
     games = await prisma.pollGame.findMany({
       where: {
         isActive: true,
@@ -195,7 +167,7 @@ export async function prepareRandomGamesForState(
   const shuffled = mische<PollGame>(games);
   const selection = shuffled.slice(0, maxOptions);
 
-  state.selectedGames = selection.map<MontagGameView>((game) => ({
+  state.selectedGames = selection.map<MontagGameView>((game: PollGame) => ({
     id: game.id,
     name: game.name,
     isFree: game.isFree,

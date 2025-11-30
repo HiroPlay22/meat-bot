@@ -20,83 +20,92 @@ interface MontagPreviewViewParams {
   serverName: string;
   nextMontagText: string;
   state: MontagSetupState;
-  excludedGameNames?: string[];
 }
 
-export function baueMontagSetupView({
-  serverName,
-  nextMontagText,
-  gameCount,
-  state,
-  excludedGameNames,
-}: MontagSetupViewParams) {
-  const lines: string[] = [
-    `🕹 **Montags-Runde Setup für _${serverName}_**`,
-    '',
-    `📅 Geplante Session: **${nextMontagText}**`,
-    `🎮 Verfügbare Spiele in der Datenbank: **${gameCount}**`,
-    '',
-    `🔁 Mehrfachauswahl: **${state.allowMultiselect ? 'aktiv' : 'deaktiviert'}**`,
-    `⏱ Dauer: **${state.durationHours}h**`,
-  ];
+export function baueMontagSetupView(params: MontagSetupViewParams): {
+  embed: EmbedBuilder;
+  components: ActionRowBuilder<ButtonBuilder>[];
+} {
+  const {
+    serverName,
+    nextMontagText,
+    gameCount,
+    state,
+    excludedGameNames = [],
+  } = params;
 
-  if (excludedGameNames && excludedGameNames.length > 0) {
-    lines.push(
-      '',
-      '🚫 Ausgeschlossen (letzte Gewinner):',
-      ...excludedGameNames.map((name) => `• ${name}`),
-    );
-  }
+  const multiText = state.allowMultiselect
+    ? 'aktiv (Mehrfachauswahl)'
+    : 'nur 1 Stimme pro Person';
 
-  lines.push(
-    '',
-    '➡ Klicke auf **„Umfrage vorbereiten“**, um eine zufällige Auswahl an Spielen zu generieren.',
-  );
+  const dauerText =
+    state.durationHours === 1
+      ? '1 Stunde'
+      : `${state.durationHours} Stunden`;
+
+  const excludedText =
+    excludedGameNames.length > 0
+      ? [
+          '🚫 Ausgeschlossen (zuletzt als Gewinner):',
+          excludedGameNames.map((n) => `• ${n}`).join('\n'),
+        ].join('\n')
+      : '🚫 Aktuell wird kein Spiel aufgrund der letzten Gewinner ausgeschlossen.';
 
   const embed = new EmbedBuilder()
     .setTitle('Montags-Runde – Setup')
-    .setDescription(lines.join('\n'))
-    .setColor(0x5865f2); // Discord-Blurple
+    .setDescription(
+      [
+        `🕹 **Montags-Runde Setup für _${serverName}_**`,
+        '',
+        `📅 Geplante Session: **${nextMontagText}**`,
+        `🎮 Verfügbare Spiele in der Datenbank: **${gameCount}**`,
+        '',
+        `🔁 Mehrfachauswahl: **${multiText}**`,
+        `⏱ Dauer: **${dauerText}**`,
+        '',
+        excludedText,
+        '',
+        '➡ Klicke auf **„Umfrage vorbereiten“**, um eine zufällige Auswahl an Spielen zu generieren.',
+      ].join('\n'),
+    )
+    .setColor(0x579326);
 
-  const row1 =
-    new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId('poll_montag_prepare')
-        .setStyle(ButtonStyle.Primary)
-        .setLabel('Umfrage vorbereiten'),
-      new ButtonBuilder()
-        .setCustomId('poll_montag_add_game')
-        .setStyle(ButtonStyle.Secondary)
-        .setLabel('Spiel hinzufügen'),
-      new ButtonBuilder()
-        .setCustomId('poll_montag_remove_game')
-        .setStyle(ButtonStyle.Secondary)
-        .setLabel('Spiel deaktivieren'),
-    );
+  const row1 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId('poll_montag_prepare')
+      .setStyle(ButtonStyle.Primary)
+      .setLabel('Umfrage vorbereiten'),
+    new ButtonBuilder()
+      .setCustomId('poll_montag_add_game')
+      .setStyle(ButtonStyle.Secondary)
+      .setLabel('Spiel hinzufügen'),
+    new ButtonBuilder()
+      .setCustomId('poll_montag_remove_game')
+      .setStyle(ButtonStyle.Secondary)
+      .setLabel('Spiel deaktivieren'),
+  );
 
-  const row2 =
-    new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId('poll_montag_toggle_multiselect')
-        .setStyle(ButtonStyle.Secondary)
-        .setLabel('Nur 1 Stimme erlauben'),
-      new ButtonBuilder()
-        .setCustomId('poll_montag_duration_dec')
-        .setStyle(ButtonStyle.Secondary)
-        .setLabel('- 1h'),
-      new ButtonBuilder()
-        .setCustomId('poll_montag_duration_inc')
-        .setStyle(ButtonStyle.Secondary)
-        .setLabel('+ 1h'),
-    );
+  const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId('poll_montag_toggle_multiselect')
+      .setStyle(ButtonStyle.Secondary)
+      .setLabel('Nur 1 Stimme erlauben'),
+    new ButtonBuilder()
+      .setCustomId('poll_montag_duration_dec')
+      .setStyle(ButtonStyle.Secondary)
+      .setLabel('- 1h'),
+    new ButtonBuilder()
+      .setCustomId('poll_montag_duration_inc')
+      .setStyle(ButtonStyle.Secondary)
+      .setLabel('+ 1h'),
+  );
 
-  const row3 =
-    new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId('poll_montag_cancel')
-        .setStyle(ButtonStyle.Danger)
-        .setLabel('Abbrechen'),
-    );
+  const row3 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId('poll_montag_cancel')
+      .setStyle(ButtonStyle.Danger)
+      .setLabel('Abbrechen'),
+  );
 
   return {
     embed,
@@ -104,66 +113,65 @@ export function baueMontagSetupView({
   };
 }
 
-export function baueMontagPreviewView({
-  serverName,
-  nextMontagText,
-  state,
-  excludedGameNames,
-}: MontagPreviewViewParams) {
-  const lines: string[] = [
-    `🕹 **Montags-Runde Vorschau für _${serverName}_**`,
-    '',
-    `📅 Session: **${nextMontagText}**`,
-    `🔁 Mehrfachauswahl: **${state.allowMultiselect ? 'aktiv' : 'deaktiviert'}**`,
-    `⏱ Dauer: **${state.durationHours}h**`,
-    '',
-    '🎮 **Spiele in dieser Umfrage:**',
-  ];
+export function baueMontagPreviewView(params: MontagPreviewViewParams): {
+  embed: EmbedBuilder;
+  components: ActionRowBuilder<ButtonBuilder>[];
+} {
+  const { serverName, nextMontagText, state } = params;
 
-  if (!state.selectedGames.length) {
-    lines.push('_Keine Spiele ausgewählt – bitte Setup anpassen._');
-  } else {
-    lines.push(
-      ...state.selectedGames.map((game) => `• ${game.name}`),
-    );
-  }
-
-  if (excludedGameNames && excludedGameNames.length > 0) {
-    lines.push(
-      '',
-      '🚫 Ausgeschlossen (letzte Gewinner):',
-      ...excludedGameNames.map((name) => `• ${name}`),
-    );
-  }
+  const selectedText = state.selectedGames.length
+    ? state.selectedGames
+        .map((game, index) => {
+          const details: string[] = [];
+          if (game.isFree) details.push('F2P');
+          if (game.maxPlayers != null) {
+            details.push(`max. ${game.maxPlayers} Spieler`);
+          }
+          const suffix = details.length ? ` (_${details.join(' • ')}_)` : '';
+          return `${index + 1}. **${game.name}**${suffix}`;
+        })
+        .join('\n')
+    : '_Keine Spiele ausgewählt – bitte Setup anpassen._';
 
   const embed = new EmbedBuilder()
     .setTitle('Montags-Runde – Vorschau')
-    .setDescription(lines.join('\n'))
-    .setColor(0x57f287); // grüner "OK"-Ton
+    .setDescription(
+      [
+        `🕹 **Montags-Runde Vorschau für _${serverName}_**`,
+        '',
+        `📅 Session: **${nextMontagText}**`,
+        `🔁 Mehrfachauswahl: **${
+          state.allowMultiselect ? 'aktiv' : 'nur 1 Stimme'
+        }**`,
+        `⏱ Dauer: **${state.durationHours}h**`,
+        '',
+        '🎮 **Spiele in dieser Umfrage:**',
+        selectedText,
+      ].join('\n'),
+    )
+    .setColor(0x57f287);
 
-  const row1 =
-    new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId('poll_montag_preview_back')
-        .setStyle(ButtonStyle.Secondary)
-        .setLabel('Zurück zum Setup'),
-      new ButtonBuilder()
-        .setCustomId('poll_montag_reroll')
-        .setStyle(ButtonStyle.Secondary)
-        .setLabel('Spiele neu würfeln'),
-    );
+  const row1 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId('poll_montag_preview_back')
+      .setStyle(ButtonStyle.Secondary)
+      .setLabel('Zurück zum Setup'),
+    new ButtonBuilder()
+      .setCustomId('poll_montag_reroll')
+      .setStyle(ButtonStyle.Secondary)
+      .setLabel('Spiele neu würfeln'),
+  );
 
-  const row2 =
-    new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId('poll_montag_start')
-        .setStyle(ButtonStyle.Success)
-        .setLabel('Umfrage starten'),
-      new ButtonBuilder()
-        .setCustomId('poll_montag_cancel')
-        .setStyle(ButtonStyle.Danger)
-        .setLabel('Abbrechen'),
-    );
+  const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId('poll_montag_start')
+      .setStyle(ButtonStyle.Success)
+      .setLabel('Umfrage starten'),
+    new ButtonBuilder()
+      .setCustomId('poll_montag_cancel')
+      .setStyle(ButtonStyle.Danger)
+      .setLabel('Abbrechen'),
+  );
 
   return {
     embed,

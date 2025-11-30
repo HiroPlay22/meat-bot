@@ -17,12 +17,12 @@ import {
 } from './montag.embeds.js';
 import {
   createNativeMontagPoll,
+  ermittleAusgeschlosseneGewinner,
   ermittleGesamtGameCount,
   getOrInitSetupState,
   getSetupState,
   prepareRandomGamesForState,
   resetSetupState,
-  ermittleZuletztGewonneneMontagSpiele,
 } from './montag.service.js';
 import { bauePollCenterView } from '../poll.embeds.js';
 import {
@@ -150,8 +150,10 @@ export async function handleMontagPollButton(
 
       const state = getOrInitSetupState(guildId, userId);
       const gameCount = await ermittleGesamtGameCount();
-      const excludedGameNames =
-        await ermittleZuletztGewonneneMontagSpiele(guildId);
+      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
+        guildId,
+        2,
+      );
 
       const { embed, components } = baueMontagSetupView({
         serverName,
@@ -175,14 +177,11 @@ export async function handleMontagPollButton(
       if (!ok) return;
 
       const state = await prepareRandomGamesForState(guildId, userId);
-      const excludedGameNames =
-        await ermittleZuletztGewonneneMontagSpiele(guildId);
 
       const { embed, components } = baueMontagPreviewView({
         serverName,
         nextMontagText,
         state,
-        excludedGameNames,
       });
 
       await interaction.update({
@@ -193,7 +192,7 @@ export async function handleMontagPollButton(
       return;
     }
 
-    // 🔹 "Spiel hinzufügen" → Modal öffnen
+    // "Spiel hinzufügen" → Modal öffnen
     if (customId === 'poll_montag_add_game') {
       const ok = await checkPermissions();
       if (!ok) return;
@@ -253,8 +252,10 @@ export async function handleMontagPollButton(
       state.allowMultiselect = !state.allowMultiselect;
 
       const gameCount = await ermittleGesamtGameCount();
-      const excludedGameNames =
-        await ermittleZuletztGewonneneMontagSpiele(guildId);
+      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
+        guildId,
+        2,
+      );
 
       const { embed, components } = baueMontagSetupView({
         serverName,
@@ -280,8 +281,10 @@ export async function handleMontagPollButton(
       state.durationHours = Math.max(1, state.durationHours - 1);
 
       const gameCount = await ermittleGesamtGameCount();
-      const excludedGameNames =
-        await ermittleZuletztGewonneneMontagSpiele(guildId);
+      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
+        guildId,
+        2,
+      );
 
       const { embed, components } = baueMontagSetupView({
         serverName,
@@ -307,8 +310,10 @@ export async function handleMontagPollButton(
       state.durationHours = Math.min(32 * 24, state.durationHours + 1);
 
       const gameCount = await ermittleGesamtGameCount();
-      const excludedGameNames =
-        await ermittleZuletztGewonneneMontagSpiele(guildId);
+      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
+        guildId,
+        2,
+      );
 
       const { embed, components } = baueMontagSetupView({
         serverName,
@@ -333,8 +338,10 @@ export async function handleMontagPollButton(
 
       const state = getOrInitSetupState(guildId, userId);
       const gameCount = await ermittleGesamtGameCount();
-      const excludedGameNames =
-        await ermittleZuletztGewonneneMontagSpiele(guildId);
+      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
+        guildId,
+        2,
+      );
 
       const { embed, components } = baueMontagSetupView({
         serverName,
@@ -357,14 +364,11 @@ export async function handleMontagPollButton(
       if (!ok) return;
 
       const state = await prepareRandomGamesForState(guildId, userId);
-      const excludedGameNames =
-        await ermittleZuletztGewonneneMontagSpiele(guildId);
 
       const { embed, components } = baueMontagPreviewView({
         serverName,
         nextMontagText,
         state,
-        excludedGameNames,
       });
 
       await interaction.update({
@@ -406,8 +410,6 @@ export async function handleMontagPollButton(
               .setColor(0xed4245),
           ],
           components: [],
-
-
         });
         return;
       }
@@ -458,7 +460,11 @@ export async function handleMontagPollButton(
 
             for (const c of countsRaw) {
               const id = Number(
-                c.id ?? c.answer_id ?? c.answerId ?? c.option_id ?? c.optionId,
+                c.id ??
+                  c.answer_id ??
+                  c.answerId ??
+                  c.option_id ??
+                  c.optionId,
               );
               const count = Number(c.count ?? c.votes ?? 0);
 
@@ -495,7 +501,10 @@ export async function handleMontagPollButton(
                 })
                 .map((answer) =>
                   String(
-                    answer.text ?? answer.answer_text ?? answer.label ?? '',
+                    answer.text ??
+                      answer.answer_text ??
+                      answer.label ??
+                      '',
                   ).trim(),
                 )
                 .filter((txt) => txt.length > 0);
@@ -874,12 +883,10 @@ export async function handleMontagPollButton(
     }
 
     // Fallback
-    if (!interaction.replied && !interaction.deferred) {
-      await interaction.reply({
-        content: 'Dieser Montags-Button wird noch nicht unterstützt.',
-        ephemeral: true,
-      });
-    }
+    await interaction.reply({
+      content: 'Dieser Montags-Button wird noch nicht unterstützt.',
+      ephemeral: true,
+    });
   } catch (error) {
     logError('Fehler im Montags-Poll-Flow', {
       functionName: 'handleMontagPollButton',
