@@ -384,6 +384,8 @@ export async function handleMontagPollButton(
               .setColor(0xed4245),
           ],
           components: [],
+
+
         });
         return;
       }
@@ -401,6 +403,8 @@ export async function handleMontagPollButton(
                 .setColor(0xed4245),
             ],
             components: [],
+
+
           });
           return;
         }
@@ -408,107 +412,82 @@ export async function handleMontagPollButton(
         const textChannel = channel as GuildTextBasedChannel;
         const message = await textChannel.messages.fetch(aktiverPoll.messageId);
 
-        // Poll im Client beenden (keine weiteren Stimmen)
-        if (message.poll) {
-          const anyPoll = message.poll as any;
-          if (anyPoll && typeof anyPoll.end === 'function') {
-            try {
-              await anyPoll.end();
-            } catch (err) {
-              const anyErr = err as any;
-              const code = anyErr?.code ?? anyErr?.rawError?.code;
-              if (code === 520001) {
-                // Poll ist laut API bereits abgelaufen → wir nutzen einfach die vorhandenen Ergebnisse
-                logInfo('Montags-Poll war beim Schließen bereits abgelaufen', {
-                  functionName: 'handleMontagPollButton',
-                  guildId,
-                  userId,
-                  extra: { pollId: aktiverPoll.id },
-                });
-              } else {
-                throw err;
-              }
+        let pollAny = message.poll as any;
+
+        // Poll manuell beenden, falls möglich
+        if (pollAny && typeof pollAny.end === 'function') {
+          try {
+            await pollAny.end();
+            const refreshed = await message.fetch();
+            pollAny = (refreshed.poll ?? message.poll) as any;
+          } catch (err: any) {
+            const code = err?.code ?? err?.rawError?.code;
+            if (code === 520001) {
+              // Poll schon abgelaufen → trotzdem Ergebnis lesen
+              logInfo('Montags-Poll war beim Schließen bereits abgelaufen', {
+                functionName: 'handleMontagPollButton',
+                guildId,
+                userId,
+                extra: { pollId: aktiverPoll.id },
+              });
+              const refreshed = await message.fetch();
+              pollAny = (refreshed.poll ?? message.poll) as any;
+            } else {
+              throw err;
             }
           }
         }
 
-        // Versuch, das Ergebnis auszulesen (alte, funktionierende Variante)
         let winnerNames: string[] = [];
 
         try {
-          const refreshed = await message.fetch();
-          const pollAny = (refreshed.poll ?? message.poll) as any;
+          // answers kann eine Collection oder ein Array sein
+          const rawAnswers = pollAny?.answers;
+          const answers: any[] =
+            rawAnswers && typeof rawAnswers.map === 'function'
+              ? rawAnswers.map((a: any) => a)
+              : Array.isArray(rawAnswers)
+              ? rawAnswers
+              : [];
 
-          const answers: any[] = pollAny?.answers ?? [];
-          const countsRaw: any[] =
-            pollAny?.results?.answer_counts ??
-            pollAny?.results?.answerCounts ??
-            [];
+          let maxVotes = 0;
 
-          if (answers.length && countsRaw.length) {
-            const countsById = new Map<number, number>();
-
-            for (const c of countsRaw) {
-              const id = Number(
-                c.id ?? c.answer_id ?? c.answerId ?? c.option_id ?? c.optionId,
-              );
-              const count = Number(
-                c.count ?? c.votes ?? c.vote_count ?? c.voteCount ?? 0,
-              );
-
-              if (!Number.isNaN(id)) {
-                countsById.set(id, count);
-              }
-            }
-
-            let maxVotes = 0;
-            for (const answer of answers) {
-              const aId = Number(
-                answer.id ??
-                  answer.answer_id ??
-                  answer.answerId ??
-                  answer.option_id ??
-                  answer.optionId,
-              );
-              const votes = countsById.get(aId) ?? 0;
-              if (votes > maxVotes) maxVotes = votes;
-            }
-
-            if (maxVotes > 0) {
-              winnerNames = answers
-                .filter((answer) => {
-                  const aId = Number(
-                    answer.id ??
-                      answer.answer_id ??
-                      answer.answerId ??
-                      answer.option_id ??
-                      answer.optionId,
-                  );
-                  const votes = countsById.get(aId) ?? 0;
-                  return votes === maxVotes;
-                })
-                .map((answer) =>
-                  String(
-                    answer.pollMedia?.text ??
-                      answer.text ??
-                      answer.answer_text ??
-                      answer.label ??
-                      '',
-                  ).trim(),
-                )
-                .filter((txt) => txt.length > 0);
-            }
+          for (const ans of answers) {
+            const votes = Number(ans.voteCount ?? 0);
+            if (votes > maxVotes) maxVotes = votes;
           }
 
+          if (maxVotes > 0) {
+            winnerNames = answers
+              .filter((ans) => Number(ans.voteCount ?? 0) === maxVotes)
+              .map((ans) =>
+                String(
+                  ans.text ??
+                    ans.pollMedia?.text ??
+                    ans.pollMedia?.question?.text ??
+                    '',
+                ).trim(),
+              )
+              .filter((name) => name.length > 0);
+          }
+
+          // Debug-Log, falls nochmal was komisch ist
           logInfo('Montags-Poll Ergebnis ausgewertet', {
             functionName: 'handleMontagPollButton',
             guildId,
             userId,
             extra: {
               pollId: aktiverPoll.id,
-              winnerNames,
-              answersLength: Array.isArray(answers) ? answers.length : null,
-              countsLength: Array.isArray(countsRaw) ? countsRaw.length : null,
+              maxVotes,
+              answersCount: answers.length,
+              answersDebug: answers.map((ans) => ({
+                text:
+                  ans.text ??
+                  ans.pollMedia?.text ??
+                  ans.pollMedia?.question?.text ??
+                  null,
+                voteCount: ans.voteCount ?? 0,
+              })),
             },
           });
         } catch (err) {
@@ -543,6 +522,8 @@ export async function handleMontagPollButton(
                 .setColor(0xed4245),
             ],
             components: [],
+
+
           });
 
           return;
@@ -580,6 +561,8 @@ export async function handleMontagPollButton(
                 .setColor(0x57f287),
             ],
             components: [],
+
+
           });
 
           logInfo('Montags-Poll geschlossen (eindeutiger Gewinner)', {
@@ -685,6 +668,8 @@ export async function handleMontagPollButton(
               .setColor(0xed4245),
           ],
           components: [],
+
+
         });
         return;
       }
@@ -725,6 +710,8 @@ export async function handleMontagPollButton(
             .setColor(0x57f287),
         ],
         components: [],
+
+
       });
 
       logInfo('Gleichstand per Zufalls-Gewinner aufgelöst', {
@@ -764,6 +751,8 @@ export async function handleMontagPollButton(
               .setColor(0xfee75c),
           ],
           components: [],
+
+
         });
 
         return;
@@ -878,6 +867,8 @@ export async function handleMontagPollButton(
             .setColor(0x57f287),
         ],
         components: [],
+
+
       });
 
       return;
