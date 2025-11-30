@@ -19,7 +19,7 @@ const pool = new Pool({ connectionString });
 // Prisma 7 Adapter für PostgreSQL
 const adapter = new PrismaPg(pool);
 
-// PrismaClient aus dem Paket holen (Prisma 7 → kein typisierter Named Export)
+// PrismaClient aus dem Paket holen (kein typisierter Named Export mehr)
 const { PrismaClient } = prismaPkg as any;
 
 // Gemeinsamer Prisma-Client für den gesamten Bot
