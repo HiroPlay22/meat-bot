@@ -79,9 +79,8 @@ function mische<T>(items: T[]): T[] {
 /**
  * Lädt aktive Spiele aus der Datenbank und wählt bis zu maxOptions zufällig aus.
  *
- * NEU:
- * - Gewinner der letzten 2 Montags-Polls (pro Guild) werden ausgeschlossen,
- *   damit sie nicht direkt wieder auftauchen.
+ * Gewinner der letzten 2 Montags-Polls (pro Guild) werden ausgeschlossen,
+ * damit sie nicht direkt wieder auftauchen.
  */
 export async function prepareRandomGamesForState(
   guildId: string,

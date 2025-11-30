@@ -10,6 +10,7 @@ import {
   TextInputStyle,
   type ButtonInteraction,
   type GuildTextBasedChannel,
+  type Message,
 } from 'discord.js';
 import {
   baueMontagPreviewView,
@@ -43,8 +44,8 @@ function ermittleNaechstenMontag19Uhr(): string {
 
   const wochentage = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
   const wt = wochentage[ziel.getDay()];
-  const tagNum = ziel.getDate().toString().padStart(2, '0');
-  const monatNum = (ziel.getMonth() + 1).toString().padStart(2, '0');
+  const tagNum = jetzt.getDate().toString().padStart(2, '0');
+  const monatNum = (jetzt.getMonth() + 1).toString().padStart(2, '0');
 
   return `${wt}, ${tagNum}.${monatNum}. um 19:00 Uhr`;
 }
@@ -52,6 +53,64 @@ function ermittleNaechstenMontag19Uhr(): string {
 // Merkt sich bei Gleichstand die Kandidaten pro Poll,
 // damit wir später per Button einen Zufalls-Gewinner ziehen können.
 const tieCandidatesPerPoll = new Map<string, string[]>();
+
+interface SimplePollAnswer {
+  text: string;
+  votes: number;
+}
+
+/**
+ * Versucht, aus einem nativen Discord-Poll die Antworten + Gewinner zu ermitteln.
+ * Da das Poll-Objekt intern nicht öffentlich typisiert ist, arbeiten wir hier
+ * bewusst defensiv mit "any".
+ */
+function ermittlePollGewinnerAusMessage(
+  message: Message<boolean>,
+): {
+  answers: SimplePollAnswer[];
+  topAnswers: SimplePollAnswer[];
+  maxVotes: number;
+} | null {
+  const rawPoll: any = message.poll;
+  if (!rawPoll) return null;
+
+  let rawAnswers: any[] = [];
+
+  if (Array.isArray(rawPoll.answers)) {
+    rawAnswers = rawPoll.answers;
+  } else if (rawPoll.answers && typeof rawPoll.answers.values === 'function') {
+    rawAnswers = Array.from(rawPoll.answers.values());
+  } else if (rawPoll.answers && typeof rawPoll.answers.toJSON === 'function') {
+    rawAnswers = rawPoll.answers.toJSON();
+  }
+
+  const answers: SimplePollAnswer[] = rawAnswers
+    .map((a: any): SimplePollAnswer => {
+      const text = String(
+        a.text ?? a.answer ?? a.label ?? a.title ?? '',
+      ).trim();
+
+      const votesRaw =
+        a.voteCount ?? a.votes ?? a.count ?? a.totalVotes ?? 0;
+
+      const votes =
+        typeof votesRaw === 'number'
+          ? votesRaw
+          : Number(votesRaw) || 0;
+
+      return { text, votes };
+    })
+    .filter((a: SimplePollAnswer) => a.text.length > 0);
+
+  if (!answers.length) return null;
+
+  const maxVotes = Math.max(...answers.map((a: SimplePollAnswer) => a.votes));
+  const topAnswers = answers.filter(
+    (a: SimplePollAnswer) => a.votes === maxVotes && maxVotes > 0,
+  );
+
+  return { answers, topAnswers, maxVotes };
+}
 
 export async function handleMontagPollButton(
   interaction: ButtonInteraction,
@@ -222,7 +281,9 @@ export async function handleMontagPollButton(
       modal.addComponents(
         new ActionRowBuilder<TextInputBuilder>().addComponents(nameInput),
         new ActionRowBuilder<TextInputBuilder>().addComponents(isFreeInput),
-        new ActionRowBuilder<TextInputBuilder>().addComponents(maxPlayersInput),
+        new ActionRowBuilder<TextInputBuilder>().addComponents(
+          maxPlayersInput,
+        ),
       );
 
       await interaction.showModal(modal);
@@ -410,89 +471,20 @@ export async function handleMontagPollButton(
 
         // Poll im Client beenden (keine weiteren Stimmen)
         if (message.poll) {
-          const anyPoll = message.poll as any;
+          const anyPoll: any = message.poll;
           if (anyPoll.end && typeof anyPoll.end === 'function') {
             await anyPoll.end();
           }
         }
 
-        // Versuch, das Ergebnis auszulesen
-        let winnerNames: string[] = [];
-
-        try {
-          const refreshed = await message.fetch();
-          const pollAny = (refreshed.poll ?? message.poll) as any;
-
-          const answers: any[] = pollAny?.answers ?? [];
-          const countsRaw: any[] =
-            pollAny?.results?.answer_counts ??
-            pollAny?.results?.answerCounts ??
-            [];
-
-          if (answers.length && countsRaw.length) {
-            const countsById = new Map<number, number>();
-
-            for (const c of countsRaw) {
-              const id = Number(
-                c.id ?? c.answer_id ?? c.answerId ?? c.option_id ?? c.optionId,
-              );
-              const count = Number(c.count ?? c.votes ?? 0);
-
-              if (!Number.isNaN(id)) {
-                countsById.set(id, count);
-              }
-            }
-
-            let maxVotes = 0;
-            for (const answer of answers) {
-              const aId = Number(
-                answer.id ??
-                  answer.answer_id ??
-                  answer.answerId ??
-                  answer.option_id ??
-                  answer.optionId,
-              );
-              const votes = countsById.get(aId) ?? 0;
-              if (votes > maxVotes) maxVotes = votes;
-            }
-
-            if (maxVotes > 0) {
-              winnerNames = answers
-                .filter((answer) => {
-                  const aId = Number(
-                    answer.id ??
-                      answer.answer_id ??
-                      answer.answerId ??
-                      answer.option_id ??
-                      answer.optionId,
-                  );
-                  const votes = countsById.get(aId) ?? 0;
-                  return votes === maxVotes;
-                })
-                .map((answer) =>
-                  String(
-                    answer.text ?? answer.answer_text ?? answer.label ?? '',
-                  ).trim(),
-                )
-                .filter((txt) => txt.length > 0);
-            }
-          }
-        } catch (err) {
-          logError('Konnte Montags-Poll-Ergebnis nicht auslesen', {
-            functionName: 'handleMontagPollButton',
-            guildId,
-            userId,
-            extra: { error: err, pollId: aktiverPoll.id },
-          });
-        }
-
         // Poll in der DB als beendet markieren (unabhängig vom Gewinner)
         await beendeMontagPoll(aktiverPoll.id);
 
+        // Versuch, das Ergebnis auszulesen
+        const ergebnis = ermittlePollGewinnerAusMessage(message);
         const pollUrl = `https://discord.com/channels/${guildId}/${aktiverPoll.channelId}/${aktiverPoll.messageId}`;
 
-        // Fall 1: keine Stimmen / kein Ergebnis lesbar
-        if (!winnerNames.length) {
+        if (!ergebnis || !ergebnis.topAnswers.length) {
           await interaction.update({
             embeds: [
               new EmbedBuilder()
@@ -514,13 +506,12 @@ export async function handleMontagPollButton(
           return;
         }
 
-        // Fall 2: eindeutiger Gewinner
-        if (winnerNames.length === 1) {
-          const winnerName = winnerNames[0];
-
+        if (ergebnis.topAnswers.length === 1) {
+          // eindeutiger Gewinner
+          const winner = ergebnis.topAnswers[0];
           const { game } = await setMontagWinner({
             pollId: aktiverPoll.id,
-            winnerGameName: winnerName,
+            winnerGameName: winner.text,
           });
 
           await interaction.update({
@@ -531,7 +522,7 @@ export async function handleMontagPollButton(
                   [
                     'Die aktive Montags-Runde-Umfrage wurde beendet.',
                     '',
-                    `🎉 Gewonnen hat: **${winnerName}**`,
+                    `🎉 Gewonnen hat: **${winner.text}**`,
                     game
                       ? `(_${game.isFree ? 'kostenlos' : 'kostenpflichtig'} • max. ${
                           game.maxPlayers ?? 'unbegrenzt'
@@ -554,17 +545,20 @@ export async function handleMontagPollButton(
             userId,
             extra: {
               pollId: aktiverPoll.id,
-              winnerName,
+              winnerName: winner.text,
             },
           });
 
           return;
         }
 
-        // Fall 3: Gleichstand → Kandidaten merken + Button zum Zufalls-Gewinner
+        // Gleichstand → Kandidaten merken + Button zum Zufalls-Gewinner
+        const winnerNames = ergebnis.topAnswers.map(
+          (a: SimplePollAnswer) => a.text,
+        );
         tieCandidatesPerPoll.set(aktiverPoll.id, winnerNames);
 
-        const winnerList = winnerNames.map((n) => `• ${n}`).join('\n');
+        const winnerList = winnerNames.map((n: string) => `• ${n}`).join('\n');
 
         const embed = new EmbedBuilder()
           .setTitle('Montags-Umfrage geschlossen – Gleichstand')
@@ -855,9 +849,11 @@ export async function handleMontagPollButton(
       ephemeral: true,
     });
   } catch (error) {
+    const guildIdSafe = interaction.guildId ?? 'unknown';
+
     logError('Fehler im Montags-Poll-Flow', {
       functionName: 'handleMontagPollButton',
-      guildId,
+      guildId: guildIdSafe,
       userId,
       extra: { error, customId },
     });
