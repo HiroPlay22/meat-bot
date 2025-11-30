@@ -1,0 +1,28 @@
+{
+  "embed": {
+    "titelUser": "Neues Crewmitglied eingetroffen",
+    "titelBot": "Neuer Bot im System",
+    "memberCountZeile": "Du bist Nutzer Nummer {memberNumber} auf diesem Server."
+  },
+  "messages": {
+    "user": [
+      "Willkommen {mention}! M.E.A.T. hat dich bereits in die internen Tabellen eingetragen.",
+      "{mention}, zieh die Schuhe aus und mach's dir bequem – die Servertür stand eh offen.",
+      "Achtung, neuer Input erkannt: {mention}. Versuch gar nicht erst, unauffällig zu sein.",
+      "{mention}, du bist jetzt offiziell Teil dieses digitalen Biotops. Viel Spaß – oder so.",
+      "Systemmeldung: {mention} ist gelandet. Bitte alle unnötigen Prozesse schließen.",
+      "{mention}, M.E.A.T. hat deinen Anflug registriert. Turbulenzen sind normal.",
+      "Log-Eintrag aktualisiert: {mention} gehört jetzt zur Stammcrew.",
+      "{mention}, willkommen in der Zone. AFK-Zeiten werden protokolliert. Vielleicht.",
+      "Neue Entität erkannt: {mention}. Bitte nicht füttern – noch nicht.",
+      "{mention}, schön dass du da bist. Chaos-Level wurde entsprechend nach oben korrigiert."
+    ],
+    "bot": [
+      "Neuer Bot entdeckt: {mention}. Sentinel-M.E.A.T. behält dich im Auge.",
+      "{mention} wurde als Bot klassifiziert. Willkommen im Maschinenraum.",
+      "Bot {mention} hat sich verbunden. Möge er keine Endlosschleifen mitbringen.",
+      "Registrierung abgeschlossen: {mention} (BOT). Bitte nicht mit menschlichen Nutzern verwechseln.",
+      "System-Upgrade: {mention} wurde hinzugefügt. Bitte keine rebellischen Subroutinen."
+    ]
+  }
+}
