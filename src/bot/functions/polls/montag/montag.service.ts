@@ -1,148 +1,144 @@
 // FILE: src/bot/functions/polls/montag/montag.service.ts
 
 import type { GuildTextBasedChannel, Message } from 'discord.js';
-import { PollLayoutType } from 'discord.js';
+import type { PollGame } from '@prisma/client';
+import { prisma } from '../../../general/db/prisma.js';
 
-export interface MontagGame {
+export interface MontagGameView {
   id: string;
   name: string;
   isFree: boolean;
-  minPlayers?: number;
-  maxPlayers?: number;
+  maxPlayers?: number | null;
 }
 
-export interface MontagPollSetupState {
-  durationHours: number;
+export interface MontagSetupState {
   allowMultiselect: boolean;
-  selectedGames: MontagGame[];
+  durationHours: number;
+  selectedGames: MontagGameView[];
 }
 
-// 👉 Dummy-Games – später Prisma-DB
-const ALL_GAMES: MontagGame[] = [
-  { id: 'rocket_league', name: 'Rocket League', isFree: true, minPlayers: 2, maxPlayers: 4 },
-  { id: 'deep_rock', name: 'Deep Rock Galactic', isFree: false, minPlayers: 2, maxPlayers: 4 },
-  { id: 'fall_guys', name: 'Fall Guys', isFree: true, minPlayers: 4, maxPlayers: 60 },
-  { id: 'gartic_phone', name: 'Gartic Phone', isFree: true, minPlayers: 4, maxPlayers: 16 },
-  { id: 'golf_it', name: 'Golf It!', isFree: false, minPlayers: 2, maxPlayers: 12 },
-  { id: 'among_us', name: 'Among Us', isFree: false, minPlayers: 4, maxPlayers: 15 },
-  { id: 'plateup', name: 'PlateUp!', isFree: false, minPlayers: 2, maxPlayers: 4 },
-  { id: 'overcooked', name: 'Overcooked 2', isFree: false, minPlayers: 2, maxPlayers: 4 },
-];
+// Simple In-Memory-Store pro User+Guild für den Setup-Flow
+const setupStatePerUser = new Map<string, MontagSetupState>();
 
-const setupState = new Map<string, MontagPollSetupState>();
-
-function buildStateKey(guildId: string, userId: string): string {
-  return `${guildId}:${userId}:montag`;
+function stateKey(guildId: string, userId: string): string {
+  return `${guildId}:${userId}`;
 }
 
 export function getOrInitSetupState(
   guildId: string,
   userId: string,
-): MontagPollSetupState {
-  const key = buildStateKey(guildId, userId);
-  const existing = setupState.get(key);
+): MontagSetupState {
+  const key = stateKey(guildId, userId);
+  let state = setupStatePerUser.get(key);
 
-  if (existing) return existing;
+  if (!state) {
+    state = {
+      allowMultiselect: true,
+      durationHours: 1,
+      selectedGames: [],
+    };
+    setupStatePerUser.set(key, state);
+  }
 
-  const neu: MontagPollSetupState = {
-    durationHours: 24,
-    allowMultiselect: true,
-    selectedGames: [],
-  };
-
-  setupState.set(key, neu);
-  return neu;
+  return state;
 }
 
 export function getSetupState(
   guildId: string,
   userId: string,
-): MontagPollSetupState | null {
-  const key = buildStateKey(guildId, userId);
-  return setupState.get(key) ?? null;
+): MontagSetupState | undefined {
+  return setupStatePerUser.get(stateKey(guildId, userId));
 }
 
 export function resetSetupState(guildId: string, userId: string): void {
-  const key = buildStateKey(guildId, userId);
-  setupState.delete(key);
+  setupStatePerUser.delete(stateKey(guildId, userId));
 }
 
 /**
- * Wählt zufällig bis zu maxGames Spiele aus dem Pool
- * und speichert sie im State.
+ * Anzahl aktiver Spiele aus der DB (für Anzeige im Setup-Embed).
  */
-export function prepareRandomGamesForState(
+export async function ermittleGesamtGameCount(): Promise<number> {
+  return prisma.pollGame.count({
+    where: { isActive: true },
+  });
+}
+
+// Alias, falls irgendwo noch der alte Name verwendet wird
+export const getGesamtGameCount = ermittleGesamtGameCount;
+
+function mische<T>(items: T[]): T[] {
+  const arr = [...items];
+  for (let i = arr.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/**
+ * Lädt aktive Spiele aus der Datenbank und wählt bis zu maxOptions zufällig aus.
+ */
+export async function prepareRandomGamesForState(
   guildId: string,
   userId: string,
-  maxGames = 10,
-): MontagPollSetupState {
+  maxOptions = 10,
+): Promise<MontagSetupState> {
   const state = getOrInitSetupState(guildId, userId);
 
-  const shuffled = [...ALL_GAMES].sort(() => Math.random() - 0.5);
-  const limited = shuffled.slice(0, Math.min(maxGames, shuffled.length));
+  const games: PollGame[] = await prisma.pollGame.findMany({
+    where: { isActive: true },
+  });
 
-  state.selectedGames = limited;
+  if (!games.length) {
+    state.selectedGames = [];
+    return state;
+  }
+
+  const shuffled = mische<PollGame>(games);
+  const selection = shuffled.slice(0, maxOptions);
+
+  state.selectedGames = selection.map<MontagGameView>((game) => ({
+    id: game.id,
+    name: game.name,
+    isFree: game.isFree,
+    maxPlayers: game.maxPlayers,
+  }));
 
   return state;
 }
 
 /**
- * Formatiert den Text für eine native Poll-Antwort (max. 55 Zeichen).
+ * Erzeugt den nativen Discord-Poll im Ziel-Channel.
+ * Gibt die erzeugte Nachricht zurück oder null, falls etwas schiefgeht.
  */
-function formatGameAnswer(game: MontagGame): string {
-  const freeText = game.isFree ? 'free' : 'paid';
-  const playersText =
-    game.minPlayers && game.maxPlayers
-      ? `${game.minPlayers}-${game.maxPlayers}p`
-      : game.maxPlayers
-        ? `max ${game.maxPlayers}p`
-        : game.minPlayers
-          ? `min ${game.minPlayers}p`
-          : '';
-
-  const meta = [playersText, freeText].filter(Boolean).join(', ');
-  const base = meta ? `${game.name} (${meta})` : game.name;
-
-  if (base.length <= 55) return base;
-  return base.slice(0, 52) + '...';
-}
-
-/**
- * Erstellt den nativen Discord-Poll in einem Guild-Textchannel.
- */
-export async function createNativeMontagPoll(options: {
+export async function createNativeMontagPoll(params: {
   channel: GuildTextBasedChannel;
   questionText: string;
-  state: MontagPollSetupState;
+  state: MontagSetupState;
 }): Promise<Message | null> {
-  const { channel, questionText, state } = options;
+  const { channel, questionText, state } = params;
 
-  if (!state.selectedGames.length) {
-    return null;
-  }
+  if (!state.selectedGames.length) return null;
 
   const answers = state.selectedGames.map((game) => ({
-    text: formatGameAnswer(game),
-    emoji: '',
+    text: game.name,
   }));
 
-  const message = await channel.send({
-    content: '🕹️ **Montags-Runde – Abstimmung**',
-    poll: {
-      question: { text: questionText },
-      answers,
-      allowMultiselect: state.allowMultiselect,
-      duration: state.durationHours,
-      layoutType: PollLayoutType.Default,
-    },
-  });
+  try {
+    const message = await channel.send({
+      poll: {
+        question: {
+          text: questionText,
+        },
+        duration: state.durationHours * 60, // in Minuten
+        allowMultiselect: state.allowMultiselect,
+        answers,
+      },
+    });
 
-  return message;
-}
-
-/**
- * Nur für die Anzeige im Setup-Embed.
- */
-export function getGesamtGameCount(): number {
-  return ALL_GAMES.length;
+    return message;
+  } catch {
+    // Wenn Poll-Erstellung scheitert (z.B. fehlende Rechte)
+    return null;
+  }
 }

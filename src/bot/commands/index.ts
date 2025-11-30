@@ -8,21 +8,18 @@ import { statsCommand } from '../functions/stats/overview/stats.command.js';
 import { welcomeTestCommand } from './dev/welcomeTest.js';
 import { pollCommand } from '../functions/polls/poll.command.js';
 
-// Map: commandName -> Command-Objekt
 export const slashCommands = new Collection<string, SlashCommand>();
 
-// Alle Commands zentral registrieren
 const alleCommands: SlashCommand[] = [
   pingCommand,
   datenschutzCommand,
   statsCommand,
   welcomeTestCommand,
-  pollCommand,          // 👈 NEU
+  pollCommand,
 ];
 
 for (const command of alleCommands) {
   slashCommands.set(command.data.name, command);
 }
 
-// Liste aller Commands (z.B. für Registrierung)
 export const slashCommandList: SlashCommand[] = alleCommands;

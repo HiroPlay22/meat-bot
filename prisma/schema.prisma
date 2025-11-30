@@ -6,16 +6,16 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // url = env("DATABASE_URL")  // ← falls bei dir schon vorhanden, wieder einsetzen
+  // URL kommt über prisma.config.ts / ENV
 }
 
 model CommandUsage {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
 
-  guildId     String?  @db.VarChar(32)
-  channelId   String?  @db.VarChar(32)
-  userId      String?  @db.VarChar(32)
+  guildId   String?  @db.VarChar(32)
+  channelId String?  @db.VarChar(32)
+  userId    String?  @db.VarChar(32)
 
   commandName String
 }
@@ -49,35 +49,63 @@ model CommandStatsGuildDaily {
   @@unique([date, guildId, commandName], name: "date_guildId_commandName")
 }
 
-// 🔹 Polls für Montags-Runde
+//
+// 🔹 NEU: Polls & Games für Montags-Runde
+//
 
+/// Typ der Umfrage – aktuell nur "MONTAG"
 enum PollType {
   MONTAG
 }
 
-enum PollStatus {
-  ACTIVE
-  CLOSED
+/// Master-Tabelle für Spiele, die in Polls verwendet werden.
+model PollGame {
+  id           String    @id @default(cuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  /// Anzeigename des Spiels, z.B. "Deep Rock Galactic"
+  name         String
+
+  /// Ob das Spiel grundsätzlich auswählbar ist
+  isActive     Boolean   @default(true)
+
+  /// Ob das Spiel kostenlos ist (F2P)
+  isFree       Boolean   @default(false)
+
+  /// Wie viele Spieler sinnvoll mitspielen können (z.B. 4, 8, 16)
+  maxPlayers   Int?
+
+  /// Optional: letztes Mal im Poll gewesen / gewonnen, für spätere Logik
+  lastPlayedAt DateTime?
+
+  /// Polls, in denen dieses Spiel als Gewinner eingetragen wurde
+  pollsWon     Poll[]    @relation("Poll_WinnerGame")
 }
 
+/// Instanzen von nativen Discord-Polls, die wir tracken
 model Poll {
-  id               String     @id @default(cuid())
-  guildId          String     @db.VarChar(32)
+  id           String    @id @default(cuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  type             PollType
-  status           PollStatus @default(ACTIVE)
+  /// Wann der Poll gestartet wurde (separat von createdAt)
+  startedAt    DateTime  @default(now())
+  endedAt      DateTime?
 
-  question         String
-  discordChannelId String     @db.VarChar(32)
-  discordMessageId String     @db.VarChar(32)
+  guildId      String    @db.VarChar(32)
+  channelId    String    @db.VarChar(32)
+  messageId    String    @db.VarChar(32)
 
-  startedAt        DateTime   @default(now())
-  endsAt           DateTime?
-  createdByUserId  String     @db.VarChar(32)
-  closedAt         DateTime?
+  /// Art der Umfrage (z.B. Montags-Runde)
+  type         PollType
 
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
+  /// Frage, die im Poll gestellt wird
+  question     String
 
-  @@index([guildId, type, status])
+  /// Optional: Gewinner-Spiel
+  winnerGameId String?
+  winnerGame   PollGame? @relation("Poll_WinnerGame", fields: [winnerGameId], references: [id])
+
+  @@index([guildId, type, endedAt], name: "poll_guild_type_endedAt")
 }

@@ -11,12 +11,20 @@ import { logInfo } from '../../general/logging/logger.js';
 export const pollCommand: SlashCommand = {
   data: new SlashCommandBuilder()
     .setName('poll')
-    .setDescription('Öffnet das M.E.A.T. Poll-Center (z.B. für die Montags-Runde).'),
+    .setDescription('Öffnet das M.E.A.T. Poll-Center.'),
 
   async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-    const guildName = interaction.guild?.name ?? 'deinem Server';
+    const guild = interaction.guild;
 
-    const { embed, components } = bauePollCenterView(guildName);
+    if (!guild) {
+      await interaction.reply({
+        content: 'Dieses Command kann nur auf einem Server verwendet werden.',
+        ephemeral: true,
+      });
+      return;
+    }
+
+    const { embed, components } = bauePollCenterView(guild.name);
 
     await interaction.reply({
       embeds: [embed],

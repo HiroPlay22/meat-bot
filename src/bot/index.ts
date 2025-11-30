@@ -30,12 +30,9 @@ if (!token) {
 }
 
 const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds, // für Slash-Commands & Guild-Funktionen
-  ],
+  intents: [GatewayIntentBits.Guilds],
 });
 
-// 🔹 Discord-Client dem Logger bekannt machen (für Log-Channel-Ausgabe)
 setDiscordClient(client);
 
 client.once(Events.ClientReady, (readyClient) => {
@@ -44,9 +41,7 @@ client.once(Events.ClientReady, (readyClient) => {
   });
 });
 
-// Einfacher zentraler Handler – später wandert das in eine eigene handler.ts
 client.on(Events.InteractionCreate, async (interaction: Interaction) => {
-  // Slash-Commands
   if (interaction.isChatInputCommand()) {
     const command = slashCommands.get(interaction.commandName);
     if (!command) {
@@ -104,32 +99,28 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
           });
         }
       } catch {
-        // Ignorieren
+        // ignorieren
       }
     }
 
     return;
   }
 
-  // Buttons → Router
   if (interaction.isButton()) {
     const buttonInteraction = interaction as ButtonInteraction;
     const customId = buttonInteraction.customId;
 
     try {
-      // 1) Datenschutz-Buttons
       if (customId.startsWith('sentinel_datenschutz_')) {
         await bearbeiteDatenschutzButton(buttonInteraction);
         return;
       }
 
-      // 2) Poll-Buttons (alles mit "poll_")
-      if (customId.startsWith('poll_')) {
+      if (customId.startsWith('poll_') || customId === 'poll_type_montag') {
         await handlePollButtonInteraction(buttonInteraction);
         return;
       }
 
-      // 3) Alle anderen Buttons → Stats-Handler (wie vorher)
       await handleStatsButtonInteraction(buttonInteraction);
       return;
     } catch (error) {
@@ -156,22 +147,18 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
           });
         }
       } catch {
-        // Ignorieren
+        // ignorieren
       }
     }
 
     return;
   }
-
-  // Andere Interaction-Typen lassen wir vorerst liegen (Selects, Modals, ...).
 });
 
-client
-  .login(token)
-  .catch((err) => {
-    logError('Login-Fehler beim Client', {
-      functionName: 'bootstrap',
-      extra: { error: err },
-    });
-    process.exit(1);
+client.login(token).catch((err) => {
+  logError('Login-Fehler beim Client', {
+    functionName: 'bootstrap',
+    extra: { error: err },
   });
+  process.exit(1);
+});

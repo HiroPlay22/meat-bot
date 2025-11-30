@@ -2,12 +2,6 @@
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
-export interface GlobalLoggingSettings {
-  aktiv: boolean;
-  logLevel: LogLevel;
-  logChannelId: string | null;
-}
-
 export interface FunktionsBasisEinstellungen {
   aktiv: boolean;
   loggingAktiv: boolean;
@@ -19,7 +13,7 @@ export interface FunktionsBasisEinstellungen {
   spezifisch?: Record<string, any>;
 }
 
-// 🔹 Welcome-Funktion
+// 🔹 Welcome
 
 export interface WelcomeSpezifischSettings {
   welcomeChannelId?: string;
@@ -31,9 +25,10 @@ export interface WelcomeFunktionsEinstellungen
   spezifisch?: WelcomeSpezifischSettings;
 }
 
-// 🔹 Polls / Montags-Runde
+// 🔹 Polls – Montags-Runde
 
 export interface PollMontagSpezifischSettings {
+  allowedRoleIds?: string[];
   announcementChannelId?: string | null;
 }
 
@@ -42,13 +37,15 @@ export interface PollMontagFunktionsEinstellungen
   spezifisch?: PollMontagSpezifischSettings;
 }
 
-export interface PollsFunktionsEinstellungen {
+export interface PollsFunktionsSettings {
   montag?: PollMontagFunktionsEinstellungen;
 }
 
+// 🔹 Funktionen-Sammler
+
 export interface FunktionenSettings {
   welcome?: WelcomeFunktionsEinstellungen;
-  polls?: PollsFunktionsEinstellungen;
+  polls?: PollsFunktionsSettings;
 }
 
 // 🔹 Datenschutz
@@ -57,12 +54,20 @@ export interface DatenschutzSettings {
   userTrackingErlaubt: boolean;
 }
 
-// 🔹 ServerSettings – GLOBAL
+// 🔹 Globales Logging pro Server
+
+export interface LoggingSettings {
+  aktiv: boolean;
+  logLevel: LogLevel;
+  logChannelId: string | null;
+}
+
+// 🔹 Hauptobjekt pro Guild
 
 export interface ServerSettings {
   sprache: 'de' | 'en';
   datenschutz: DatenschutzSettings;
-  logging?: GlobalLoggingSettings;      // 👈 wichtig für logger.ts
+  logging: LoggingSettings; // ⬅️ nicht mehr optional
   functions: FunktionenSettings;
 }
 

@@ -4,10 +4,11 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type {
   AlleServerSettings,
+  FunktionenSettings,
+  LoggingSettings,
+  PollMontagFunktionsEinstellungen,
   ServerSettings,
   WelcomeFunktionsEinstellungen,
-  PollMontagFunktionsEinstellungen,
-  GlobalLoggingSettings,
 } from './server-settings-schema.js';
 
 let cache: AlleServerSettings | null = null;
@@ -34,16 +35,6 @@ async function ladeRohServerSettings(): Promise<AlleServerSettings> {
   return json;
 }
 
-// 🔹 Defaults
-
-function baueGlobalLoggingDefaults(): GlobalLoggingSettings {
-  return {
-    aktiv: false,
-    logLevel: 'info',
-    logChannelId: null,
-  };
-}
-
 function baueWelcomeDefaults(): WelcomeFunktionsEinstellungen {
   return {
     aktiv: false,
@@ -66,10 +57,19 @@ function bauePollMontagDefaults(): PollMontagFunktionsEinstellungen {
     logLevel: 'info',
     logChannelId: null,
     statsAktiv: false,
-    ephemeralStandard: true,
+    ephemeralStandard: false,
     spezifisch: {
+      allowedRoleIds: [],
       announcementChannelId: null,
     },
+  };
+}
+
+function baueLoggingDefaults(): LoggingSettings {
+  return {
+    aktiv: false,
+    logLevel: 'info',
+    logChannelId: null,
   };
 }
 
@@ -79,7 +79,7 @@ function baueServerDefaults(): ServerSettings {
     datenschutz: {
       userTrackingErlaubt: false,
     },
-    logging: baueGlobalLoggingDefaults(),
+    logging: baueLoggingDefaults(),
     functions: {
       welcome: baueWelcomeDefaults(),
       polls: {
@@ -90,43 +90,56 @@ function baueServerDefaults(): ServerSettings {
 }
 
 /**
- * Lädt die ServerSettings für eine Guild.
- * Wenn keine Einträge vorhanden sind, wird ein Default-Objekt zurückgegeben.
+ * Lädt die ServerSettings für eine Guild und merged sie
+ * mit sinnvollen Defaults.
  */
 export async function ladeServerEinstellungen(
   guildId: string,
 ): Promise<ServerSettings> {
   const alleSettings = await ladeRohServerSettings();
-
   const settings = alleSettings[guildId];
+
   const defaults = baueServerDefaults();
 
+  // Noch nichts konfiguriert → reine Defaults
   if (!settings) {
     return defaults;
   }
 
-  return {
-    ...defaults,
-    ...settings,
-    logging: {
-      ...defaults.logging!,
-      ...(settings.logging ?? {}),
-    },
-    functions: {
-      ...defaults.functions,
-      ...settings.functions,
-      welcome: {
-        ...defaults.functions.welcome!,
-        ...settings.functions?.welcome,
+  const mergedFunctions: FunktionenSettings = {
+    ...defaults.functions,
+    ...settings.functions,
+    welcome: {
+      ...defaults.functions.welcome!,
+      ...settings.functions?.welcome,
+      spezifisch: {
+        ...defaults.functions.welcome?.spezifisch,
+        ...settings.functions?.welcome?.spezifisch,
       },
-      polls: {
-        ...defaults.functions.polls,
-        ...settings.functions?.polls,
-        montag: {
-          ...defaults.functions.polls?.montag!,
-          ...settings.functions?.polls?.montag,
+    },
+    polls: {
+      ...defaults.functions.polls,
+      ...settings.functions?.polls,
+      montag: {
+        ...defaults.functions.polls?.montag!,
+        ...settings.functions?.polls?.montag,
+        spezifisch: {
+          ...defaults.functions.polls?.montag?.spezifisch,
+          ...settings.functions?.polls?.montag?.spezifisch,
         },
       },
     },
+  };
+
+  const mergedLogging: LoggingSettings = {
+    ...defaults.logging,
+    ...(settings.logging ?? {}),
+  };
+
+  return {
+    ...defaults,
+    ...settings,
+    logging: mergedLogging,
+    functions: mergedFunctions,
   };
 }
