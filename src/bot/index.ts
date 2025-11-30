@@ -13,6 +13,8 @@ import {
   logError,
   logInfo,
   logWarn,
+  logDebug,
+  setDiscordClient,
 } from './general/logging/logger.js';
 import { trackCommandUsage } from './general/stats/statsManager.js';
 import { handleStatsButtonInteraction } from './functions/stats/overview/stats.buttons.js';
@@ -32,6 +34,9 @@ const client = new Client({
     GatewayIntentBits.Guilds, // für Slash-Commands & Guild-Funktionen
   ],
 });
+
+// 🔹 Discord-Client dem Logger bekannt machen (für Log-Channel-Ausgabe)
+setDiscordClient(client);
 
 client.once(Events.ClientReady, (readyClient) => {
   logInfo(`Eingeloggt als ${readyClient.user.tag}`, {
