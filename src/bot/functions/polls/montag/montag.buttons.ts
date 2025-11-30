@@ -33,22 +33,6 @@ import {
 import { ladeServerEinstellungen } from '../../../general/config/server-settings-loader.js';
 import { logError, logInfo } from '../../../general/logging/logger.js';
 
-function getPollAnswerText(answer: any): string {
-  const base =
-    answer.text ??
-    answer.answer_text ??
-    answer.label ??
-    answer.poll_media?.text ??
-    answer.pollMedia?.text ??
-    '';
-
-  if (typeof base === 'string') {
-    return base.trim();
-  }
-
-  return String(base ?? '').trim();
-}
-
 function ermittleNaechstenMontag19Uhr(): string {
   const jetzt = new Date();
   const tag = jetzt.getDay();
@@ -59,8 +43,8 @@ function ermittleNaechstenMontag19Uhr(): string {
 
   const wochentage = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
   const wt = wochentage[ziel.getDay()];
-  const tagNum = jetzt.getDate().toString().padStart(2, '0');
-  const monatNum = (jetzt.getMonth() + 1).toString().padStart(2, '0');
+  const tagNum = ziel.getDate().toString().padStart(2, '0');
+  const monatNum = (ziel.getMonth() + 1).toString().padStart(2, '0');
 
   return `${wt}, ${tagNum}.${monatNum}. um 19:00 Uhr`;
 }
@@ -424,41 +408,37 @@ export async function handleMontagPollButton(
         const textChannel = channel as GuildTextBasedChannel;
         const message = await textChannel.messages.fetch(aktiverPoll.messageId);
 
-        let pollAny = message.poll as any;
-
-        // Versuche den Poll manuell zu beenden.
-        // Wenn Discord "Poll expired" (520001) meldet, ignorieren wir das
-        // und lesen trotzdem die (finalen) Ergebnisse aus.
-        if (pollAny && typeof pollAny.end === 'function') {
-          try {
-            await pollAny.end();
-
-            // nach dem Beenden neu einlesen, damit Ergebnisse final sind
-            const refreshed = await message.fetch();
-            pollAny = (refreshed.poll ?? message.poll) as any;
-          } catch (err: any) {
-            const code = err?.code ?? err?.rawError?.code;
-            if (code === 520001) {
-              // Poll ist laut API bereits abgelaufen → einfach Ergebnis verwenden
-              logInfo('Montags-Poll war beim Schließen bereits abgelaufen', {
-                functionName: 'handleMontagPollButton',
-                guildId,
-                userId,
-                extra: { pollId: aktiverPoll.id },
-              });
-
-              const refreshed = await message.fetch();
-              pollAny = (refreshed.poll ?? message.poll) as any;
-            } else {
-              throw err;
+        // Poll im Client beenden (keine weiteren Stimmen)
+        if (message.poll) {
+          const anyPoll = message.poll as any;
+          if (anyPoll && typeof anyPoll.end === 'function') {
+            try {
+              await anyPoll.end();
+            } catch (err) {
+              const anyErr = err as any;
+              const code = anyErr?.code ?? anyErr?.rawError?.code;
+              if (code === 520001) {
+                // Poll ist laut API bereits abgelaufen → wir nutzen einfach die vorhandenen Ergebnisse
+                logInfo('Montags-Poll war beim Schließen bereits abgelaufen', {
+                  functionName: 'handleMontagPollButton',
+                  guildId,
+                  userId,
+                  extra: { pollId: aktiverPoll.id },
+                });
+              } else {
+                throw err;
+              }
             }
           }
         }
 
-        // Versuch, das Ergebnis auszulesen
+        // Versuch, das Ergebnis auszulesen (alte, funktionierende Variante)
         let winnerNames: string[] = [];
 
         try {
+          const refreshed = await message.fetch();
+          const pollAny = (refreshed.poll ?? message.poll) as any;
+
           const answers: any[] = pollAny?.answers ?? [];
           const countsRaw: any[] =
             pollAny?.results?.answer_counts ??
@@ -470,13 +450,11 @@ export async function handleMontagPollButton(
 
             for (const c of countsRaw) {
               const id = Number(
-                c.id ??
-                  c.answer_id ??
-                  c.answerId ??
-                  c.option_id ??
-                  c.optionId,
+                c.id ?? c.answer_id ?? c.answerId ?? c.option_id ?? c.optionId,
               );
-              const count = Number(c.count ?? c.votes ?? 0);
+              const count = Number(
+                c.count ?? c.votes ?? c.vote_count ?? c.voteCount ?? 0,
+              );
 
               if (!Number.isNaN(id)) {
                 countsById.set(id, count);
@@ -509,10 +487,30 @@ export async function handleMontagPollButton(
                   const votes = countsById.get(aId) ?? 0;
                   return votes === maxVotes;
                 })
-                .map((answer) => getPollAnswerText(answer))
+                .map((answer) =>
+                  String(
+                    answer.pollMedia?.text ??
+                      answer.text ??
+                      answer.answer_text ??
+                      answer.label ??
+                      '',
+                  ).trim(),
+                )
                 .filter((txt) => txt.length > 0);
             }
           }
+
+          logInfo('Montags-Poll Ergebnis ausgewertet', {
+            functionName: 'handleMontagPollButton',
+            guildId,
+            userId,
+            extra: {
+              pollId: aktiverPoll.id,
+              winnerNames,
+              answersLength: Array.isArray(answers) ? answers.length : null,
+              countsLength: Array.isArray(countsRaw) ? countsRaw.length : null,
+            },
+          });
         } catch (err) {
           logError('Konnte Montags-Poll-Ergebnis nicht auslesen', {
             functionName: 'handleMontagPollButton',
