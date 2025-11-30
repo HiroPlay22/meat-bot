@@ -33,6 +33,22 @@ import {
 import { ladeServerEinstellungen } from '../../../general/config/server-settings-loader.js';
 import { logError, logInfo } from '../../../general/logging/logger.js';
 
+function getPollAnswerText(answer: any): string {
+  const base =
+    answer.text ??
+    answer.answer_text ??
+    answer.label ??
+    answer.poll_media?.text ??
+    answer.pollMedia?.text ??
+    '';
+
+  if (typeof base === 'string') {
+    return base.trim();
+  }
+
+  return String(base ?? '').trim();
+}
+
 function ermittleNaechstenMontag19Uhr(): string {
   const jetzt = new Date();
   const tag = jetzt.getDay();
@@ -439,43 +455,62 @@ export async function handleMontagPollButton(
           }
         }
 
+        // Versuch, das Ergebnis auszulesen
         let winnerNames: string[] = [];
 
         try {
           const answers: any[] = pollAny?.answers ?? [];
+          const countsRaw: any[] =
+            pollAny?.results?.answer_counts ??
+            pollAny?.results?.answerCounts ??
+            [];
 
-          if (Array.isArray(answers) && answers.length > 0) {
-            let maxVotes = 0;
+          if (answers.length && countsRaw.length) {
+            const countsById = new Map<number, number>();
 
-            for (const ans of answers) {
-              const votes = Number(
-                ans.voteCount ??
-                  ans.votes ??
-                  ans.results?.count ??
-                  0,
+            for (const c of countsRaw) {
+              const id = Number(
+                c.id ??
+                  c.answer_id ??
+                  c.answerId ??
+                  c.option_id ??
+                  c.optionId,
               );
+              const count = Number(c.count ?? c.votes ?? 0);
+
+              if (!Number.isNaN(id)) {
+                countsById.set(id, count);
+              }
+            }
+
+            let maxVotes = 0;
+            for (const answer of answers) {
+              const aId = Number(
+                answer.id ??
+                  answer.answer_id ??
+                  answer.answerId ??
+                  answer.option_id ??
+                  answer.optionId,
+              );
+              const votes = countsById.get(aId) ?? 0;
               if (votes > maxVotes) maxVotes = votes;
             }
 
             if (maxVotes > 0) {
               winnerNames = answers
-                .filter((ans) => {
-                  const votes = Number(
-                    ans.voteCount ??
-                      ans.votes ??
-                      ans.results?.count ??
-                      0,
+                .filter((answer) => {
+                  const aId = Number(
+                    answer.id ??
+                      answer.answer_id ??
+                      answer.answerId ??
+                      answer.option_id ??
+                      answer.optionId,
                   );
+                  const votes = countsById.get(aId) ?? 0;
                   return votes === maxVotes;
                 })
-                .map((ans) =>
-                  String(
-                    ans.pollMedia?.text ??
-                      ans.text ??
-                      '',
-                  ).trim(),
-                )
-                .filter((name) => name.length > 0);
+                .map((answer) => getPollAnswerText(answer))
+                .filter((txt) => txt.length > 0);
             }
           }
         } catch (err) {
