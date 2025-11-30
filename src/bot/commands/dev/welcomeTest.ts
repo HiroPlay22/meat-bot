@@ -66,8 +66,6 @@ export const welcomeTestCommand: SlashCommand = {
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
-
     try {
       const guildId = interaction.guild.id;
       const settings = await ladeServerEinstellungen(guildId);
@@ -83,9 +81,11 @@ export const welcomeTestCommand: SlashCommand = {
           },
         );
 
-        await interaction.editReply(
-          'Die Welcome-Funktion ist auf diesem Server aktuell **deaktiviert**. Aktiviere sie in den `serverSettings`.',
-        );
+        await interaction.reply({
+          content:
+            'Die Welcome-Funktion ist auf diesem Server aktuell **deaktiviert**. Aktiviere sie in den `serverSettings`.',
+          ephemeral: true,
+        });
         return;
       }
 
@@ -124,15 +124,18 @@ export const welcomeTestCommand: SlashCommand = {
           },
         );
 
-        await interaction.editReply(
-          `Test-Willkommensnachricht wurde im konfigurierten Channel <#${zielChannel.id}> gesendet.`,
-        );
+        await interaction.reply({
+          content: `Test-Willkommensnachricht wurde im konfigurierten Channel <#${zielChannel.id}> gesendet.`,
+          ephemeral: true,
+        });
       } else {
         // Fallback: aktueller Channel (mit Type-Cast nach Text-Check)
         if (!interaction.channel || !interaction.channel.isTextBased()) {
-          await interaction.editReply(
-            'Es ist kein gültiger Welcome-Channel konfiguriert und dieser Channel ist nicht textbasiert. Nix zu machen.',
-          );
+          await interaction.reply({
+            content:
+              'Es ist kein gültiger Welcome-Channel konfiguriert und dieser Channel ist nicht textbasiert. Nix zu machen.',
+            ephemeral: true,
+          });
           return;
         }
 
@@ -150,9 +153,11 @@ export const welcomeTestCommand: SlashCommand = {
           },
         );
 
-        await interaction.editReply(
-          'Kein gültiger Welcome-Channel konfiguriert – Test-Willkommensnachricht wurde in **diesem** Channel gesendet.',
-        );
+        await interaction.reply({
+          content:
+            'Kein gültiger Welcome-Channel konfiguriert – Test-Willkommensnachricht wurde in **diesem** Channel gesendet.',
+          ephemeral: true,
+        });
       }
     } catch (error) {
       logError('Fehler im /welcome-test Command', {
@@ -163,9 +168,11 @@ export const welcomeTestCommand: SlashCommand = {
       });
 
       try {
-        await interaction.editReply(
-          'Uff. Beim Testen der Welcome-Funktion ist etwas schiefgelaufen. Schau mal in die Logs.',
-        );
+        await interaction.reply({
+          content:
+            'Uff. Beim Testen der Welcome-Funktion ist etwas schiefgelaufen. Schau mal in die Logs.',
+          ephemeral: true,
+        });
       } catch {
         // Ignorieren
       }
