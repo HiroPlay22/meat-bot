@@ -1,40 +1,41 @@
 // FILE: src/bot/general/db/prismaClient.ts
 
-import { PrismaClient } from '@prisma/client';
+import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
+import * as prismaPkg from '@prisma/client';
 import { logError } from '../logging/logger.js';
 
-const databaseUrl = process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL;
 
-if (!databaseUrl) {
-  logError('DATABASE_URL ist nicht gesetzt – Prisma kann nicht initialisiert werden.', {
-    functionName: 'prismaClient',
-  });
-  throw new Error('Missing DATABASE_URL for Prisma');
+if (!connectionString) {
+  throw new Error(
+    'DATABASE_URL ist nicht gesetzt. Prisma kann keine Verbindung aufbauen.',
+  );
 }
 
-declare global {
-  // Verhindert mehrere Instanzen im Dev-Mode
-  // eslint-disable-next-line no-var
-  var __MEAT_PRISMA__: PrismaClient | undefined;
-}
+// PostgreSQL Connection Pool
+const pool = new Pool({ connectionString });
 
-function createPrismaClient(): PrismaClient {
-  const adapter = new PrismaPg({
-    connectionString: databaseUrl,
-  });
+// Prisma 7 Adapter für PostgreSQL
+const adapter = new PrismaPg(pool);
 
-  return new PrismaClient({
-    adapter,
-    // spätere Feinsteuerung möglich (query-Logging etc.)
-    log: ['warn', 'error'],
-  });
-}
+// PrismaClient aus dem Paket holen (Prisma 7 → kein typisierter Named Export)
+const { PrismaClient } = prismaPkg as any;
 
-const prisma = global.__MEAT_PRISMA__ ?? createPrismaClient();
+// Gemeinsamer Prisma-Client für den gesamten Bot
+export const prisma = new PrismaClient({ adapter });
 
+// Aufräumen bei lokalem Exit (in Railway eher theoretisch, aber schadet nicht)
 if (process.env.NODE_ENV !== 'production') {
-  global.__MEAT_PRISMA__ = prisma;
+  process.on('beforeExit', async () => {
+    try {
+      await prisma.$disconnect();
+      await pool.end();
+    } catch (error) {
+      logError('Fehler beim Herunterfahren der Prisma-/DB-Verbindung', {
+        functionName: 'prismaClient.beforeExit',
+        extra: { error },
+      });
+    }
+  });
 }
-
-export { prisma };
