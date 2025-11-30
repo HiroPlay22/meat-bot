@@ -32,9 +32,17 @@ export interface DatenschutzSettings {
   userTrackingErlaubt: boolean;
 }
 
+// 🔹 NEU: Globales Logging pro Server (Ruleset-Style, aber schlank)
+export interface LoggingSettings {
+  aktiv: boolean;
+  logLevel: LogLevel;
+  logChannelId: string | null;
+}
+
 export interface ServerSettings {
   sprache: 'de' | 'en';
   datenschutz: DatenschutzSettings;
+  logging: LoggingSettings;
   functions: FunktionenSettings;
 }
 

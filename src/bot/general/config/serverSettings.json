@@ -4,18 +4,23 @@
     "datenschutz": {
       "userTrackingErlaubt": false
     },
+    "logging": {
+      "aktiv": true,
+      "logLevel": "info",
+      "logChannelId": null
+    },
     "functions": {
       "welcome": {
         "aktiv": true,
         "loggingAktiv": true,
         "logLevel": "info",
-        "logChannelId": null,
-        "statsAktiv": false,
-        "ephemeralStandard": false,
-        "spezifisch": {
-          "welcomeChannelId": "1363882924557992169",
-          "begruesseBots": true
-        }
+        "logChannelId": "1444665947431501998",
+          "statsAktiv": false,
+          "ephemeralStandard": false,
+          "spezifisch": {
+            "welcomeChannelId": "1363882924557992169",
+            "begruesseBots": true
+          }
       }
     }
   }

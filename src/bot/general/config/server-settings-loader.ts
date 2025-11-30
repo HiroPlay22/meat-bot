@@ -6,6 +6,7 @@ import type {
   AlleServerSettings,
   ServerSettings,
   WelcomeFunktionsEinstellungen,
+  LoggingSettings,
 } from './server-settings-schema.js';
 
 let cache: AlleServerSettings | null = null;
@@ -48,12 +49,22 @@ function baueWelcomeDefaults(): WelcomeFunktionsEinstellungen {
   };
 }
 
+// 🔹 NEU: Globales Logging-Default pro Server
+function baueLoggingDefaults(): LoggingSettings {
+  return {
+    aktiv: false,
+    logLevel: 'info',
+    logChannelId: null,
+  };
+}
+
 function baueServerDefaults(): ServerSettings {
   return {
     sprache: 'de',
     datenschutz: {
       userTrackingErlaubt: false,
     },
+    logging: baueLoggingDefaults(),
     functions: {
       welcome: baueWelcomeDefaults(),
     },
@@ -70,17 +81,20 @@ export async function ladeServerEinstellungen(
   const alleSettings = await ladeRohServerSettings();
 
   const settings = alleSettings[guildId];
+  const defaults = baueServerDefaults();
 
   if (!settings) {
     // Noch nichts konfiguriert → Default, später kann man das vom Dashboard aus speichern.
-    return baueServerDefaults();
+    return defaults;
   }
-
-  const defaults = baueServerDefaults();
 
   return {
     ...defaults,
     ...settings,
+    logging: {
+      ...defaults.logging,
+      ...(settings as Partial<ServerSettings>).logging,
+    },
     functions: {
       ...defaults.functions,
       ...settings.functions,
