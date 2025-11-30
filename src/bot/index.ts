@@ -6,6 +6,7 @@ import {
   Events,
   GatewayIntentBits,
   type Interaction,
+  type ButtonInteraction,
 } from 'discord.js';
 import { slashCommands } from './commands/index.js';
 import {
@@ -15,6 +16,7 @@ import {
 } from './general/logging/logger.js';
 import { trackCommandUsage } from './general/stats/statsManager.js';
 import { handleStatsButtonInteraction } from './functions/stats/overview/stats.buttons.js';
+import { bearbeiteDatenschutzButton } from './functions/sentinel/datenschutz/datenschutz.buttons.js';
 
 const token = process.env.DISCORD_TOKEN;
 
@@ -104,9 +106,49 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
     return;
   }
 
-  // Buttons (erstmal nur /stats-Buttons)
+  // Buttons → Router
   if (interaction.isButton()) {
-    await handleStatsButtonInteraction(interaction);
+    const buttonInteraction = interaction as ButtonInteraction;
+    const customId = buttonInteraction.customId;
+
+    try {
+      // 1) Datenschutz-Buttons
+      if (customId.startsWith('sentinel_datenschutz_')) {
+        await bearbeiteDatenschutzButton(buttonInteraction);
+        return;
+      }
+
+      // 2) Alle anderen Buttons → Stats-Handler (wie vorher)
+      await handleStatsButtonInteraction(buttonInteraction);
+      return;
+    } catch (error) {
+      logError('Fehler bei der Button-Verarbeitung', {
+        functionName: 'interactionButton',
+        guildId: interaction.guildId ?? undefined,
+        channelId: interaction.channelId,
+        userId: interaction.user.id,
+        extra: { error },
+      });
+
+      try {
+        if (interaction.replied || interaction.deferred) {
+          await interaction.followUp({
+            content:
+              'Uff. Da ist was bei einem Button schiefgelaufen. Sag Hiro, er soll mal in die Logs schauen.',
+            ephemeral: true,
+          });
+        } else {
+          await interaction.reply({
+            content:
+              'Uff. Da ist was bei einem Button schiefgelaufen. Sag Hiro, er soll mal in die Logs schauen.',
+            ephemeral: true,
+          });
+        }
+      } catch {
+        // Ignorieren
+      }
+    }
+
     return;
   }
 
