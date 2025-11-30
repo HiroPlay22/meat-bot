@@ -109,22 +109,35 @@
               </div>
 
               <div class="flex flex-wrap gap-3">
+                <!-- Bot-Status (später per API aktualisierbar) -->
                 <div
                   class="flex items-center gap-2 rounded-xl bg-slate-900/80 px-3 py-2 text-xs border border-slate-800/80"
                 >
-                  <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                  <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
                   <span class="font-medium text-slate-200">Bot-Status</span>
-                  <span class="text-emerald-300/90">Online (Testumgebung)</span>
+                  <span id="bot-status-text" class="text-emerald-300/90">
+                    Online (Testumgebung)
+                  </span>
                 </div>
 
+                <!-- Verbundener Test-Server (Icon kannst du ersetzen) -->
                 <div
                   class="flex items-center gap-2 rounded-xl bg-slate-900/70 px-3 py-2 text-xs border border-slate-800/80"
                 >
-                  <span class="inline-flex h-5 w-5 items-center justify-center rounded-md bg-slate-950/80 text-[0.7rem] text-rose-400 border border-slate-700/70">
-                    🧠
+                  <div
+                    class="flex h-5 w-5 items-center justify-center overflow-hidden rounded-md bg-slate-950"
+                  >
+                    <!-- TODO: eigenes Guild-Icon z. B. assets/img/server_test.png -->
+                    <img
+                      src="assets/img/meat_logo1.png"
+                      alt="Testserver"
+                      class="h-5 w-5 object-cover"
+                    />
+                  </div>
+                  <span class="font-medium text-slate-200">Verbundener Server</span>
+                  <span class="text-slate-400 text-[0.78rem]">
+                    GamingFriends · Test
                   </span>
-                  <span class="font-medium text-slate-200">Core-Modus</span>
-                  <span class="text-slate-400">Sentinel, Stats, Commands</span>
                 </div>
               </div>
 
@@ -134,7 +147,7 @@
                     Aktueller Fokus
                   </p>
                   <p class="text-[0.8rem]">
-                    Opt-in Tracking (Sentinel), Command-Stats & erste Web-Module.
+                    Opt-in Tracking (Sentinel), Command-Stats &amp; erste Web-Module.
                   </p>
                 </div>
                 <div class="space-y-1">
@@ -142,7 +155,7 @@
                     Nächste Steps
                   </p>
                   <p class="text-[0.8rem]">
-                    Dashboard-Module, Clip-Queue, Event-Steuerung,
+                    Dashboard-Module, Clip-Queue, Event-Module &amp;
                     Multi-Server-Konfiguration.
                   </p>
                 </div>
@@ -152,7 +165,8 @@
                   </p>
                   <p class="text-[0.8rem]">
                     Interner Build im Testbetrieb.<br />
-                    Öffentliche Oberfläche: <span class="text-amber-300">Soon™</span>
+                    Öffentliche Oberfläche:
+                    <span class="text-amber-300">Soon™</span>
                   </p>
                 </div>
               </div>
@@ -166,19 +180,32 @@
               class="rounded-2xl border border-meat-border bg-meat-soft/80 px-4 py-4 sm:px-5"
             >
               <div class="flex items-start justify-between gap-3">
-                <div>
-                  <p class="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
-                    Bot Snapshot
-                  </p>
-                  <h3 class="mt-1 text-sm font-semibold text-slate-100">
-                    M.E.A.T./Core – Testserver
-                  </h3>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-slate-900 border border-slate-700/80"
+                  >
+                    <img
+                      src="assets/img/meat_logo1.png"
+                      alt="M.E.A.T."
+                      class="h-8 w-8 object-contain"
+                    />
+                  </div>
+                  <div>
+                    <p
+                      class="text-[0.7rem] uppercase tracking-[0.16em] text-slate-500"
+                    >
+                      Bot Snapshot
+                    </p>
+                    <h3 class="mt-1 text-sm font-semibold text-slate-100">
+                      M.E.A.T./Core – Test-Cluster
+                    </h3>
+                  </div>
                 </div>
                 <div
                   class="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[0.7rem] text-emerald-300 border border-emerald-500/40"
                 >
                   <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <span>Online</span>
+                  <span id="bot-status-pill">Online</span>
                 </div>
               </div>
 
@@ -187,7 +214,12 @@
                   <dt class="text-[0.7rem] uppercase tracking-wide text-slate-500">
                     Verbundene Server
                   </dt>
-                  <dd class="text-sm font-semibold text-slate-100">Test-Cluster</dd>
+                  <dd
+                    id="stat-guilds"
+                    class="text-sm font-semibold text-slate-100"
+                  >
+                    Testserver (Preview)
+                  </dd>
                 </div>
                 <div class="space-y-1">
                   <dt class="text-[0.7rem] uppercase tracking-wide text-slate-500">
@@ -223,7 +255,7 @@
               </p>
               <div class="mt-3 flex flex-wrap gap-2">
                 <a
-                  href="datenschutz.html"
+                  href="/datenschutz"
                   class="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2 text-xs text-slate-200 hover:border-rose-500 hover:text-rose-100 hover:bg-slate-900 transition"
                 >
                   <span
@@ -270,63 +302,72 @@
 
         <!-- Grid mit Cards / Preview-Bereich -->
         <section class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          <!-- Globale Stat-Karten (placeholder) -->
+          <!-- 1) Stats-Graph (später echte Daten) -->
           <article
-            class="rounded-2xl border border-meat-border bg-meat-soft/80 p-5 flex flex-col justify-between"
+            class="rounded-2xl border border-meat-border bg-meat-soft/80 p-5 flex flex-col"
           >
             <header class="flex items-center justify-between gap-2">
               <div>
                 <p
                   class="text-[0.7rem] uppercase tracking-[0.16em] text-slate-500"
                 >
-                  Globale Bot-Stats
+                  Server &amp; Commands
                 </p>
                 <h3 class="mt-1 text-sm font-semibold text-slate-100">
-                  Übersicht (Preview)
+                  Aktivität (Preview)
                 </h3>
               </div>
               <span
                 class="inline-flex items-center rounded-full bg-slate-900/80 px-2.5 py-1 text-[0.65rem] text-slate-400 border border-slate-700/80"
               >
-                Live-Zahlen später
+                Live-Daten später
               </span>
             </header>
 
-            <dl class="mt-4 grid grid-cols-2 gap-3 text-xs text-slate-400">
-              <div>
-                <dt class="text-[0.7rem] uppercase tracking-wide text-slate-500">
-                  Server
-                </dt>
-                <dd class="mt-0.5 text-lg font-semibold text-slate-100">–</dd>
+            <!-- Fake-Bar-Chart, später per JS aus API füllen -->
+            <div class="mt-4">
+              <div class="flex items-end gap-2 h-32">
+                <div class="flex-1 flex flex-col items-center gap-1">
+                  <div class="w-full rounded-md bg-slate-900 border border-slate-800 flex items-end justify-center">
+                    <div class="w-3/4 rounded-md bg-rose-500/80 h-6"></div>
+                  </div>
+                  <span class="text-[0.7rem] text-slate-500">Mo</span>
+                </div>
+                <div class="flex-1 flex flex-col items-center gap-1">
+                  <div class="w-full rounded-md bg-slate-900 border border-slate-800 flex items-end justify-center">
+                    <div class="w-3/4 rounded-md bg-rose-500/80 h-10"></div>
+                  </div>
+                  <span class="text-[0.7rem] text-slate-500">Di</span>
+                </div>
+                <div class="flex-1 flex flex-col items-center gap-1">
+                  <div class="w-full rounded-md bg-slate-900 border border-slate-800 flex items-end justify-center">
+                    <div class="w-3/4 rounded-md bg-rose-500/80 h-16"></div>
+                  </div>
+                  <span class="text-[0.7rem] text-slate-500">Mi</span>
+                </div>
+                <div class="flex-1 flex flex-col items-center gap-1">
+                  <div class="w-full rounded-md bg-slate-900 border border-slate-800 flex items-end justify-center">
+                    <div class="w-3/4 rounded-md bg-rose-500/80 h-12"></div>
+                  </div>
+                  <span class="text-[0.7rem] text-slate-500">Do</span>
+                </div>
+                <div class="flex-1 flex flex-col items-center gap-1">
+                  <div class="w-full rounded-md bg-slate-900 border border-slate-800 flex items-end justify-center">
+                    <div class="w-3/4 rounded-md bg-rose-500/80 h-20"></div>
+                  </div>
+                  <span class="text-[0.7rem] text-slate-500">Fr</span>
+                </div>
               </div>
-              <div>
-                <dt class="text-[0.7rem] uppercase tracking-wide text-slate-500">
-                  Nutzer (global)
-                </dt>
-                <dd class="mt-0.5 text-lg font-semibold text-slate-100">–</dd>
-              </div>
-              <div>
-                <dt class="text-[0.7rem] uppercase tracking-wide text-slate-500">
-                  Commands insgesamt
-                </dt>
-                <dd class="mt-0.5 text-lg font-semibold text-slate-100">–</dd>
-              </div>
-              <div>
-                <dt class="text-[0.7rem] uppercase tracking-wide text-slate-500">
-                  Aktive Module
-                </dt>
-                <dd class="mt-0.5 text-lg font-semibold text-slate-100">Core</dd>
-              </div>
-            </dl>
-
-            <p class="mt-4 text-[0.72rem] text-slate-500">
-              Die echten Zahlen werden später direkt aus dem Sentinel- &
-              Stats-System (Datenbank) gespeist und hier als Charts und Karten
-              angezeigt.
-            </p>
+              <p class="mt-3 text-[0.72rem] text-slate-500">
+                Die Balken stehen aktuell nur symbolisch für Befehlsaktivität pro
+                Tag. Später werden hier echte Daten aus dem
+                <span class="text-slate-400">Stats-System (CommandUsage)</span>
+                visualisiert.
+              </p>
+            </div>
           </article>
 
-          <!-- DevLog / Roadmap -->
+          <!-- 2) Dev-Status / Roadmap -->
           <article
             class="rounded-2xl border border-meat-border bg-meat-soft/80 p-5 flex flex-col"
           >
@@ -355,7 +396,7 @@
                   </p>
                   <p class="text-[0.75rem] text-slate-500">
                     Bot-Basis, Slash-Commands, Logging, Prisma, Railway, Sentinel
-                    (Opt-in).
+                    (Opt-in) – Status: <span class="text-emerald-300">läuft</span>.
                   </p>
                 </div>
               </li>
@@ -370,7 +411,8 @@
                   </p>
                   <p class="text-[0.75rem] text-slate-500">
                     Server- &amp; User-Stats, Command-Tracking, Clip-Queue,
-                    Event-Module (Montagsrunde, Fun-Games).
+                    Event-Module (Montagsrunde &amp; Co.) – Status:
+                    <span class="text-sky-300">in Arbeit</span>.
                   </p>
                 </div>
               </li>
@@ -384,65 +426,55 @@
                     Vollwertiges Web-Dashboard
                   </p>
                   <p class="text-[0.75rem] text-slate-500">
-                    Multi-Server-Config, Rechte-Matrix, GPT-gestützte
-                    Empfehlungen, visuelle Server-Profile.
+                    Multi-Server-Konfiguration, Rechte-Matrix, GPT-gestützte
+                    Empfehlungen, visuelle Server-Profile – Status:
+                    <span class="text-slate-400">planned</span>.
                   </p>
                 </div>
               </li>
             </ol>
           </article>
 
-          <!-- Server-/Owner-Card / Branding -->
+          <!-- 3) Git-Commits (ECHT, via GitHub API) -->
           <article
-            class="rounded-2xl border border-meat-border bg-meat-soft/80 p-5 flex flex-col justify-between"
+            class="rounded-2xl border border-meat-border bg-meat-soft/80 p-5 flex flex-col"
           >
             <header class="flex items-center justify-between gap-2">
               <div>
                 <p
                   class="text-[0.7rem] uppercase tracking-[0.16em] text-slate-500"
                 >
-                  Projekt
+                  Git Activity
                 </p>
                 <h3 class="mt-1 text-sm font-semibold text-slate-100">
-                  Powered by Hiro
+                  Letzte Commits (meat-bot)
                 </h3>
               </div>
+              <a
+                href="https://github.com/HiroPlay22/meat-bot"
+                target="_blank"
+                rel="noreferrer"
+                class="text-[0.7rem] text-slate-400 hover:text-rose-300"
+              >
+                Zum Repo →
+              </a>
             </header>
 
-            <div class="mt-4 space-y-2 text-xs text-slate-400">
-              <p>
-                M.E.A.T. ist ein modularer Bot für Discord (später Twitch &amp;
-                Web), optimiert für Gaming-Communities, LANs, Events und
-                Stat-Overkill.
-              </p>
-              <p>
-                Fokus: saubere Architektur, DSGVO-Opt-in, modulare Erweiterbarkeit
-                und ein bisschen Trash-Charme.
-              </p>
-            </div>
+            <ul
+              id="git-commits"
+              class="mt-4 space-y-3 text-xs text-slate-400"
+            >
+              <li class="text-[0.75rem] text-slate-500">
+                Lade Commits von GitHub …
+              </li>
+            </ul>
 
-            <div class="mt-4 flex flex-wrap gap-2 text-[0.72rem]">
-              <span
-                class="rounded-full bg-slate-900/90 px-3 py-1 border border-slate-700/70 text-slate-300"
-              >
-                🧠 M.E.A.T. Core
+            <p class="mt-4 text-[0.7rem] text-slate-500">
+              Datenquelle:
+              <span class="text-slate-400">
+                <code>GitHub REST API · main</code>
               </span>
-              <span
-                class="rounded-full bg-slate-900/90 px-3 py-1 border border-slate-700/70 text-slate-300"
-              >
-                🛡 Sentinel (Datenschutz)
-              </span>
-              <span
-                class="rounded-full bg-slate-900/90 px-3 py-1 border border-slate-700/70 text-slate-300"
-              >
-                📊 Stats &amp; Tracking
-              </span>
-              <span
-                class="rounded-full bg-slate-900/90 px-3 py-1 border border-slate-700/70 text-slate-300"
-              >
-                🎮 Events &amp; Games
-              </span>
-            </div>
+            </p>
           </article>
         </section>
       </div>
@@ -465,5 +497,87 @@
         </p>
       </div>
     </footer>
+
+    <!-- GitHub-Commits laden -->
+    <script>
+      (async function loadCommits() {
+        const list = document.getElementById("git-commits");
+        if (!list) return;
+
+        try {
+          const res = await fetch(
+            "https://api.github.com/repos/HiroPlay22/meat-bot/commits?sha=main&per_page=5"
+          );
+
+          if (!res.ok) {
+            throw new Error("GitHub API Error: " + res.status);
+          }
+
+          const data = await res.json();
+
+          if (!Array.isArray(data) || data.length === 0) {
+            list.innerHTML =
+              '<li class="text-[0.75rem] text-slate-500">Keine Commits gefunden.</li>';
+            return;
+          }
+
+          list.innerHTML = "";
+
+          data.forEach((commit) => {
+            const li = document.createElement("li");
+            li.className = "flex items-start justify-between gap-3";
+
+            const message =
+              (commit.commit && commit.commit.message
+                ? commit.commit.message.split("\n")[0]
+                : "No message") || "No message";
+
+            const sha = commit.sha ? commit.sha.slice(0, 7) : "";
+            const url = commit.html_url || "#";
+            const date =
+              commit.commit && commit.commit.author && commit.commit.author.date
+                ? new Date(commit.commit.author.date)
+                : null;
+
+            const formattedDate = date
+              ? date.toLocaleString("de-DE", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "";
+
+            li.innerHTML = `
+              <div class="space-y-0.5">
+                <p class="text-[0.78rem] text-slate-200 truncate max-w-[13rem] md:max-w-[14rem]">
+                  ${message}
+                </p>
+                <p class="text-[0.7rem] text-slate-500">
+                  <span class="text-slate-400">${sha}</span>${
+              formattedDate ? " · " + formattedDate : ""
+            }
+                </p>
+              </div>
+              <a
+                href="${url}"
+                target="_blank"
+                rel="noreferrer"
+                class="mt-0.5 text-[0.7rem] text-rose-300 hover:text-rose-200"
+              >
+                View
+              </a>
+            `;
+
+            list.appendChild(li);
+          });
+        } catch (error) {
+          console.error("Fehler beim Laden der Commits:", error);
+          list.innerHTML =
+            '<li class="text-[0.75rem] text-slate-500">Konnte Commits nicht laden.</li>';
+        }
+      })();
+    </script>
   </body>
 </html>
