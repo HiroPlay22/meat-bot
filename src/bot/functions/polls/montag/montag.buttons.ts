@@ -32,6 +32,7 @@ import {
   beendeMontagPoll,
   findeAktivenMontagPoll,
   findeMontagPollByMessage,
+  findeLetztenMontagPoll,
   legeMontagPollAn,
   setMontagWinner,
 } from '../poll.db.js';
@@ -105,6 +106,27 @@ async function sendeMontagErgebnisNachricht(params: {
         extra: { pollChannelId, announcementChannelId, error },
       });
     }
+  }
+}
+
+async function entfernePinHinweis(
+  channel: GuildTextBasedChannel,
+  pinnedMessageId: string,
+): Promise<void> {
+  try {
+    const recent = await channel.messages.fetch({ limit: 5 });
+    for (const [, msg] of recent) {
+      if (
+        msg.type === 6 && // MessageType.ChannelPinnedMessage
+        (msg.reference?.messageId === pinnedMessageId ||
+          msg.content.includes(pinnedMessageId))
+      ) {
+        await msg.delete().catch(() => {});
+        break;
+      }
+    }
+  } catch {
+    // nicht kritisch
   }
 }
 
@@ -869,6 +891,7 @@ export async function handleMontagPollButton(
       try {
         if (message.pinnable && !message.pinned) {
           await message.pin();
+          await entfernePinHinweis(zielChannel, message.id);
         }
       } catch {
         // nice-to-have
@@ -882,6 +905,27 @@ export async function handleMontagPollButton(
       });
 
       const pollUrl = message.url;
+
+      // Vor neuem Pin: alten Montags-Poll (falls vorhanden) im gleichen Guild/Channel entpinnen
+      try {
+        const letzterPoll = await findeLetztenMontagPoll(
+          guildId,
+          message.id,
+        );
+        if (
+          letzterPoll &&
+          letzterPoll.channelId === message.channelId
+        ) {
+          const oldMessage = await zielChannel.messages
+            .fetch(letzterPoll.messageId)
+            .catch(() => null);
+          if (oldMessage?.pinned) {
+            await oldMessage.unpin().catch(() => {});
+          }
+        }
+      } catch {
+        // nice-to-have, Fehler ignorieren
+      }
 
       logInfo('Montags-Poll erstellt', {
         functionName: 'handleMontagPollButton',
