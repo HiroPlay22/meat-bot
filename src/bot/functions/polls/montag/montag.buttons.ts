@@ -74,6 +74,18 @@ async function deleteInteractionMessageIfPossible(
   }
 }
 
+async function deleteInteractionReplySafe(
+  interaction: ButtonInteraction,
+): Promise<void> {
+  try {
+    await interaction.deleteReply();
+    return;
+  } catch {
+    // fallback
+  }
+  await deleteInteractionMessageIfPossible(interaction);
+}
+
 async function sendeMontagErgebnisNachricht(params: {
   guild: Guild;
   pollChannelId: string;
@@ -198,15 +210,14 @@ export async function handleMontagPollButton(
           .setDescription(
             [
               "Es gibt bereits eine aktive Umfrage für die Montags-Runde.",
-              "",
-              `🔗 [Zur laufenden Abstimmung](${pollUrl})`,
-              "",
               "Du kannst die Umfrage hier auch direkt schließen.",
             ].join("\n"),
           )
           .setColor(0xfee75c);
 
-        const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        const linkRow = bauePollLinkRow(pollUrl);
+
+        const closeRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
           new ButtonBuilder()
             .setCustomId("poll_montag_close_active")
             .setStyle(ButtonStyle.Danger)
@@ -215,7 +226,7 @@ export async function handleMontagPollButton(
 
         await interaction.update({
           embeds: [embed],
-          components: [row],
+          components: [linkRow, closeRow],
         });
 
         return;
@@ -370,6 +381,64 @@ export async function handleMontagPollButton(
 
       const state = getOrInitSetupState(guildId, userId);
       state.durationHours = Math.min(32 * 24, state.durationHours + 1);
+
+      const gameCount = await ermittleGesamtGameCount();
+      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
+        guildId,
+        2,
+      );
+
+      const { embed, components } = baueMontagSetupView({
+        serverName,
+        nextMontagText,
+        gameCount,
+        state,
+        excludedGameNames,
+      });
+
+      await interaction.update({
+        embeds: [embed],
+        components,
+      });
+
+      return;
+    }
+
+    if (customId === "poll_montag_duration_dec5") {
+      const ok = await checkPermissions();
+      if (!ok) return;
+
+      const state = getOrInitSetupState(guildId, userId);
+      state.durationHours = Math.max(1, state.durationHours - 5);
+
+      const gameCount = await ermittleGesamtGameCount();
+      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
+        guildId,
+        2,
+      );
+
+      const { embed, components } = baueMontagSetupView({
+        serverName,
+        nextMontagText,
+        gameCount,
+        state,
+        excludedGameNames,
+      });
+
+      await interaction.update({
+        embeds: [embed],
+        components,
+      });
+
+      return;
+    }
+
+    if (customId === "poll_montag_duration_inc5") {
+      const ok = await checkPermissions();
+      if (!ok) return;
+
+      const state = getOrInitSetupState(guildId, userId);
+      state.durationHours = Math.min(32 * 24, state.durationHours + 5);
 
       const gameCount = await ermittleGesamtGameCount();
       const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
@@ -727,7 +796,7 @@ export async function handleMontagPollButton(
 
         return;
       } finally {
-        await deleteInteractionMessageIfPossible(interaction);
+        await deleteInteractionReplySafe(interaction);
         closingPollIds.delete(aktiverPoll.id);
       }
     }

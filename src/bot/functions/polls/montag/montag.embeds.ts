@@ -1,11 +1,10 @@
-// FILE: src/bot/functions/polls/montag/montag.embeds.ts
-
-import {
+﻿import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   EmbedBuilder,
 } from 'discord.js';
+import { emoji, safe } from '../../../general/style/emoji.js';
 import type { MontagSetupState } from './montag.service.js';
 
 interface MontagSetupViewParams {
@@ -50,6 +49,14 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
     excludedGameNames = [],
   } = params;
 
+  const iconHeader = safe(emoji.meat_avatar);
+  const iconCalendar = safe(emoji.meat_calendar);
+  const iconGames = safe(emoji.meat_game);
+  const iconMulti = safe(emoji.meat_votings);
+  const iconDuration = safe(emoji.meat_boss);
+  const iconExclude = safe(emoji.meat_lock);
+  const iconAction = safe(emoji.meat_votings);
+
   const multiText = state.allowMultiselect
     ? 'aktiv (Mehrfachauswahl)'
     : 'nur 1 Stimme pro Person';
@@ -59,26 +66,26 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
   const excludedText =
     excludedGameNames.length > 0
       ? [
-          '🚫 Ausgeschlossen (zuletzt als Gewinner):',
+          `${iconExclude} Ausgeschlossen (zuletzt als Gewinner):`,
           excludedGameNames.map((n) => `• ${n}`).join('\n'),
         ].join('\n')
-      : '🚫 Aktuell wird kein Spiel aufgrund der letzten Gewinner ausgeschlossen.';
+      : `${iconExclude} Aktuell wird kein Spiel aufgrund der letzten Gewinner ausgeschlossen.`;
 
   const embed = new EmbedBuilder()
     .setTitle('Montags-Runde – Setup')
     .setDescription(
       [
-        `🕹 **Montags-Runde Setup für _${serverName}_**`,
+        `${iconHeader} **Montags-Runde Setup für _${serverName}_**`,
         '',
-        `📅 Geplante Session: **${nextMontagText}**`,
-        `🎮 Verfügbare Spiele in der Datenbank: **${gameCount}**`,
+        `${iconCalendar} Geplante Session: **${nextMontagText}**`,
+        `${iconGames} Verfügbare Spiele in der Datenbank: **${gameCount}**`,
         '',
-        `🔁 Mehrfachauswahl: **${multiText}**`,
-        `⏱ Dauer: **${dauerText}**`,
+        `${iconMulti} Mehrfachauswahl: **${multiText}**`,
+        `${iconDuration} Dauer: **${dauerText}**`,
         '',
         excludedText,
         '',
-        '➡ Klicke auf **„Umfrage vorbereiten“**, um eine zufällige Auswahl an Spielen zu generieren.',
+        `${iconAction} Klicke auf **„Umfrage planen“**, um eine zufällige Auswahl an Spielen zu generieren.`,
       ].join('\n'),
     )
     .setColor(0x579326);
@@ -87,7 +94,7 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
     new ButtonBuilder()
       .setCustomId('poll_montag_prepare')
       .setStyle(ButtonStyle.Primary)
-      .setLabel('Umfrage vorbereiten'),
+      .setLabel('Umfrage planen'),
     new ButtonBuilder()
       .setCustomId('poll_montag_add_game')
       .setStyle(ButtonStyle.Secondary)
@@ -104,9 +111,17 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
       .setStyle(ButtonStyle.Secondary)
       .setLabel('- 1h'),
     new ButtonBuilder()
+      .setCustomId('poll_montag_duration_dec5')
+      .setStyle(ButtonStyle.Secondary)
+      .setLabel('- 5h'),
+    new ButtonBuilder()
       .setCustomId('poll_montag_duration_inc')
       .setStyle(ButtonStyle.Secondary)
       .setLabel('+ 1h'),
+    new ButtonBuilder()
+      .setCustomId('poll_montag_duration_inc5')
+      .setStyle(ButtonStyle.Secondary)
+      .setLabel('+ 5h'),
   );
 
   const row3 = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -128,6 +143,12 @@ export function baueMontagPreviewView(params: MontagPreviewViewParams): {
 } {
   const { serverName, nextMontagText, state } = params;
 
+  const iconHeader = safe(emoji.meat_avatar);
+  const iconCalendar = safe(emoji.meat_calendar);
+  const iconMulti = safe(emoji.meat_votings);
+  const iconDuration = safe(emoji.meat_boss);
+  const iconGames = safe(emoji.meat_game);
+
   const selectedText = state.selectedGames.length
     ? state.selectedGames
         .map((game, index) => {
@@ -146,15 +167,15 @@ export function baueMontagPreviewView(params: MontagPreviewViewParams): {
     .setTitle('Montags-Runde – Vorschau')
     .setDescription(
       [
-        `🕹 **Montags-Runde Vorschau für _${serverName}_**`,
+        `${iconHeader} **Montags-Runde Vorschau für _${serverName}_**`,
         '',
-        `📅 Session: **${nextMontagText}**`,
-        `🔁 Mehrfachauswahl: **${
+        `${iconCalendar} Session: **${nextMontagText}**`,
+        `${iconMulti} Mehrfachauswahl: **${
           state.allowMultiselect ? 'aktiv' : 'nur 1 Stimme'
         }**`,
-        `⏱ Dauer: **${formatDurationText(state.durationHours)}**`,
+        `${iconDuration} Dauer: **${formatDurationText(state.durationHours)}**`,
         '',
-        '🎮 **Spiele in dieser Umfrage:**',
+        `${iconGames} **Spiele in dieser Umfrage:**`,
         selectedText,
       ].join('\n'),
     )
