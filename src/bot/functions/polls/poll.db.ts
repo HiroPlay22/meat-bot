@@ -31,6 +31,22 @@ export async function findeMontagPollByMessage(
   });
 }
 
+export async function findeLetztenMontagPoll(
+  guildId: string,
+  excludeMessageId?: string,
+): Promise<Poll | null> {
+  return prisma.poll.findFirst({
+    where: {
+      guildId,
+      type: PollType.MONTAG,
+      messageId: excludeMessageId ? { not: excludeMessageId } : undefined,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+}
+
 /**
  * Legt einen neuen Montags-Poll in der DB an.
  */
