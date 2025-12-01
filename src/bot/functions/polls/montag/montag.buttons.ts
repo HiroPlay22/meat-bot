@@ -727,6 +727,7 @@ export async function handleMontagPollButton(
 
         return;
       } finally {
+        await deleteInteractionMessageIfPossible(interaction);
         closingPollIds.delete(aktiverPoll.id);
       }
     }
