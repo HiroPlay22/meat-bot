@@ -57,10 +57,10 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
   const iconMulti = safe(emoji.meat_votings);
   const iconDuration = safe(emoji.meat_boss);
   const iconExclude = safe(emoji.meat_lock);
-
-  const multiText = state.allowMultiselect
-    ? "aktiv (Mehrfachauswahl)"
-    : "nur 1 Stimme pro Person";
+  const multiIndicator = state.allowMultiselect ? "🟢" : "🔘";
+  const sessionText = nextMontagText
+    .replace(", ", " ")
+    .replace(" um ", " • ");
 
   const dauerText = formatDurationText(state.durationHours);
 
@@ -74,13 +74,16 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
 
   const embed = new EmbedBuilder()
     .setTitle(`Montags-Runde Setup für _${serverName}_`)
-    .setThumbnail(serverIconUrl ?? null)
+    .setAuthor({
+      name: serverName,
+      iconURL: serverIconUrl ?? undefined,
+    })
     .setDescription(
       [
-        `${iconServers} Verfügbare Spiele in der CD: \`${gameCount}\``,
-        `${iconMulti} Mehrfachauswahl: **${multiText}** \`${multiText}\``,
-        `${iconDuration} Dauer: **${dauerText}** \`${dauerText}\``,
-        `${safe(emoji.meat_calendar)} Geplante Session: \`${nextMontagText}\``,
+        `${iconServers} Spiele in der DB: \`${gameCount}\``,
+        `${iconMulti} Mehrfachauswahl: ${multiIndicator}`,
+        `${iconDuration} Dauer: ${dauerText}`,
+        `${safe(emoji.meat_calendar)} Geplante Session: \`${sessionText}\``,
         "",
         excludedText,
         "",
@@ -146,6 +149,10 @@ export function baueMontagPreviewView(params: MontagPreviewViewParams): {
   const iconMulti = safe(emoji.meat_votings);
   const iconDuration = safe(emoji.meat_boss);
   const iconGames = safe(emoji.meat_game);
+  const multiIndicator = state.allowMultiselect ? "🟢" : "🔘";
+  const sessionText = nextMontagText
+    .replace(", ", " ")
+    .replace(" um ", " • ");
 
   const selectedText = state.selectedGames.length
     ? state.selectedGames
@@ -163,17 +170,18 @@ export function baueMontagPreviewView(params: MontagPreviewViewParams): {
 
   const embed = new EmbedBuilder()
     .setTitle(`Montags-Runde Vorschau für _${serverName}_`)
-    .setThumbnail(serverIconUrl ?? null)
+    .setAuthor({
+      name: serverName,
+      iconURL: serverIconUrl ?? undefined,
+    })
     .setDescription(
       [
         `${iconGames} **Spiele in dieser Umfrage:**`,
         selectedText,
         "",
-        `${iconMulti} Mehrfachauswahl: **${
-          state.allowMultiselect ? "aktiv" : "nur 1 Stimme"
-        }** \`${state.allowMultiselect ? "aktiv" : "nur 1 Stimme"}\``,
-        `${iconDuration} Dauer: **${formatDurationText(state.durationHours)}** \`${formatDurationText(state.durationHours)}\``,
-        `${iconCalendar} Session: \`${nextMontagText}\``,
+        `${iconMulti} Mehrfachauswahl: ${multiIndicator}`,
+        `${iconDuration} Dauer: ${formatDurationText(state.durationHours)}`,
+        `${iconCalendar} Session: \`${sessionText}\``,
       ].join("\n"),
     )
     .setColor(0x57f287);
