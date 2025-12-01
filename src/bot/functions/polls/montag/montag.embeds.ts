@@ -9,6 +9,7 @@ import type { MontagSetupState } from "./montag.service.js";
 
 interface MontagSetupViewParams {
   serverName: string;
+  serverIconUrl?: string | null;
   nextMontagText: string;
   gameCount: number;
   state: MontagSetupState;
@@ -33,6 +34,7 @@ function formatDurationText(hours: number): string {
 
 interface MontagPreviewViewParams {
   serverName: string;
+  serverIconUrl?: string | null;
   nextMontagText: string;
   state: MontagSetupState;
 }
@@ -43,16 +45,13 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
 } {
   const {
     serverName,
+    serverIconUrl,
     nextMontagText,
     gameCount,
     state,
     excludedGameNames = [],
   } = params;
 
-  const iconHeader = safe(
-    (emoji as Record<string, string>).meat_db ?? emoji.meat_servers,
-  );
-  const iconCalendar = safe(emoji.meat_calendar);
   const iconGame = safe(emoji.meat_game);
   const iconServers = safe(emoji.meat_servers);
   const iconMulti = safe(emoji.meat_votings);
@@ -75,15 +74,13 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
 
   const embed = new EmbedBuilder()
     .setTitle(`Montags-Runde Setup für _${serverName}_`)
+    .setThumbnail(serverIconUrl ?? null)
     .setDescription(
       [
-        `${iconHeader} Server: **${serverName}**`,
-        "",
-        `${iconCalendar} Geplante Session: \`${nextMontagText}\``,
         `${iconServers} Verfügbare Spiele in der CD: \`${gameCount}\``,
-        "",
-        `${iconMulti} Mehrfachauswahl: **${multiText}**`,
-        `${iconDuration} Dauer: **${dauerText}**`,
+        `${iconMulti} Mehrfachauswahl: **${multiText}** \`${multiText}\``,
+        `${iconDuration} Dauer: **${dauerText}** \`${dauerText}\``,
+        `${safe(emoji.meat_calendar)} Geplante Session: \`${nextMontagText}\``,
         "",
         excludedText,
         "",
@@ -91,14 +88,6 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
       ].join("\n"),
     )
     .setColor(0x579326);
-
-  const toggleButton = new ButtonBuilder()
-    .setCustomId("poll_montag_toggle_multiselect")
-    .setStyle(state.allowMultiselect ? ButtonStyle.Success : ButtonStyle.Secondary)
-    .setLabel("Mehrfachauswahl");
-  if (state.allowMultiselect) {
-    toggleButton.setEmoji("✔️");
-  }
 
   const row1 = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
@@ -109,7 +98,10 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
       .setCustomId("poll_montag_add_game")
       .setStyle(ButtonStyle.Secondary)
       .setLabel("Spiel hinzufügen"),
-    toggleButton,
+    new ButtonBuilder()
+      .setCustomId("poll_montag_toggle_multiselect")
+      .setStyle(state.allowMultiselect ? ButtonStyle.Success : ButtonStyle.Secondary)
+      .setLabel("Mehrfachauswahl"),
   );
 
   const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -148,9 +140,8 @@ export function baueMontagPreviewView(params: MontagPreviewViewParams): {
   embed: EmbedBuilder;
   components: ActionRowBuilder<ButtonBuilder>[];
 } {
-  const { serverName, nextMontagText, state } = params;
+  const { serverName, serverIconUrl, nextMontagText, state } = params;
 
-  const iconHeader = safe(emoji.meat_avatar);
   const iconCalendar = safe(emoji.meat_calendar);
   const iconMulti = safe(emoji.meat_votings);
   const iconDuration = safe(emoji.meat_boss);
@@ -171,28 +162,27 @@ export function baueMontagPreviewView(params: MontagPreviewViewParams): {
     : "_Keine Spiele ausgewählt – bitte Setup anpassen._";
 
   const embed = new EmbedBuilder()
-    .setTitle("Montags-Runde – Vorschau")
+    .setTitle(`Montags-Runde Vorschau für _${serverName}_`)
+    .setThumbnail(serverIconUrl ?? null)
     .setDescription(
       [
-        `${iconHeader} **Montags-Runde Vorschau für _${serverName}_**`,
-        "",
-        `${iconCalendar} Session: \`${nextMontagText}\``,
-        `${iconMulti} Mehrfachauswahl: **${
-          state.allowMultiselect ? "aktiv" : "nur 1 Stimme"
-        }**`,
-        `${iconDuration} Dauer: **${formatDurationText(state.durationHours)}**`,
-        "",
         `${iconGames} **Spiele in dieser Umfrage:**`,
         selectedText,
+        "",
+        `${iconMulti} Mehrfachauswahl: **${
+          state.allowMultiselect ? "aktiv" : "nur 1 Stimme"
+        }** \`${state.allowMultiselect ? "aktiv" : "nur 1 Stimme"}\``,
+        `${iconDuration} Dauer: **${formatDurationText(state.durationHours)}** \`${formatDurationText(state.durationHours)}\``,
+        `${iconCalendar} Session: \`${nextMontagText}\``,
       ].join("\n"),
     )
     .setColor(0x57f287);
 
   const row1 = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("poll_montag_preview_back")
-      .setStyle(ButtonStyle.Secondary)
-      .setLabel("Zurück zum Setup"),
+      .setCustomId("poll_montag_start")
+      .setStyle(ButtonStyle.Success)
+      .setLabel("Umfrage starten"),
     new ButtonBuilder()
       .setCustomId("poll_montag_reroll")
       .setStyle(ButtonStyle.Secondary)
@@ -201,9 +191,9 @@ export function baueMontagPreviewView(params: MontagPreviewViewParams): {
 
   const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("poll_montag_start")
-      .setStyle(ButtonStyle.Success)
-      .setLabel("Umfrage starten"),
+      .setCustomId("poll_montag_preview_back")
+      .setStyle(ButtonStyle.Secondary)
+      .setLabel("Zurück zum Setup"),
     new ButtonBuilder()
       .setCustomId("poll_montag_cancel")
       .setStyle(ButtonStyle.Danger)

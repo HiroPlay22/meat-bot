@@ -245,6 +245,7 @@ export async function handleMontagPollButton(
 
       const { embed, components } = baueMontagSetupView({
         serverName,
+        serverIconUrl: interaction.guild?.iconURL(),
         nextMontagText,
         gameCount,
         state,
@@ -267,6 +268,7 @@ export async function handleMontagPollButton(
 
       const { embed, components } = baueMontagPreviewView({
         serverName,
+        serverIconUrl: interaction.guild?.iconURL(),
         nextMontagText,
         state,
       });
@@ -336,6 +338,7 @@ export async function handleMontagPollButton(
 
       const { embed, components } = baueMontagSetupView({
         serverName,
+        serverIconUrl: interaction.guild?.iconURL(),
         nextMontagText,
         gameCount,
         state,
@@ -365,6 +368,7 @@ export async function handleMontagPollButton(
 
       const { embed, components } = baueMontagSetupView({
         serverName,
+        serverIconUrl: interaction.guild?.iconURL(),
         nextMontagText,
         gameCount,
         state,
@@ -394,6 +398,7 @@ export async function handleMontagPollButton(
 
       const { embed, components } = baueMontagSetupView({
         serverName,
+        serverIconUrl: interaction.guild?.iconURL(),
         nextMontagText,
         gameCount,
         state,
@@ -480,6 +485,7 @@ export async function handleMontagPollButton(
 
       const { embed, components } = baueMontagSetupView({
         serverName,
+        serverIconUrl: interaction.guild?.iconURL(),
         nextMontagText,
         gameCount,
         state,
@@ -502,6 +508,7 @@ export async function handleMontagPollButton(
 
       const { embed, components } = baueMontagPreviewView({
         serverName,
+        serverIconUrl: interaction.guild?.iconURL(),
         nextMontagText,
         state,
       });
