@@ -57,7 +57,9 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
   const iconMulti = safe(emoji.meat_votings);
   const iconDuration = safe(emoji.meat_boss);
   const iconExclude = safe(emoji.meat_lock);
-  const multiIndicator = state.allowMultiselect ? "🟢" : "🔘";
+  const multiIndicator = state.allowMultiselect
+    ? safe((emoji as Record<string, string>).meat_online ?? emoji.meat_leer)
+    : safe((emoji as Record<string, string>).meat_offline ?? emoji.meat_leer);
   const sessionText = nextMontagText
     .replace(", ", " ")
     .replace(" um ", " • ");
@@ -81,8 +83,8 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
     .setDescription(
       [
         `${iconServers} Spiele in der DB: \`${gameCount}\``,
-        `${iconMulti} Mehrfachauswahl: ${multiIndicator}`,
-        `${iconDuration} Dauer: ${dauerText}`,
+        `${iconMulti} Mehrfachauswahl: ${multiIndicator} \`${state.allowMultiselect ? "aktiv" : "inaktiv"}\``,
+        `${iconDuration} Dauer: ${dauerText} \`${dauerText}\``,
         `${safe(emoji.meat_calendar)} Geplante Session: \`${sessionText}\``,
         "",
         excludedText,
@@ -149,7 +151,9 @@ export function baueMontagPreviewView(params: MontagPreviewViewParams): {
   const iconMulti = safe(emoji.meat_votings);
   const iconDuration = safe(emoji.meat_boss);
   const iconGames = safe(emoji.meat_game);
-  const multiIndicator = state.allowMultiselect ? "🟢" : "🔘";
+  const multiIndicator = state.allowMultiselect
+    ? safe((emoji as Record<string, string>).meat_online ?? emoji.meat_leer)
+    : safe((emoji as Record<string, string>).meat_offline ?? emoji.meat_leer);
   const sessionText = nextMontagText
     .replace(", ", " ")
     .replace(" um ", " • ");
@@ -179,8 +183,8 @@ export function baueMontagPreviewView(params: MontagPreviewViewParams): {
         `${iconGames} **Spiele in dieser Umfrage:**`,
         selectedText,
         "",
-        `${iconMulti} Mehrfachauswahl: ${multiIndicator}`,
-        `${iconDuration} Dauer: ${formatDurationText(state.durationHours)}`,
+        `${iconMulti} Mehrfachauswahl: ${multiIndicator} \`${state.allowMultiselect ? "aktiv" : "inaktiv"}\``,
+        `${iconDuration} Dauer: ${formatDurationText(state.durationHours)} \`${formatDurationText(state.durationHours)}\``,
         `${iconCalendar} Session: \`${sessionText}\``,
       ].join("\n"),
     )
@@ -194,7 +198,7 @@ export function baueMontagPreviewView(params: MontagPreviewViewParams): {
     new ButtonBuilder()
       .setCustomId("poll_montag_reroll")
       .setStyle(ButtonStyle.Secondary)
-      .setLabel("Spiele neu würfeln"),
+      .setLabel("🎲 Reroll"),
   );
 
   const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
