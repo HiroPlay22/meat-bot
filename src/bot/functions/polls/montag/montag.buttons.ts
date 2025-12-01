@@ -10,6 +10,7 @@
   type Guild,
   type GuildTextBasedChannel,
   type Message,
+  MessageType,
 } from "discord.js";
 import { baueMontagPreviewView, baueMontagSetupView } from "./montag.embeds.js";
 import {
@@ -891,8 +892,41 @@ export async function handleMontagPollButton(
       }
 
       try {
+        const pinned = await zielChannel.messages.fetchPinned().catch(() => null);
+        if (pinned) {
+          for (const m of pinned.values()) {
+            if (m.author.id === guild.client.user?.id && m.poll) {
+              try {
+                await m.unpin();
+              } catch {
+                // best effort
+              }
+            }
+          }
+        }
+      } catch {
+        // best effort
+      }
+
+      try {
         if (message.pinnable && !message.pinned) {
           await message.pin();
+
+          const recent = await zielChannel.messages.fetch({ limit: 5 }).catch(() => null);
+          if (recent) {
+            for (const sysMsg of recent.values()) {
+              if (
+                sysMsg.type === MessageType.ChannelPinnedMessage &&
+                sysMsg.deletable
+              ) {
+                try {
+                  await sysMsg.delete();
+                } catch {
+                  // best effort
+                }
+              }
+            }
+          }
         }
       } catch {
         // nice-to-have
