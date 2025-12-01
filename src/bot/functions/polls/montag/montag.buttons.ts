@@ -20,6 +20,7 @@ import {
 import {
   createNativeMontagPoll,
   ermittleGesamtGameCount,
+  ermittleAusgeschlosseneGewinner,
   ermittleMontagPollErgebnis,
   getOrInitSetupState,
   getSetupState,
@@ -56,6 +57,7 @@ function ermittleNaechstenMontag19Uhr(): string {
 // Merkt sich bei Gleichstand die Kandidaten pro Poll,
 // damit wir später per Button einen Zufalls-Gewinner ziehen können.
 const tieCandidatesPerPoll = new Map<string, string[]>();
+const closingPollIds = new Set<string>();
 
 async function sendeMontagErgebnisNachricht(params: {
   guild: Guild;
@@ -202,12 +204,17 @@ export async function handleMontagPollButton(
 
       const state = getOrInitSetupState(guildId, userId);
       const gameCount = await ermittleGesamtGameCount();
+      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
+        guildId,
+        2,
+      );
 
       const { embed, components } = baueMontagSetupView({
         serverName,
         nextMontagText,
         gameCount,
         state,
+        excludedGameNames,
       });
 
       await interaction.update({
@@ -290,12 +297,17 @@ export async function handleMontagPollButton(
       state.allowMultiselect = !state.allowMultiselect;
 
       const gameCount = await ermittleGesamtGameCount();
+      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
+        guildId,
+        2,
+      );
 
       const { embed, components } = baueMontagSetupView({
         serverName,
         nextMontagText,
         gameCount,
         state,
+        excludedGameNames,
       });
 
       await interaction.update({
@@ -314,12 +326,17 @@ export async function handleMontagPollButton(
       state.durationHours = Math.max(1, state.durationHours - 1);
 
       const gameCount = await ermittleGesamtGameCount();
+      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
+        guildId,
+        2,
+      );
 
       const { embed, components } = baueMontagSetupView({
         serverName,
         nextMontagText,
         gameCount,
         state,
+        excludedGameNames,
       });
 
       await interaction.update({
@@ -338,12 +355,17 @@ export async function handleMontagPollButton(
       state.durationHours = Math.min(32 * 24, state.durationHours + 1);
 
       const gameCount = await ermittleGesamtGameCount();
+      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
+        guildId,
+        2,
+      );
 
       const { embed, components } = baueMontagSetupView({
         serverName,
         nextMontagText,
         gameCount,
         state,
+        excludedGameNames,
       });
 
       await interaction.update({
@@ -361,12 +383,17 @@ export async function handleMontagPollButton(
 
       const state = getOrInitSetupState(guildId, userId);
       const gameCount = await ermittleGesamtGameCount();
+      const { excludedGameNames } = await ermittleAusgeschlosseneGewinner(
+        guildId,
+        2,
+      );
 
       const { embed, components } = baueMontagSetupView({
         serverName,
         nextMontagText,
         gameCount,
         state,
+        excludedGameNames,
       });
 
       await interaction.update({
@@ -435,6 +462,8 @@ export async function handleMontagPollButton(
       }
 
       try {
+        closingPollIds.add(aktiverPoll.id);
+
         const channel = await guild.channels.fetch(aktiverPoll.channelId);
         if (!channel || !channel.isTextBased()) {
           await interaction.update({
@@ -712,6 +741,9 @@ export async function handleMontagPollButton(
 
         return;
       }
+      finally {
+        closingPollIds.delete(aktiverPoll.id);
+      }
     }
 
     // 4b) Gleichstand auflösen: Zufalls-Gewinner ziehen
@@ -981,6 +1013,11 @@ export async function handleAutoEndedMontagPoll(
 ): Promise<void> {
   const pollRecord = await findeMontagPollByMessage(message.id);
   if (!pollRecord) return;
+
+  if (closingPollIds.has(pollRecord.id)) {
+    // Wird gerade manuell geschlossen – Auto-Ende überspringen
+    return;
+  }
 
   let currentMessage = message;
 
