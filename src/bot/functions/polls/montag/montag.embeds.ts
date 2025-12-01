@@ -49,14 +49,15 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
     excludedGameNames = [],
   } = params;
 
-  const iconHeader = safe(emoji.meat_avatar);
+  const iconHeader = safe(
+    (emoji as Record<string, string>).meat_db ?? emoji.meat_servers,
+  );
   const iconCalendar = safe(emoji.meat_calendar);
-  const iconGames = safe(emoji.meat_game);
+  const iconGame = safe(emoji.meat_game);
   const iconServers = safe(emoji.meat_servers);
   const iconMulti = safe(emoji.meat_votings);
   const iconDuration = safe(emoji.meat_boss);
   const iconExclude = safe(emoji.meat_lock);
-  const iconAction = safe(emoji.meat_votings);
 
   const multiText = state.allowMultiselect
     ? "aktiv (Mehrfachauswahl)"
@@ -66,29 +67,38 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
 
   const excludedText =
     excludedGameNames.length > 0
-      ? `❌ Ausgeschlossen (zuletzt gespielt): ${excludedGameNames
-          .map((n) => `${iconGames} ${n}`)
-          .join(", ")}`
+      ? [
+          "Ausgeschlossen (zuletzt gespielt):",
+          excludedGameNames.map((n) => `${iconGame} ${n}`).join("   "),
+        ].join("\n")
       : `${iconExclude} Aktuell wird kein Spiel aufgrund der letzten Gewinner ausgeschlossen.`;
 
   const embed = new EmbedBuilder()
-    .setTitle("Montags-Runde – Setup")
+    .setTitle(`Montags-Runde Setup für _${serverName}_`)
     .setDescription(
       [
-        `${iconHeader} **Montags-Runde Setup für _${serverName}_**`,
+        `${iconHeader} Server: **${serverName}**`,
         "",
         `${iconCalendar} Geplante Session: \`${nextMontagText}\``,
-        `${iconServers} Verfügbare Spiele in der DB: \`${gameCount}\``,
+        `${iconServers} Verfügbare Spiele in der CD: \`${gameCount}\``,
         "",
         `${iconMulti} Mehrfachauswahl: **${multiText}**`,
         `${iconDuration} Dauer: **${dauerText}**`,
         "",
         excludedText,
         "",
-        `${iconAction} Klicke auf **„Umfrage planen“**, um eine zufällige Auswahl an Spielen zu generieren.`,
+        `> Klicke auf **„Umfrage planen“**, um eine zufällige Auswahl an Spielen zu generieren.`,
       ].join("\n"),
     )
     .setColor(0x579326);
+
+  const toggleButton = new ButtonBuilder()
+    .setCustomId("poll_montag_toggle_multiselect")
+    .setStyle(state.allowMultiselect ? ButtonStyle.Success : ButtonStyle.Secondary)
+    .setLabel("Mehrfachauswahl");
+  if (state.allowMultiselect) {
+    toggleButton.setEmoji("✔️");
+  }
 
   const row1 = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
@@ -99,13 +109,10 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
       .setCustomId("poll_montag_add_game")
       .setStyle(ButtonStyle.Secondary)
       .setLabel("Spiel hinzufügen"),
+    toggleButton,
   );
 
   const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("poll_montag_toggle_multiselect")
-      .setStyle(ButtonStyle.Secondary)
-      .setLabel("Nur 1 Stimme erlauben"),
     new ButtonBuilder()
       .setCustomId("poll_montag_duration_dec")
       .setStyle(ButtonStyle.Secondary)

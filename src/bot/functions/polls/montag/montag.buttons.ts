@@ -215,18 +215,22 @@ export async function handleMontagPollButton(
           )
           .setColor(0xfee75c);
 
-        const linkRow = bauePollLinkRow(pollUrl);
+        const linkButton = new ButtonBuilder()
+          .setStyle(ButtonStyle.Link)
+          .setURL(pollUrl)
+          .setLabel("Zur Umfrage");
 
-        const closeRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
           new ButtonBuilder()
             .setCustomId("poll_montag_close_active")
             .setStyle(ButtonStyle.Danger)
             .setLabel("Umfrage schließen"),
+          linkButton,
         );
 
         await interaction.update({
           embeds: [embed],
-          components: [linkRow, closeRow],
+          components: [row],
         });
 
         return;
