@@ -593,7 +593,7 @@ export async function handleMontagPollButton(
 
         const pollUrl = `https://discord.com/channels/${guildId}/${aktiverPoll.channelId}/${aktiverPoll.messageId}`;
 
-        // Fall 1: keine Stimmen / kein Ergebnis lesbar
+                // Fall 1: keine Stimmen / kein Ergebnis lesbar
         if (!winnerNames.length) {
           const embed = new EmbedBuilder()
             .setTitle('Montags-Umfrage geschlossen')
@@ -601,170 +601,33 @@ export async function handleMontagPollButton(
               [
                 'Die aktive Montags-Runde-Umfrage wurde beendet.',
                 '',
-                'Es konnten keine gÃ¼ltigen Stimmen ermittelt werden.',
-                '',
-                `ðŸ”— [Zur ehemaligen Umfrage](${pollUrl})`,
+                'Es konnten keine gültigen Stimmen ermittelt werden.',
               ].join('\n'),
             )
             .setColor(0xed4245);
+
+          const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+            new ButtonBuilder()
+              .setStyle(ButtonStyle.Link)
+              .setLabel('Zur Umfrage')
+              .setURL(pollUrl),
+          );
 
           await sendeMontagErgebnisNachricht({
             guild,
             pollChannelId: aktiverPoll.channelId,
             announcementChannelId: null,
             embed,
+            components: [linkRow],
           });
+
+          await interaction.message?.delete().catch(() => {});
 
           return;
         }
-
         // Fall 2: eindeutiger Gewinner
         if (winnerNames.length === 1) {
-          const winnerName = winnerNames[0];
-
-          const { game } = await setMontagWinner({
-            pollId: aktiverPoll.id,
-            winnerGameName: winnerName,
-          });
-
-          const embed = new EmbedBuilder()
-            .setTitle('Montags-Umfrage geschlossen')
-            .setDescription(
-              [
-                'Die aktive Montags-Runde-Umfrage wurde beendet.',
-                '',
-                `ðŸŽ‰ Gewonnen hat: **${winnerName}**`,
-                game
-                  ? `(_${game.isFree ? 'kostenlos' : 'kostenpflichtig'} â€¢ max. ${
-                      game.maxPlayers ?? 'unbegrenzt'
-                    } Spieler_)`
-                  : '',
-                '',
-                `ðŸ”— [Zur ehemaligen Umfrage](${pollUrl})`,
-              ]
-                .filter((line) => line.length > 0)
-                .join('\n'),
-            )
-            .setColor(0x57f287);
-
-          await sendeMontagErgebnisNachricht({
-            guild,
-            pollChannelId: aktiverPoll.channelId,
-            announcementChannelId,
-            embed,
-          });
-
-          logInfo('Montags-Poll geschlossen (eindeutiger Gewinner)', {
-            functionName: 'handleMontagPollButton',
-            guildId,
-            userId,
-            extra: {
-              pollId: aktiverPoll.id,
-              winnerName,
-            },
-          });
-
-          return;
-        }
-
-        // Fall 3: Gleichstand â†’ Kandidaten merken + Button zum Zufalls-Gewinner
-        tieCandidatesPerPoll.set(aktiverPoll.id, winnerNames);
-
-        const winnerList = winnerNames.map((n) => `â€¢ ${n}`).join('\n');
-
-        const embed = new EmbedBuilder()
-          .setTitle('Montags-Umfrage geschlossen â€“ Gleichstand')
-          .setDescription(
-            [
-              'Die aktive Montags-Runde-Umfrage wurde beendet.',
-              '',
-              'Folgende Spiele haben gleich viele Stimmen:',
-              winnerList,
-              '',
-              'Klicke auf **â€žZufalls-Gewinner ziehenâ€œ**, um einen Gewinner festzulegen.',
-              '',
-              `ðŸ”— [Zur ehemaligen Umfrage](${pollUrl})`,
-            ].join('\n'),
-          )
-          .setColor(0xfee75c);
-
-        const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-          new ButtonBuilder()
-            .setCustomId(`poll_montag_pick_winner_${aktiverPoll.id}`)
-            .setStyle(ButtonStyle.Primary)
-            .setLabel('Zufalls-Gewinner ziehen'),
-        );
-
-        await sendeMontagErgebnisNachricht({
-          guild,
-          pollChannelId: aktiverPoll.channelId,
-          announcementChannelId: null,
-          embed,
-          components: [row],
-        });
-
-        logInfo('Montags-Poll geschlossen (Gleichstand)', {
-          functionName: 'handleMontagPollButton',
-          guildId,
-          userId,
-          extra: {
-            pollId: aktiverPoll.id,
-            candidates: winnerNames,
-          },
-        });
-
-        return;
-      } catch (error) {
-        logError('Fehler beim SchlieÃŸen des Montags-Polls', {
-          functionName: 'handleMontagPollButton',
-          guildId,
-          userId,
-          extra: { error, customId },
-        });
-
-        if (interaction.replied || interaction.deferred) {
-          await interaction.followUp({
-            content:
-              'Beim SchlieÃŸen der Umfrage ist etwas schiefgelaufen. Schau bitte in die Logs.',
-            ephemeral: true,
-          });
-        } else {
-          await interaction.reply({
-            content:
-              'Beim SchlieÃŸen der Umfrage ist etwas schiefgelaufen. Schau bitte in die Logs.',
-            ephemeral: true,
-          });
-        }
-
-        return;
-      }
-      finally {
-        closingPollIds.delete(aktiverPoll.id);
-      }
-    }
-
-    // 4b) Gleichstand auflÃ¶sen: Zufalls-Gewinner ziehen
-    if (customId.startsWith('poll_montag_pick_winner_')) {
-      const ok = await checkPermissions();
-      if (!ok) return;
-
-      const pollId = customId.substring('poll_montag_pick_winner_'.length);
-
-      const candidates = tieCandidatesPerPoll.get(pollId);
-
-      if (!candidates || !candidates.length) {
-        await interaction.reply({
-          content:
-            'Keine Gleichstandsdaten gefunden. Bitte wÃ¤hle manuell einen Gewinner aus.',
-          ephemeral: true,
-        });
-        return;
-      }
-
-      // Einmal verwenden, dann verwerfen
-      tieCandidatesPerPoll.delete(pollId);
-
-      const winnerName =
+                const winnerName =
         candidates[Math.floor(Math.random() * candidates.length)];
 
       const { poll, game } = await setMontagWinner({
@@ -775,24 +638,29 @@ export async function handleMontagPollButton(
       const pollUrl = `https://discord.com/channels/${poll.guildId}/${poll.channelId}/${poll.messageId}`;
 
       const embed = new EmbedBuilder()
-        .setTitle('Montags-Umfrage â€“ Gewinner gezogen')
+        .setTitle('Montags-Umfrage – Gewinner gezogen')
         .setDescription(
           [
-            'Der Gleichstand wurde per Zufall aufgelÃ¶st.',
+            'Der Gleichstand wurde per Zufall aufgelöst.',
             '',
-            `ðŸŽ‰ Gewinner: **${winnerName}**`,
+            `Gewinner: **${winnerName}**`,
             game
-              ? `(_${game.isFree ? 'kostenlos' : 'kostenpflichtig'} â€¢ max. ${
+              ? `(_${game.isFree ? 'kostenlos' : 'kostenpflichtig'} - max. ${
                   game.maxPlayers ?? 'unbegrenzt'
                 } Spieler_)`
               : '',
-            '',
-            `ðŸ”— [Zur Umfrage](${pollUrl})`,
           ]
             .filter((line) => line.length > 0)
-            .join('\n'),
+            .join('\\n'),
         )
         .setColor(0x57f287);
+
+      const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+          .setStyle(ButtonStyle.Link)
+          .setLabel('Zur Umfrage')
+          .setURL(pollUrl),
+      );
 
       await interaction.deferUpdate();
 
@@ -801,9 +669,11 @@ export async function handleMontagPollButton(
         pollChannelId: poll.channelId,
         announcementChannelId,
         embed,
+        components: [linkRow],
       });
 
-      logInfo('Gleichstand per Zufalls-Gewinner aufgelÃ¶st', {
+      await interaction.message?.delete().catch(() => {});
+logInfo('Gleichstand per Zufalls-Gewinner aufgelÃ¶st', {
         functionName: 'handleMontagPollButton',
         guildId,
         userId,
@@ -1069,25 +939,31 @@ export async function handleAutoEndedMontagPoll(
 
   const pollUrl = `https://discord.com/channels/${pollRecord.guildId}/${pollRecord.channelId}/${pollRecord.messageId}`;
 
-  if (!winnerNames.length) {
+    if (!winnerNames.length) {
     const embed = new EmbedBuilder()
       .setTitle('Montags-Umfrage geschlossen')
       .setDescription(
         [
           'Die aktive Montags-Runde-Umfrage wurde beendet.',
           '',
-          'Es konnten keine gÃ¼ltigen Stimmen ermittelt werden.',
-          '',
-          `ðŸ”— [Zur ehemaligen Umfrage](${pollUrl})`,
+          'Es konnten keine gültigen Stimmen ermittelt werden.',
         ].join('\n'),
       )
       .setColor(0xed4245);
+
+    const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setStyle(ButtonStyle.Link)
+        .setLabel('Zur Umfrage')
+        .setURL(pollUrl),
+    );
 
     await sendeMontagErgebnisNachricht({
       guild,
       pollChannelId: pollRecord.channelId,
       announcementChannelId: null,
       embed,
+      components: [linkRow],
     });
 
     logInfo('Montags-Poll automatisch beendet (keine Stimmen)', {
@@ -1099,7 +975,7 @@ export async function handleAutoEndedMontagPoll(
     return;
   }
 
-  if (winnerNames.length === 1) {
+    if (winnerNames.length === 1) {
     const winnerName = winnerNames[0];
 
     const { game } = await setMontagWinner({
@@ -1113,25 +989,31 @@ export async function handleAutoEndedMontagPoll(
         [
           'Die aktive Montags-Runde-Umfrage wurde beendet.',
           '',
-          `ðŸŽ‰ Gewonnen hat: **${winnerName}**`,
+          `Gewonnen hat: **${winnerName}**`,
           game
-            ? `(_${game.isFree ? 'kostenlos' : 'kostenpflichtig'} â€¢ max. ${
+            ? `(_${game.isFree ? 'kostenlos' : 'kostenpflichtig'} - max. ${
                 game.maxPlayers ?? 'unbegrenzt'
               } Spieler_)`
             : '',
-          '',
-          `ðŸ”— [Zur ehemaligen Umfrage](${pollUrl})`,
         ]
           .filter((line) => line.length > 0)
-          .join('\n'),
+          .join('\\n'),
       )
       .setColor(0x57f287);
+
+    const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setStyle(ButtonStyle.Link)
+        .setLabel('Zur Umfrage')
+        .setURL(pollUrl),
+    );
 
     await sendeMontagErgebnisNachricht({
       guild,
       pollChannelId: pollRecord.channelId,
       announcementChannelId,
       embed,
+      components: [linkRow],
     });
 
     logInfo('Montags-Poll automatisch beendet (Gewinner)', {
@@ -1143,12 +1025,12 @@ export async function handleAutoEndedMontagPoll(
     return;
   }
 
-  tieCandidatesPerPoll.set(pollRecord.id, winnerNames);
+  tieCandidatesPerPoll.set(pollRecord.id, winnerNames);tieCandidatesPerPoll.set(pollRecord.id, winnerNames);
 
-  const winnerList = winnerNames.map((n) => `â€¢ ${n}`).join('\n');
+    const winnerList = winnerNames.map((n) => `• ${n}`).join('\\n');
 
   const embed = new EmbedBuilder()
-    .setTitle('Montags-Umfrage geschlossen â€“ Gleichstand')
+    .setTitle('Montags-Umfrage geschlossen – Gleichstand')
     .setDescription(
       [
         'Die aktive Montags-Runde-Umfrage wurde beendet.',
@@ -1156,10 +1038,8 @@ export async function handleAutoEndedMontagPoll(
         'Folgende Spiele haben gleich viele Stimmen:',
         winnerList,
         '',
-        'Klicke auf **â€žZufalls-Gewinner ziehenâ€œ**, um einen Gewinner festzulegen.',
-        '',
-        `ðŸ”— [Zur ehemaligen Umfrage](${pollUrl})`,
-      ].join('\n'),
+        'Klicke auf **„Zufalls-Gewinner ziehen“**, um einen Gewinner festzulegen.',
+      ].join('\\n'),
     )
     .setColor(0xfee75c);
 
@@ -1168,6 +1048,10 @@ export async function handleAutoEndedMontagPoll(
       .setCustomId(`poll_montag_pick_winner_${pollRecord.id}`)
       .setStyle(ButtonStyle.Primary)
       .setLabel('Zufalls-Gewinner ziehen'),
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
+      .setLabel('Zur Umfrage')
+      .setURL(pollUrl),
   );
 
   await sendeMontagErgebnisNachricht({
@@ -1177,11 +1061,18 @@ export async function handleAutoEndedMontagPoll(
     embed,
     components: [row],
   });
-
-  logInfo('Montags-Poll automatisch beendet (Gleichstand)', {
+logInfo('Montags-Poll automatisch beendet (Gleichstand)', {
     functionName: 'handleAutoEndedMontagPoll',
     guildId: pollRecord.guildId,
     extra: { pollId: pollRecord.id, candidates: winnerNames, answersDebug },
   });
 }
+
+
+
+
+
+
+
+
 
