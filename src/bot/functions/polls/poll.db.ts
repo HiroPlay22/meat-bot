@@ -19,6 +19,18 @@ export async function findeAktivenMontagPoll(
   });
 }
 
+export async function findeMontagPollByMessage(
+  messageId: string,
+): Promise<Poll | null> {
+  return prisma.poll.findFirst({
+    where: {
+      messageId,
+      type: PollType.MONTAG,
+      endedAt: null,
+    },
+  });
+}
+
 /**
  * Legt einen neuen Montags-Poll in der DB an.
  */
@@ -70,15 +82,30 @@ export async function setMontagWinner(params: {
 }): Promise<{ poll: Poll; game: PollGame | null }> {
   const { pollId, winnerGameName } = params;
 
-  const trimmed = winnerGameName.trim();
+  const normalizeName = (value: string): string =>
+    value.replace(/\s+/g, ' ').trim();
+
+  const normalized = normalizeName(winnerGameName);
   let game: PollGame | null = null;
 
-  if (trimmed.length > 0) {
-    game = await prisma.pollGame.findFirst({
-      where: {
-        name: trimmed,
-      },
-    });
+  if (normalized.length > 0) {
+    game =
+      (await prisma.pollGame.findFirst({
+        where: {
+          name: {
+            equals: normalized,
+            mode: 'insensitive',
+          },
+        },
+      })) ??
+      (await prisma.pollGame.findFirst({
+        where: {
+          name: {
+            equals: winnerGameName.trim(),
+            mode: 'insensitive',
+          },
+        },
+      }));
   }
 
   if (!game) {

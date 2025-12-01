@@ -16,6 +16,22 @@ interface MontagSetupViewParams {
   excludedGameNames?: string[];
 }
 
+function formatDurationText(hours: number): string {
+  const clamped = Math.max(1, Math.min(hours, 32 * 24));
+  const days = Math.floor(clamped / 24);
+  const restHours = clamped % 24;
+
+  const parts: string[] = [];
+  if (days > 0) {
+    parts.push(days === 1 ? '1 Tag' : `${days} Tage`);
+  }
+  if (restHours > 0 || parts.length === 0) {
+    parts.push(restHours === 1 ? '1 Stunde' : `${restHours} Stunden`);
+  }
+
+  return parts.join(' ');
+}
+
 interface MontagPreviewViewParams {
   serverName: string;
   nextMontagText: string;
@@ -38,10 +54,7 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
     ? 'aktiv (Mehrfachauswahl)'
     : 'nur 1 Stimme pro Person';
 
-  const dauerText =
-    state.durationHours === 1
-      ? '1 Stunde'
-      : `${state.durationHours} Stunden`;
+  const dauerText = formatDurationText(state.durationHours);
 
   const excludedText =
     excludedGameNames.length > 0
@@ -79,10 +92,6 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
       .setCustomId('poll_montag_add_game')
       .setStyle(ButtonStyle.Secondary)
       .setLabel('Spiel hinzufügen'),
-    new ButtonBuilder()
-      .setCustomId('poll_montag_remove_game')
-      .setStyle(ButtonStyle.Secondary)
-      .setLabel('Spiel deaktivieren'),
   );
 
   const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -143,7 +152,7 @@ export function baueMontagPreviewView(params: MontagPreviewViewParams): {
         `🔁 Mehrfachauswahl: **${
           state.allowMultiselect ? 'aktiv' : 'nur 1 Stimme'
         }**`,
-        `⏱ Dauer: **${state.durationHours}h**`,
+        `⏱ Dauer: **${formatDurationText(state.durationHours)}**`,
         '',
         '🎮 **Spiele in dieser Umfrage:**',
         selectedText,

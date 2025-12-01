@@ -5,6 +5,7 @@ import {
   Client,
   Events,
   GatewayIntentBits,
+  Partials,
   type Interaction,
   type ButtonInteraction,
   type ModalSubmitInteraction,
@@ -21,6 +22,7 @@ import { handleStatsButtonInteraction } from './functions/stats/overview/stats.b
 import { bearbeiteDatenschutzButton } from './functions/sentinel/datenschutz/datenschutz.buttons.js';
 import { handlePollButtonInteraction } from './functions/polls/poll.buttons.js';
 import { handleMontagAddGameModal } from './functions/polls/montag/montag.modals.js';
+import { handleAutoEndedMontagPoll } from './functions/polls/montag/montag.buttons.js';
 
 const token = process.env.DISCORD_TOKEN;
 
@@ -32,7 +34,8 @@ if (!token) {
 }
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds],
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
+  partials: [Partials.Channel, Partials.Message],
 });
 
 // Discord-Client dem Logger bekannt machen
@@ -42,6 +45,19 @@ client.once(Events.ClientReady, (readyClient) => {
   logInfo(`Eingeloggt als ${readyClient.user.tag}`, {
     functionName: 'clientReady',
   });
+});
+
+client.on(Events.MessageUpdate, async (_oldMessage, newMessage) => {
+  try {
+    await handleAutoEndedMontagPoll(newMessage);
+  } catch (error) {
+    logError('Fehler beim automatischen Poll-Ende', {
+      functionName: 'messageUpdate',
+      guildId: newMessage.guildId ?? undefined,
+      channelId: newMessage.channelId,
+      extra: { error, messageId: newMessage.id },
+    });
+  }
 });
 
 client.on(Events.InteractionCreate, async (interaction: Interaction) => {

@@ -44,6 +44,56 @@ export function getOrInitSetupState(
   return state;
 }
 
+export function ermittleMontagPollErgebnis(message: Message): {
+  winnerNames: string[];
+  maxVotes: number;
+  answersDebug: { text: string | null; voteCount: number }[];
+} {
+  const pollAny = (message.poll ?? null) as any;
+
+  if (!pollAny) {
+    return { winnerNames: [], maxVotes: 0, answersDebug: [] };
+  }
+
+  const rawAnswers = pollAny.answers;
+  const answers: any[] =
+    rawAnswers && typeof rawAnswers.map === 'function'
+      ? rawAnswers.map((a: any) => a)
+      : Array.isArray(rawAnswers)
+      ? rawAnswers
+      : [];
+
+  let maxVotes = 0;
+
+  for (const ans of answers) {
+    const votes = Number(ans.voteCount ?? ans.count ?? 0);
+    if (votes > maxVotes) maxVotes = votes;
+  }
+
+  const winnerNames =
+    maxVotes > 0
+      ? answers
+          .filter((ans) => Number(ans.voteCount ?? ans.count ?? 0) === maxVotes)
+          .map((ans) =>
+            String(
+              ans.text ??
+                ans.pollMedia?.text ??
+                ans.pollMedia?.question?.text ??
+                '',
+            ).trim(),
+          )
+          .filter((name) => name.length > 0)
+      : [];
+
+  const answersDebug = answers.map((ans) => ({
+    text:
+      ans.text ?? ans.pollMedia?.text ?? ans.pollMedia?.question?.text ?? null,
+    voteCount: Number(ans.voteCount ?? ans.count ?? 0),
+  }));
+
+  return { winnerNames, maxVotes, answersDebug };
+}
+
 export function getSetupState(
   guildId: string,
   userId: string,
@@ -182,10 +232,10 @@ export async function prepareRandomGamesForState(
  * Gibt die erzeugte Nachricht zurück oder null, falls etwas schiefgeht.
  */
 export async function createNativeMontagPoll(params: {
-  channel: GuildTextBasedChannel;
-  questionText: string;
-  state: MontagSetupState;
-}): Promise<Message | null> {
+    channel: GuildTextBasedChannel;
+    questionText: string;
+    state: MontagSetupState;
+  }): Promise<Message | null> {
   const { channel, questionText, state } = params;
 
   if (!state.selectedGames.length) return null;
@@ -195,12 +245,14 @@ export async function createNativeMontagPoll(params: {
   }));
 
   try {
+    const durationHours = Math.max(1, Math.min(32 * 24, state.durationHours));
+
     const message = await channel.send({
       poll: {
         question: {
           text: questionText,
         },
-        duration: state.durationHours * 60, // in Minuten
+        duration: durationHours, // Discord erwartet Stunden, max. 32 Tage
         allowMultiselect: state.allowMultiselect,
         answers,
       },
