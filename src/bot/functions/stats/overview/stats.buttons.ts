@@ -396,6 +396,9 @@ export async function handleStatsButtonInteraction(
 
     // 🔹 View: Allgemein → Haupt-Embed updaten
     if (view === 'guild') {
+      // volle Memberliste laden, damit Bots/Member zuverlässig gezählt werden
+      const memberCollection = await guild.members.fetch();
+
       const textChannelCount = guild.channels.cache.filter(
         (channel) =>
           channel.type === ChannelType.GuildText ||
@@ -412,7 +415,7 @@ export async function handleStatsButtonInteraction(
       const embed = baueGuildStatsEmbed({
         guild,
         memberCount: guild.memberCount,
-        botCount: guild.members.cache.filter((m) => m.user.bot).size,
+        botCount: memberCollection.filter((m) => m.user.bot).size,
         textChannelCount,
         voiceChannelCount,
         roleCount: guild.roles.cache.size,
