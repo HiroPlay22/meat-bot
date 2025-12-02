@@ -23,6 +23,10 @@ export function bauePollCenterView(
 
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
+      .setCustomId('poll_type_native_quick')
+      .setStyle(ButtonStyle.Secondary)
+      .setLabel('Native Umfrage'),
+    new ButtonBuilder()
       .setCustomId('poll_type_montag')
       .setStyle(ButtonStyle.Primary)
       .setLabel('Montags-Runde'),

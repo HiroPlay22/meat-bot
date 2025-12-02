@@ -196,6 +196,56 @@ export async function handleMontagPollButton(
       return true;
     }
 
+    // 0) Native Standard-Poll schnell starten
+    if (customId === "poll_type_native_quick") {
+      const channelRaw = interaction.channel ?? guild.systemChannel;
+      if (!channelRaw || !channelRaw.isTextBased()) {
+        await interaction.reply({
+          content:
+            "Kein gültiger Text-Channel gefunden, in dem der Poll erstellt werden kann.",
+          ephemeral: true,
+        });
+        return;
+      }
+
+      const target = channelRaw as GuildTextBasedChannel;
+
+      const pollPayload: any = {
+        question: { text: "Neue Umfrage" },
+        answers: [{ text: "Ja" }, { text: "Nein" }],
+        duration: 24,
+      };
+
+      try {
+        await interaction.deferUpdate();
+        await target.send({ poll: pollPayload });
+        await deleteInteractionReplySafe(interaction);
+      } catch (error) {
+        logError("Konnte nativen Poll nicht erstellen", {
+          functionName: "handleMontagPollButton",
+          guildId,
+          userId,
+          extra: { error },
+        });
+
+        if (interaction.replied || interaction.deferred) {
+          await interaction.followUp({
+            content:
+              "Der native Poll konnte nicht erstellt werden. Prüfe bitte die Berechtigungen.",
+            ephemeral: true,
+          });
+        } else {
+          await interaction.reply({
+            content:
+              "Der native Poll konnte nicht erstellt werden. Prüfe bitte die Berechtigungen.",
+            ephemeral: true,
+          });
+        }
+      }
+
+      return;
+    }
+
     // 1) Einstieg aus dem Poll-Center: "Montags-Runde"
     if (customId === "poll_type_montag") {
       const ok = await checkPermissions();
@@ -777,8 +827,8 @@ export async function handleMontagPollButton(
           pollChannelId: aktiverPoll.channelId,
           announcementChannelId: null,
           embed,
-          components: [randomRow, linkRow],
-          announcementComponents: [linkRow],
+          components: [randomRow],
+          announcementComponents: [randomRow],
         });
 
         logInfo("Montags-Poll geschlossen (Gleichstand)", {
@@ -1058,7 +1108,10 @@ export async function handleMontagPollButton(
                 .setLabel("Zur Umfrage"),
             );
             await announceChannel.send({
-              content: `> ${safe(emoji.meat_game)} Neue Montags-Runde Umfrage gestartet!`,
+              content: [
+                `> ${safe(emoji.meat_game)} Neue Montags-Runde Umfrage gestartet!`,
+                `> Session: \`${nextMontagText}\``,
+              ].join("\n"),
               components: [announceRow],
             });
           }
