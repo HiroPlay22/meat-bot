@@ -132,10 +132,21 @@ export function baueCommandsStatsEmbed(options: {
 
   const lines = items.map((item) => {
     const descPart = item.description ? ` - ${item.description}` : '';
-    return `${emoji.meat_commands} \`/${item.commandName}\` - **${item.count}x**${descPart}`;
+    return `${emoji.meat_commands} \`/${item.commandName}\` - \`${item.count}x\`${descPart}`;
   });
 
-  embed.addFields({ name: 'Befehle', value: lines.join('\n') });
+  const half = Math.ceil(lines.length / 2);
+  const left = lines.slice(0, half);
+  const right = lines.slice(half);
+
+  embed.addFields(
+    { name: 'Befehle', value: left.join('\n'), inline: true },
+    {
+      name: ' ',
+      value: right.length ? right.join('\n') : '\u200b',
+      inline: true,
+    },
+  );
 
   return embed;
 }
@@ -175,7 +186,7 @@ export function baueMeineStatsEmbed(options: {
     items.length > 0
       ? items.map(
           (item) =>
-            `${emoji.meat_commands} \`/${item.commandName}\` - **${item.count}x**`,
+            `${emoji.meat_commands} \`/${item.commandName}\` - \`${item.count}x\``,
         )
       : ['Keine Befehlsdaten vorhanden.'];
 
@@ -209,8 +220,9 @@ export function baueMeineStatsEmbed(options: {
       inline: true,
     },
     {
-      name: `<@${user.id}>`,
+      name: 'Profil',
       value: [
+        `<@${user.id}>`,
         `${emoji.meat_calendar} Erstellt \`${createdDate}\``,
         `${emoji.meat_members} Beitritt \`${joinedDate}\``,
         `${emoji.meat_boost} Booster seit \`${boostSince}\``,
