@@ -112,3 +112,15 @@ model Poll {
 
   @@index([guildId, type, endedAt], name: "poll_guild_type_endedAt")
 }
+
+/// Tägliche Aktivität pro User (Messages/Voice) – userId nur bei Opt-in.
+model UserActivityDaily {
+  id           String    @id @default(cuid())
+  date         DateTime
+  guildId      String?   @db.VarChar(32)
+  userId       String?   @db.VarChar(32)
+  messageCount Int       @default(0)
+  voiceSeconds Int       @default(0)
+
+  @@unique([date, guildId, userId], name: "date_guild_user")
+}

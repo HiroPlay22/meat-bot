@@ -23,6 +23,10 @@ import { bearbeiteDatenschutzButton } from './functions/sentinel/datenschutz/dat
 import { handlePollButtonInteraction } from './functions/polls/poll.buttons.js';
 import { handleMontagAddGameModal } from './functions/polls/montag/montag.modals.js';
 import { handleAutoEndedMontagPoll } from './functions/polls/montag/montag.buttons.js';
+import {
+  addVoiceSeconds,
+  trackMessageActivity,
+} from './general/stats/activity.service.js';
 
 const token = process.env.DISCORD_TOKEN;
 
@@ -34,7 +38,13 @@ if (!token) {
 }
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.MessageContent,
+  ],
   partials: [Partials.Channel, Partials.Message],
 });
 
@@ -56,6 +66,70 @@ client.on(Events.MessageUpdate, async (_oldMessage, newMessage) => {
       guildId: newMessage.guildId ?? undefined,
       channelId: newMessage.channelId,
       extra: { error, messageId: newMessage.id },
+    });
+  }
+});
+
+client.on(Events.MessageCreate, async (message) => {
+  try {
+    if (!message.guild) return;
+    if (message.author.bot) return;
+    await trackMessageActivity({
+      guildId: message.guildId,
+      userId: message.author.id,
+    });
+  } catch (error) {
+    logError('Fehler beim Message-Tracking', {
+      functionName: 'MessageCreate',
+      guildId: message.guildId ?? undefined,
+      channelId: message.channelId,
+      extra: { error },
+    });
+  }
+});
+
+const voiceJoinTimes = new Map<string, number>();
+
+client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
+  const guildId = newState.guild.id;
+  const userId = newState.id;
+
+  try {
+    // Track only human users
+    const member = newState.member ?? oldState.member;
+    if (member?.user?.bot) return;
+
+    const key = `${guildId}:${userId}`;
+    const now = Date.now();
+
+    const oldChannel = oldState.channelId;
+    const newChannel = newState.channelId;
+
+    // If leaving or switching, close previous session
+    if (oldChannel && oldChannel !== newChannel) {
+      const joinedAt = voiceJoinTimes.get(key);
+      if (joinedAt) {
+        const seconds = Math.max(Math.round((now - joinedAt) / 1000), 0);
+        await addVoiceSeconds({ guildId, userId, seconds });
+      }
+      voiceJoinTimes.delete(key);
+    }
+
+    // If joined a new channel, start timer
+    if (!oldChannel && newChannel) {
+      voiceJoinTimes.set(key, now);
+    }
+
+    // If just left without rejoin
+    if (oldChannel && !newChannel) {
+      voiceJoinTimes.delete(key);
+    }
+  } catch (error) {
+    logError('Fehler beim Voice-Tracking', {
+      functionName: 'VoiceStateUpdate',
+      guildId,
+      userId,
+      extra: { error },
     });
   }
 });
