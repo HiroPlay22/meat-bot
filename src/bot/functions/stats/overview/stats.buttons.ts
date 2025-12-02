@@ -1,6 +1,10 @@
 // FILE: src/bot/functions/stats/overview/stats.buttons.ts
 
-import { ChannelType, type ButtonInteraction } from 'discord.js';
+import {
+  ChannelType,
+  type ButtonInteraction,
+  type GuildMember,
+} from 'discord.js';
 import { prisma } from '../../../general/db/prismaClient.js';
 import { logError, logInfo } from '../../../general/logging/logger.js';
 import {
@@ -223,7 +227,7 @@ export async function handleStatsButtonInteraction(
         roleCount: guild.roles.cache.size,
       });
 
-      const components = baueStatsButtons('guild');
+      const components = baueStatsButtons('guild', guild.name);
 
       await interaction.update({
         embeds: [embed],
@@ -246,7 +250,7 @@ export async function handleStatsButtonInteraction(
         stats,
       });
 
-      const components = baueStatsButtons('montag');
+      const components = baueStatsButtons('montag', guild.name);
 
       await interaction.update({
         embeds: [embed],
@@ -270,7 +274,7 @@ export async function handleStatsButtonInteraction(
         items,
       });
 
-      const components = baueStatsButtons('commands');
+      const components = baueStatsButtons('commands', guild.name);
 
       await interaction.update({
         embeds: [embed],
@@ -299,8 +303,16 @@ export async function handleStatsButtonInteraction(
             })
           : { messageCount: 0, voiceSeconds: 0 };
 
+      let member: GuildMember | null = null;
+      try {
+        member = await guild.members.fetch(interaction.user.id);
+      } catch {
+        // best effort
+      }
+
       const embed = baueMeineStatsEmbed({
         user: interaction.user,
+        member: member ?? undefined,
         trackingStatus,
         items,
         activity: activityTotals,

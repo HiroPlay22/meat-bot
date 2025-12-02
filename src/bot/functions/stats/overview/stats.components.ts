@@ -28,11 +28,12 @@ export const STATS_DATENSCHUTZ_BUTTON_ID = 'stats_open_datenschutz';
  */
 export function baueStatsButtons(
   activeView: StatsView,
+  guildLabel?: string,
 ): ActionRowBuilder<ButtonBuilder>[] {
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId(STATS_BUTTON_IDS.GUILD)
-      .setLabel('Allgemein')
+      .setLabel(guildLabel ?? 'Allgemein')
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(activeView === 'guild'),
 

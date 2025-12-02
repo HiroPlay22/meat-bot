@@ -17,11 +17,11 @@ const texte = ladeTexte('stats/overview', 'de');
 
 type StatsView = 'guild' | 'commands' | 'montag' | 'me';
 
-function baueStatsButtons(active: StatsView) {
+function baueStatsButtons(active: StatsView, guildLabel?: string) {
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId('stats_view_guild')
-      .setLabel(texte.buttons?.viewGuild ?? 'Allgemein')
+      .setLabel(guildLabel ?? texte.buttons?.viewGuild ?? 'Allgemein')
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(active === 'guild'),
     new ButtonBuilder()
@@ -125,7 +125,7 @@ export const statsCommand: SlashCommand = {
         topCommandCount,
       });
 
-      const buttons = baueStatsButtons('guild');
+      const buttons = baueStatsButtons('guild', guild.name);
 
       await interaction.reply({
         embeds: [embed],

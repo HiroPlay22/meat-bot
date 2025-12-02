@@ -1,16 +1,12 @@
 ﻿// FILE: src/bot/functions/stats/overview/stats.embeds.ts
 
-import {
-  EmbedBuilder,
-  type Guild,
-  type User,
-} from 'discord.js';
+import { EmbedBuilder, type Guild, type GuildMember, type User } from 'discord.js';
 import { ladeTexte } from '../../../general/texts/text-loader.js';
 import { emoji, safe } from '../../../general/style/emoji.js';
 import type { TrackingStatusTyp } from '../../sentinel/datenschutz/datenschutz.service.js';
 import type { MontagStats } from '../polls/montag/montag.stats.js';
 
-// Texte für das Stats-Modul (deutsche Variante)
+// Texte fuer das Stats-Modul (deutsche Variante)
 const texte = ladeTexte('stats/overview', 'de');
 
 type CommandStatItem = {
@@ -58,12 +54,12 @@ export function baueGuildStatsEmbed(options: {
 
   const embed = new EmbedBuilder()
     .setAuthor({
-      name: texte.views?.guild?.title ?? 'Server-Übersicht',
+      name: texte.views?.guild?.title ?? 'Server-Uebersicht',
       iconURL: guildIcon,
     })
     .setDescription(
       texte.views?.guild?.description ??
-        'Allgemeine M.E.A.T.-Statistiken für diesen Server.',
+        'Allgemeine M.E.A.T.-Statistiken fuer diesen Server.',
     )
     .setColor(0xff3366)
     .setThumbnail(guildIcon);
@@ -72,12 +68,12 @@ export function baueGuildStatsEmbed(options: {
     `${emoji.meat_calendar} Erstellt \`${createdDateFormatted}\``,
     `${emoji.meat_members} Mitglieder \`${memberCount}\``,
     `${emoji.meat_dev} Bots \`${botCount}\``,
-    `${emoji.meat_boost} Boosts \`${boostCount} · lvl${boostTier}\``,
+    `${emoji.meat_boost} Boosts \`${boostCount} \u00b7 lvl${boostTier}\``,
   ].join('\n');
 
   const rightColumn = [
     `${emoji.meat_roles} Rollen \`${roleCount}\``,
-    `${emoji.meat_channels} Kanäle \`${totalChannels}\``,
+    `${emoji.meat_channels} Kanaele \`${totalChannels}\``,
     `${emoji.meat_text} Text \`${textChannelCount}\``,
     `${emoji.meat_voice} Voice \`${voiceChannelCount}\``,
   ].join('\n');
@@ -114,7 +110,7 @@ export function baueCommandsStatsEmbed(options: {
     );
     embed.addFields({
       name: 'Hinweis',
-      value: 'Es liegen noch keine Befehlsdaten für diesen Server vor.',
+      value: 'Es liegen noch keine Befehlsdaten fuer diesen Server vor.',
     });
     return embed;
   }
@@ -130,13 +126,13 @@ export function baueCommandsStatsEmbed(options: {
 
   embed.setDescription(
     `${descriptionBase}\n\n` +
-      `${emoji.meat_commands} Insgesamt wurden auf diesem Server **${totalUses}** Befehle ausgeführt.\n` +
-      `${emoji.meat_dice ?? emoji.meat_commands} Aktivster Befehl: \`/${topItem.commandName}\` – **${topItem.count}x**.`,
+      `${emoji.meat_commands} Insgesamt wurden auf diesem Server **${totalUses}** Befehle ausgefuehrt.\n` +
+      `${emoji.meat_dice ?? emoji.meat_commands} Aktivster Befehl: \`/${topItem.commandName}\` - **${topItem.count}x**.`,
   );
 
   const lines = items.map((item) => {
-    const descPart = item.description ? ` – ${item.description}` : '';
-    return `${emoji.meat_commands} \`/${item.commandName}\` – **${item.count}x**${descPart}`;
+    const descPart = item.description ? ` - ${item.description}` : '';
+    return `${emoji.meat_commands} \`/${item.commandName}\` - **${item.count}x**${descPart}`;
   });
 
   embed.addFields({ name: 'Befehle', value: lines.join('\n') });
@@ -150,13 +146,16 @@ export function baueCommandsStatsEmbed(options: {
 
 export function baueMeineStatsEmbed(options: {
   user: User;
+  member?: GuildMember;
   trackingStatus: TrackingStatusTyp;
   items: MeineStatsItem[];
   activity: { messageCount: number; voiceSeconds: number };
 }): EmbedBuilder {
-  const { user, trackingStatus, items, activity } = options;
+  const { user, member, trackingStatus, items, activity } = options;
 
   const userAvatar = user.displayAvatarURL({ size: 128 });
+  const displayName = member?.displayName ?? user.username;
+  const profileLink = `https://discord.com/users/${user.id}`;
 
   const embed = new EmbedBuilder()
     .setTitle(texte.views?.me?.title ?? 'Deine M.E.A.T.-Stats')
@@ -165,7 +164,7 @@ export function baueMeineStatsEmbed(options: {
 
   if (trackingStatus !== 'allowed') {
     embed.setDescription(
-      `${texte.views?.me?.noTracking ?? 'Keine persönlichen Statistiken verfügbar.'}\n\n${
+      `${texte.views?.me?.noTracking ?? 'Keine persoenlichen Statistiken verfuegbar.'}\n\n${
         texte.views?.me?.hintDatenschutz ??
         'Du kannst deine Datenschutz-Einstellungen jederzeit anpassen.'
       }`,
@@ -178,7 +177,7 @@ export function baueMeineStatsEmbed(options: {
     items.length > 0
       ? items.map(
           (item) =>
-            `${emoji.meat_commands} \`/${item.commandName}\` – **${item.count}x**`,
+            `${emoji.meat_commands} \`/${item.commandName}\` - **${item.count}x**`,
         )
       : ['Keine Befehlsdaten vorhanden.'];
 
@@ -188,8 +187,15 @@ export function baueMeineStatsEmbed(options: {
       : `${Math.round(activity.voiceSeconds / 60)}m`;
 
   embed.setDescription(
-    `Du hast insgesamt **${total}** M.E.A.T.-Befehle auf diesem Server ausgeführt.`,
+    `Du hast insgesamt **${total}** M.E.A.T.-Befehle auf diesem Server ausgefuehrt.`,
   );
+
+  const createdDate =
+    user.createdAt?.toLocaleDateString('de-DE') ?? 'unbekannt';
+  const joinedDate =
+    member?.joinedAt?.toLocaleDateString('de-DE') ?? 'unbekannt';
+  const boostSince =
+    member?.premiumSince?.toLocaleDateString('de-DE') ?? 'kein Booster';
 
   embed.addFields(
     {
@@ -198,8 +204,11 @@ export function baueMeineStatsEmbed(options: {
       inline: true,
     },
     {
-      name: 'Aktivität',
+      name: `[${displayName}](${profileLink})`,
       value: [
+        `${emoji.meat_calendar} Erstellt \`${createdDate}\``,
+        `${emoji.meat_members} Beitritt \`${joinedDate}\``,
+        `${emoji.meat_boost} Booster seit \`${boostSince}\``,
         `${emoji.meat_text} Nachrichten \`${activity.messageCount}\``,
         `${emoji.meat_voice} Voice \`${voiceFormatted}\``,
       ].join('\n'),
@@ -224,7 +233,7 @@ export function baueMontagStatsEmbed(options: {
   const iconNew = safe((emoji as Record<string, string>).meat_memory ?? emoji.meat_game);
 
   const embed = new EmbedBuilder()
-    .setTitle(`Montagsrunde Stats – ${guild.name}`)
+    .setTitle(`Montagsrunde Stats - ${guild.name}`)
     .setColor(0x579326)
     .setDescription(`${iconDb} Spiele in der DB: \`${stats.gameCount}\``);
 
@@ -256,7 +265,7 @@ export function baueMontagStatsEmbed(options: {
       inline: true,
     },
     {
-      name: 'Neu hinzugefügt',
+      name: 'Neu hinzugefuegt',
       value: newestLines.join('\n'),
       inline: true,
     },
