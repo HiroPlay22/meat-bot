@@ -73,7 +73,7 @@ export function baueGuildStatsEmbed(options: {
 
   const rightColumn = [
     `${emoji.meat_roles} Rollen \`${roleCount}\``,
-    `${emoji.meat_channels} Kanaele \`${totalChannels}\``,
+    `${emoji.meat_channels} Kanäle \`${totalChannels}\``,
     `${emoji.meat_text} Text \`${textChannelCount}\``,
     `${emoji.meat_voice} Voice \`${voiceChannelCount}\``,
   ].join('\n');
@@ -126,7 +126,7 @@ export function baueCommandsStatsEmbed(options: {
 
   embed.setDescription(
     `${descriptionBase}\n\n` +
-      `${emoji.meat_commands} Insgesamt wurden auf diesem Server **${totalUses}** Befehle ausgefuehrt.\n` +
+      `${emoji.meat_commands} Insgesamt wurden auf diesem Server **${totalUses}** Befehle ausgeführt.\n` +
       `${emoji.meat_dice ?? emoji.meat_commands} Aktivster Befehl: \`/${topItem.commandName}\` - **${topItem.count}x**.`,
   );
 
@@ -165,6 +165,7 @@ export function baueMeineStatsEmbed(options: {
   const { user, member, trackingStatus, items, activity } = options;
 
   const userAvatar = user.displayAvatarURL({ size: 128 });
+  const displayName = member?.displayName ?? user.username;
 
   const embed = new EmbedBuilder()
     .setTitle(texte.views?.me?.title ?? 'Deine M.E.A.T.-Stats')
@@ -215,12 +216,12 @@ export function baueMeineStatsEmbed(options: {
 
   embed.addFields(
     {
-      name: 'Deine Top-Befehle',
+      name: `${displayName}'s Top-Befehle`,
       value: commandLines.join('\n'),
       inline: true,
     },
     {
-      name: `<@${user.id}>`,
+      name: `${displayName}'s Stats`,
       value: [
         `${emoji.meat_calendar} Erstellt \`${createdDate}\``,
         `${emoji.meat_members} Beitritt \`${joinedDate}\``,
