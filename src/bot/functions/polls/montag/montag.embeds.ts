@@ -53,7 +53,7 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
   } = params;
 
   const iconGame = safe(emoji.meat_game);
-  const iconServers = safe(emoji.meat_servers);
+  const iconServers = safe((emoji as Record<string, string>).meat_db ?? emoji.meat_servers);
   const iconDuration = safe(emoji.meat_boss);
   const iconExclude = safe(emoji.meat_lock);
   const multiIndicator = state.allowMultiselect

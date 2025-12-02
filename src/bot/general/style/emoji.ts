@@ -11,6 +11,7 @@ export const emoji = {
   meat_boss: '<:meat_boss:1374064288997576805>',
   meat_boost: '<:meat_boost:1374064286208495757>',
   meat_calendar: '<:meat_calendar:1374064287751864481>',
+  meat_db: '<:meat_db:1373694038196224060>',
 
   // 📊 Globale Bot-Stats
   meat_servers: '<:meat_servers:1373694046194761779>',

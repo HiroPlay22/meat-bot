@@ -33,6 +33,7 @@ import {
 } from "../poll.db.js";
 import { ladeServerEinstellungen } from "../../../general/config/server-settings-loader.js";
 import { logError, logInfo } from "../../../general/logging/logger.js";
+import { emoji, safe } from "../../../general/style/emoji.js";
 
 function ermittleNaechstenMontag19Uhr(): string {
   const jetzt = new Date();
@@ -428,6 +429,7 @@ export async function handleMontagPollButton(
 
       const { embed, components } = baueMontagSetupView({
         serverName,
+        serverIconUrl: interaction.guild?.iconURL(),
         nextMontagText,
         gameCount,
         state,
@@ -457,6 +459,7 @@ export async function handleMontagPollButton(
 
       const { embed, components } = baueMontagSetupView({
         serverName,
+        serverIconUrl: interaction.guild?.iconURL(),
         nextMontagText,
         gameCount,
         state,
@@ -704,11 +707,12 @@ export async function handleMontagPollButton(
               [
                 "Die aktive Montags-Runde-Umfrage wurde beendet.",
                 "",
-                `🎉 Gewonnen hat: **${winnerName}**`,
+                `${safe(emoji.meat_boss)} Gewonnen hat:`,
+                `> ${winnerName}`,
                 game
-                  ? `(_${game.isFree ? "kostenlos" : "kostenpflichtig"} • max. ${
+                  ? `> (${game.isFree ? "kostenlos" : "kostenpflichtig"} • max. ${
                       game.maxPlayers ?? "unbegrenzt"
-                    } Spieler_)`
+                    } Spieler)`
                   : "",
               ]
                 .filter((line) => line.length > 0)
@@ -1042,12 +1046,15 @@ export async function handleMontagPollButton(
             announcementChannelId,
           );
           if (announceChannel && announceChannel.isTextBased()) {
+            const announceRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+              new ButtonBuilder()
+                .setStyle(ButtonStyle.Link)
+                .setURL(pollUrl)
+                .setLabel("Zur Umfrage"),
+            );
             await announceChannel.send({
-              content: [
-                "📢 **Neue Montags-Runde Umfrage gestartet!**",
-                "",
-                `🔗 [Zur Abstimmung](${pollUrl})`,
-              ].join("\n"),
+              content: `> ${safe(emoji.meat_game)} Neue Montags-Runde Umfrage gestartet!`,
+              components: [announceRow],
             });
           }
         } catch {
@@ -1189,11 +1196,12 @@ export async function handleAutoEndedMontagPoll(
         [
           "Die aktive Montags-Runde-Umfrage wurde beendet.",
           "",
-          `🎉 Gewonnen hat: **${winnerName}**`,
+          `${safe(emoji.meat_boss)} Gewonnen hat:`,
+          `> ${winnerName}`,
           game
-            ? `(_${game.isFree ? "kostenlos" : "kostenpflichtig"} • max. ${
+            ? `> (${game.isFree ? "kostenlos" : "kostenpflichtig"} • max. ${
                 game.maxPlayers ?? "unbegrenzt"
-              } Spieler_)`
+              } Spieler)`
             : "",
         ]
           .filter((line) => line.length > 0)
