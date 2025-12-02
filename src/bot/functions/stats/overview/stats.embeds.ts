@@ -287,7 +287,7 @@ export function baueMontagStatsEmbed(options: {
       inline: true,
     },
     {
-      name: 'Neu hinzugefuegt',
+      name: 'Neu hinzugefügt',
       value: newestLines.join('\n'),
       inline: true,
     },
