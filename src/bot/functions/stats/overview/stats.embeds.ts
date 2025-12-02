@@ -237,19 +237,16 @@ export function baueMontagStatsEmbed(options: {
   const { guild, stats } = options;
   const iconGame = safe(emoji.meat_game);
   const iconDb = safe((emoji as Record<string, string>).meat_db ?? emoji.meat_servers);
-  const iconFree = safe(emoji.meat_online);
-  const iconPlayers = safe(emoji.meat_users);
 
   const embed = new EmbedBuilder()
     .setTitle(`Montagsrunde Stats – ${guild.name}`)
-    .setThumbnail(guild.iconURL({ size: 128 }) ?? null)
     .setColor(0x579326)
     .setDescription(`${iconDb} Spiele in der DB: \`${stats.gameCount}\``);
 
   const topLines =
     stats.topWins.length > 0
       ? stats.topWins.map((g) => {
-          const badges = [`Gespielt ${g.winCount}x`];
+          const badges = [`played ${g.winCount}x`];
           return `${iconGame} ${g.name} \`${badges.join(' | ')}\``;
         })
       : ['Noch keine Gewinner ermittelt.'];
@@ -258,9 +255,8 @@ export function baueMontagStatsEmbed(options: {
     stats.newest.length > 0
       ? stats.newest.map((g) => {
           const badgeParts: string[] = [];
-          badgeParts.push(g.isFree ? `${iconFree} F2P` : `${iconFree} €`);
-          if (g.maxPlayers != null) {
-            badgeParts.push(`${iconPlayers} max. ${g.maxPlayers}`);
+          if (g.isFree) {
+            badgeParts.push('F2P');
           }
           const badge = badgeParts.length ? `\`${badgeParts.join(' | ')}\`` : '';
           return `${iconGame} ${g.name}${badge ? ' ' + badge : ''}`;
