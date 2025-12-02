@@ -743,7 +743,9 @@ export async function handleMontagPollButton(
         }
         tieCandidatesPerPoll.set(aktiverPoll.id, winnerNames);
 
-        const winnerList = winnerNames.map((n) => `• ${n}`).join("\n");
+        const winnerList = winnerNames
+          .map((n) => `${safe(emoji.meat_game)} ${n}`)
+          .join("\n");
 
         const embed = new EmbedBuilder()
           .setTitle("Montags-Umfrage geschlossen – Gleichstand")
@@ -754,7 +756,7 @@ export async function handleMontagPollButton(
               "Folgende Spiele haben gleich viele Stimmen:",
               winnerList,
               "",
-              "Klicke auf „Zufalls-Gewinner ziehen“, um einen Gewinner festzulegen.",
+              `> Klicke auf „Zufalls-Gewinner ziehen“, um einen Gewinner festzulegen.`,
             ].join("\n"),
           )
           .setColor(0xfee75c);
@@ -764,6 +766,10 @@ export async function handleMontagPollButton(
             .setCustomId(`poll_montag_pick_winner_${aktiverPoll.id}`)
             .setStyle(ButtonStyle.Primary)
             .setLabel("Zufalls-Gewinner ziehen"),
+          new ButtonBuilder()
+            .setStyle(ButtonStyle.Link)
+            .setURL(pollUrl)
+            .setLabel("Zur Umfrage"),
         );
 
         await sendeMontagErgebnisNachricht({
