@@ -152,8 +152,9 @@ export function baueMeineStatsEmbed(options: {
   user: User;
   trackingStatus: TrackingStatusTyp;
   items: MeineStatsItem[];
+  activity: { messageCount: number; voiceSeconds: number };
 }): EmbedBuilder {
-  const { user, trackingStatus, items } = options;
+  const { user, trackingStatus, items, activity } = options;
 
   const userAvatar = user.displayAvatarURL({ size: 128 });
 
@@ -172,24 +173,39 @@ export function baueMeineStatsEmbed(options: {
     return embed;
   }
 
-  if (!items.length) {
-    embed.setDescription(
-      texte.views?.me?.noData ?? 'Es liegen noch keine Daten zu deinen Befehlen vor.',
-    );
-    return embed;
-  }
-
   const total = items.reduce((sum, item) => sum + item.count, 0);
+  const commandLines =
+    items.length > 0
+      ? items.map(
+          (item) =>
+            `${emoji.meat_commands} \`/${item.commandName}\` – **${item.count}x**`,
+        )
+      : ['Keine Befehlsdaten vorhanden.'];
+
+  const voiceFormatted =
+    activity.voiceSeconds >= 3600
+      ? `${(activity.voiceSeconds / 3600).toFixed(1)}h`
+      : `${Math.round(activity.voiceSeconds / 60)}m`;
 
   embed.setDescription(
     `Du hast insgesamt **${total}** M.E.A.T.-Befehle auf diesem Server ausgeführt.`,
   );
 
-  const lines = items.map((item) => {
-    return `${emoji.meat_commands} \`/${item.commandName}\` – **${item.count}x**`;
-  });
-
-  embed.addFields({ name: 'Deine Top-Befehle', value: lines.join('\n') });
+  embed.addFields(
+    {
+      name: 'Deine Top-Befehle',
+      value: commandLines.join('\n'),
+      inline: true,
+    },
+    {
+      name: 'Aktivität',
+      value: [
+        `${emoji.meat_text} Nachrichten \`${activity.messageCount}\``,
+        `${emoji.meat_voice} Voice \`${voiceFormatted}\``,
+      ].join('\n'),
+      inline: true,
+    },
+  );
 
   return embed;
 }

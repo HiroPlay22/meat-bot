@@ -19,6 +19,7 @@ import {
 import { ermittleTrackingStatus } from '../../sentinel/datenschutz/datenschutz.service.js';
 import { baueDatenschutzEmbedUndKomponenten } from '../../sentinel/datenschutz/datenschutz.embeds.js';
 import { ladeMontagStats } from '../polls/montag/montag.stats.js';
+import { ladeUserActivityTotals } from '../../../general/stats/activity.service.js';
 
 type CommandStatItem = {
   commandName: string;
@@ -290,11 +291,19 @@ export async function handleStatsButtonInteraction(
         trackingStatus === 'allowed'
           ? await ladeMeineCommandStats(guild.id, interaction.user.id)
           : [];
+      const activityTotals =
+        trackingStatus === 'allowed'
+          ? await ladeUserActivityTotals({
+              guildId: guild.id,
+              userId: interaction.user.id,
+            })
+          : { messageCount: 0, voiceSeconds: 0 };
 
       const embed = baueMeineStatsEmbed({
         user: interaction.user,
         trackingStatus,
         items,
+        activity: activityTotals,
       });
 
       // Hauptnachricht bleibt unverändert → nur Interaction bestätigen
