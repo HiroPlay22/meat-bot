@@ -31,9 +31,9 @@ export const commandsCommand: SlashCommand = {
 
     const descriptions: Record<string, string> = {
       ping: 'Pong!',
-      datenschutz: 'Datenschutz-Einstellung',
+      datenschutz: 'Opt-In',
       stats: 'Zeigt Statistiken',
-      'welcome-test': 'Test-Serverbeitritt',
+      'welcome-test': 'Serverbeitritt',
       poll: 'Öffnet Poll-Center',
       commands: 'Zeigt alle Commands',
     };
@@ -46,7 +46,7 @@ export const commandsCommand: SlashCommand = {
 
     const cmdIcon = '<:meat_commands:1373694040176070779>';
     const lines = commands.map(
-      (c) => `${cmdIcon} \`/${c.name}\` • ${c.description}`,
+      (c) => `${cmdIcon} \`/${c.name}\` ${c.description}`,
     );
 
     const half = Math.ceil(lines.length / 2);
