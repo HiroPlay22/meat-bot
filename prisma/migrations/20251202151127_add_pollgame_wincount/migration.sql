@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "PollGame" ADD COLUMN     "winCount" INTEGER NOT NULL DEFAULT 0;

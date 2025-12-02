@@ -148,9 +148,39 @@ export async function setMontagWinner(params: {
       where: { id: game.id },
       data: {
         lastPlayedAt: new Date(),
+        winCount: { increment: 1 },
       },
     }),
   ]);
 
   return { poll, game };
+}
+
+/**
+ * Backfill für winCount aller PollGames basierend auf vorhandenen Montags-Polls.
+ * Setzt zunächst alle winCounts auf 0 und zählt dann Gewinne pro Spiel neu hoch.
+ */
+export async function backfillMontagWinCounts(): Promise<void> {
+  await prisma.pollGame.updateMany({
+    data: { winCount: 0 },
+  });
+
+  const grouped = await prisma.poll.groupBy({
+    by: ['winnerGameId'],
+    where: {
+      type: PollType.MONTAG,
+      winnerGameId: { not: null },
+    },
+    _count: { _all: true },
+  });
+
+  for (const entry of grouped) {
+    if (!entry.winnerGameId) continue;
+    const wins = entry._count?._all ?? 0;
+    if (wins === 0) continue;
+    await prisma.pollGame.update({
+      where: { id: entry.winnerGameId },
+      data: { winCount: wins },
+    });
+  }
 }

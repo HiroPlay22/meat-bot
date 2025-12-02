@@ -15,7 +15,7 @@ import { logError, logInfo } from '../../../general/logging/logger.js';
 
 const texte = ladeTexte('stats/overview', 'de');
 
-type StatsView = 'guild' | 'commands' | 'me';
+type StatsView = 'guild' | 'commands' | 'montag' | 'me';
 
 function baueStatsButtons(active: StatsView) {
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -29,6 +29,11 @@ function baueStatsButtons(active: StatsView) {
       .setLabel(texte.buttons?.viewCommands ?? 'Commands')
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(active === 'commands'),
+    new ButtonBuilder()
+      .setCustomId('stats_view_montag')
+      .setLabel('Montagsrunde')
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(active === 'montag'),
     new ButtonBuilder()
       .setCustomId('stats_view_me')
       .setLabel(texte.buttons?.viewMe ?? 'Meine Stats')

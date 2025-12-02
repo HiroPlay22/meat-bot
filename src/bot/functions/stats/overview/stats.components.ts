@@ -6,11 +6,12 @@ import {
   ButtonStyle,
 } from 'discord.js';
 
-export type StatsView = 'guild' | 'commands' | 'me';
+export type StatsView = 'guild' | 'commands' | 'montag' | 'me';
 
 export const STATS_BUTTON_IDS = {
   GUILD: 'stats_view_guild',
   COMMANDS: 'stats_view_commands',
+  MONTAG: 'stats_view_montag',
   ME: 'stats_view_me',
 } as const;
 
@@ -40,6 +41,12 @@ export function baueStatsButtons(
       .setLabel('Commands')
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(activeView === 'commands'),
+
+    new ButtonBuilder()
+      .setCustomId(STATS_BUTTON_IDS.MONTAG)
+      .setLabel('Montagsrunde')
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(activeView === 'montag'),
 
     new ButtonBuilder()
       .setCustomId(STATS_BUTTON_IDS.ME)

@@ -79,6 +79,9 @@ model PollGame {
   /// Optional: letztes Mal im Poll gewesen / gewonnen, für spätere Logik
   lastPlayedAt DateTime?
 
+  /// Anzahl der Gewinne über alle Montags-Polls
+  winCount     Int       @default(0)
+
   /// Polls, in denen dieses Spiel als Gewinner eingetragen wurde
   pollsWon     Poll[]    @relation("Poll_WinnerGame")
 }

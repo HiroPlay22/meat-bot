@@ -7,6 +7,7 @@ import {
   baueGuildStatsEmbed,
   baueCommandsStatsEmbed,
   baueMeineStatsEmbed,
+  baueMontagStatsEmbed,
 } from './stats.embeds.js';
 import {
   STATS_BUTTON_IDS,
@@ -17,6 +18,7 @@ import {
 } from './stats.components.js';
 import { ermittleTrackingStatus } from '../../sentinel/datenschutz/datenschutz.service.js';
 import { baueDatenschutzEmbedUndKomponenten } from '../../sentinel/datenschutz/datenschutz.embeds.js';
+import { ladeMontagStats } from '../polls/montag/montag.stats.js';
 
 type CommandStatItem = {
   commandName: string;
@@ -30,6 +32,8 @@ function ermittleViewAusCustomId(customId: string): StatsView | null {
       return 'guild';
     case STATS_BUTTON_IDS.COMMANDS:
       return 'commands';
+    case STATS_BUTTON_IDS.MONTAG:
+      return 'montag';
     case STATS_BUTTON_IDS.ME:
       return 'me';
     default:
@@ -225,6 +229,29 @@ export async function handleStatsButtonInteraction(
       });
 
       logInfo('Stats-View gewechselt: guild', {
+        functionName: 'handleStatsButtonInteraction',
+        guildId: guild.id,
+        userId: interaction.user.id,
+      });
+      return;
+    }
+
+    if (view === 'montag') {
+      const stats = await ladeMontagStats(guild.id);
+
+      const embed = baueMontagStatsEmbed({
+        guild,
+        stats,
+      });
+
+      const components = baueStatsButtons('montag');
+
+      await interaction.update({
+        embeds: [embed],
+        components,
+      });
+
+      logInfo('Stats-View gewechselt: montag', {
         functionName: 'handleStatsButtonInteraction',
         guildId: guild.id,
         userId: interaction.user.id,
