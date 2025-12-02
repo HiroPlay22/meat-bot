@@ -1065,7 +1065,7 @@ export async function handleMontagPollButton(
       resetSetupState(guildId, userId);
 
       await interaction.deferUpdate();
-      await deleteInteractionMessageIfPossible(interaction);
+      await deleteInteractionReplySafe(interaction);
 
       return;
     }
