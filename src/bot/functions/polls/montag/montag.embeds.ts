@@ -54,7 +54,6 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
 
   const iconGame = safe(emoji.meat_game);
   const iconServers = safe(emoji.meat_servers);
-  const iconMulti = safe(emoji.meat_votings);
   const iconDuration = safe(emoji.meat_boss);
   const iconExclude = safe(emoji.meat_lock);
   const multiIndicator = state.allowMultiselect
@@ -83,8 +82,8 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
     .setDescription(
       [
         `${iconServers} Spiele in der DB: \`${gameCount}\``,
-        `${iconMulti} Mehrfachauswahl: ${multiIndicator} \`${state.allowMultiselect ? "aktiv" : "inaktiv"}\``,
-        `${iconDuration} Dauer: ${dauerText} \`${dauerText}\``,
+        `${multiIndicator} Mehrfachauswahl: \`${state.allowMultiselect ? "aktiv" : "inaktiv"}\``,
+        `${iconDuration} Dauer: \`${dauerText}\``,
         `${safe(emoji.meat_calendar)} Geplante Session: \`${sessionText}\``,
         "",
         excludedText,
@@ -148,7 +147,6 @@ export function baueMontagPreviewView(params: MontagPreviewViewParams): {
   const { serverName, serverIconUrl, nextMontagText, state } = params;
 
   const iconCalendar = safe(emoji.meat_calendar);
-  const iconMulti = safe(emoji.meat_votings);
   const iconDuration = safe(emoji.meat_boss);
   const iconGames = safe(emoji.meat_game);
   const multiIndicator = state.allowMultiselect
@@ -183,8 +181,8 @@ export function baueMontagPreviewView(params: MontagPreviewViewParams): {
         `${iconGames} **Spiele in dieser Umfrage:**`,
         selectedText,
         "",
-        `${iconMulti} Mehrfachauswahl: ${multiIndicator} \`${state.allowMultiselect ? "aktiv" : "inaktiv"}\``,
-        `${iconDuration} Dauer: ${formatDurationText(state.durationHours)} \`${formatDurationText(state.durationHours)}\``,
+        `${multiIndicator} Mehrfachauswahl: \`${state.allowMultiselect ? "aktiv" : "inaktiv"}\``,
+        `${iconDuration} Dauer: \`${formatDurationText(state.durationHours)}\``,
         `${iconCalendar} Session: \`${sessionText}\``,
       ].join("\n"),
     )

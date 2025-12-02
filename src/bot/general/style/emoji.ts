@@ -21,6 +21,7 @@ export const emoji = {
   // 🏠 Server Stats
   meat_members: '<:meat_user:1373694031124627478>',
   meat_online: '<:meat_online:1373697659478478888>',
+  meat_offline: '<:meat_offline:1373694051840299048>',
   meat_text: '<:meat_text:1373694036614971484>',
   meat_voice: '<:meat_voice:1373694035151028417>',
   meat_roles: '<:meat_roles:1373694032462614528>',
