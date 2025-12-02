@@ -62,12 +62,13 @@ export const statsCommand: SlashCommand = {
       return;
     }
 
-    const guild = interaction.guild;
-    const guildId = guild.id;
+      const guild = interaction.guild;
+      const guildId = guild.id;
 
     try {
       // Basic Guild-Daten
       const memberCount = guild.memberCount ?? 0;
+      const botCount = guild.members.cache.filter((m) => m.user.bot).size;
 
       const channels = guild.channels.cache;
       const textChannelCount = channels.filter((ch: any) =>
@@ -115,6 +116,7 @@ export const statsCommand: SlashCommand = {
       const embed = baueGuildStatsEmbed({
         guild,
         memberCount,
+        botCount,
         textChannelCount,
         voiceChannelCount,
         roleCount,

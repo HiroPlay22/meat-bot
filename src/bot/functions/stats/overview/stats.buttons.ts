@@ -216,6 +216,7 @@ export async function handleStatsButtonInteraction(
       const embed = baueGuildStatsEmbed({
         guild,
         memberCount: guild.memberCount,
+        botCount: guild.members.cache.filter((m) => m.user.bot).size,
         textChannelCount,
         voiceChannelCount,
         roleCount: guild.roles.cache.size,

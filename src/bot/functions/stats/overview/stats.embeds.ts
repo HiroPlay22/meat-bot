@@ -1,4 +1,4 @@
-// FILE: src/bot/functions/stats/overview/stats.embeds.ts
+﻿// FILE: src/bot/functions/stats/overview/stats.embeds.ts
 
 import {
   EmbedBuilder,
@@ -27,13 +27,10 @@ type MeineStatsItem = {
 export function baueGuildStatsEmbed(options: {
   guild: Guild;
   memberCount: number;
+  botCount: number;
   textChannelCount: number;
   voiceChannelCount: number;
   roleCount: number;
-  /**
-   * totalCommandCount / topCommand* sind für später vorgesehen,
-   * werden aktuell in diesem Embed nicht genutzt.
-   */
   totalCommandCount?: number;
   topCommandName?: string;
   topCommandCount?: number;
@@ -41,6 +38,7 @@ export function baueGuildStatsEmbed(options: {
   const {
     guild,
     memberCount,
+    botCount,
     textChannelCount,
     voiceChannelCount,
     roleCount,
@@ -51,8 +49,9 @@ export function baueGuildStatsEmbed(options: {
     guild.client.user.displayAvatarURL({ size: 128 });
 
   const boostCount = guild.premiumSubscriptionCount ?? 0;
-  const boostTier = guild.premiumTier; // 0–3
+  const boostTier = guild.premiumTier;
   const totalChannels = textChannelCount + voiceChannelCount;
+  const humanCount = Math.max(memberCount - botCount, 0);
 
   const createdAt = guild.createdAt;
   const createdDateFormatted = createdAt
@@ -69,34 +68,25 @@ export function baueGuildStatsEmbed(options: {
         'Allgemeine M.E.A.T.-Statistiken für diesen Server.',
     )
     .setColor(0xff3366)
-    .setThumbnail(guildIcon); // ➜ Bild wieder rechts als Thumbnail
+    .setThumbnail(guildIcon);
 
-  // Linke Spalte – mehrere Zeilen in EINEM Field
   const leftColumn = [
     `${emoji.meat_calendar} Erstellt \`${createdDateFormatted}\``,
     `${emoji.meat_members} Mitglieder \`${memberCount}\``,
-    `${emoji.meat_boost} Boosts \`L${boostTier}·${boostCount}x\``,
-    `${emoji.meat_roles} Rollen \`${roleCount}\``,
+    `${emoji.meat_users} Bots \`${botCount}\` | Humans \`${humanCount}\``,
+    `${emoji.meat_boost} Boosts \`${boostCount} · lvl${boostTier}\``,
   ].join('\n');
 
-  // Rechte Spalte – mehrere Zeilen in EINEM Field
   const rightColumn = [
+    `${emoji.meat_roles} Rollen \`${roleCount}\``,
     `${emoji.meat_channels} Kanäle \`${totalChannels}\``,
     `${emoji.meat_text} Text \`${textChannelCount}\``,
     `${emoji.meat_voice} Voice \`${voiceChannelCount}\``,
   ].join('\n');
 
   embed.addFields(
-    {
-      name: ' ',
-      value: leftColumn,
-      inline: true,
-    },
-    {
-      name: ' ',
-      value: rightColumn,
-      inline: true,
-    },
+    { name: ' ', value: leftColumn, inline: true },
+    { name: ' ', value: rightColumn, inline: true },
   );
 
   return embed;
@@ -115,11 +105,7 @@ export function baueCommandsStatsEmbed(options: {
   const botAvatar = guild.client.user.displayAvatarURL({ size: 128 });
 
   const embed = new EmbedBuilder()
-    .setTitle(
-      `${
-        texte.views?.commands?.title ?? 'Befehls-Statistiken'
-      }`,
-    )
+    .setTitle(texte.views?.commands?.title ?? 'Befehls-Statistiken')
     .setThumbnail(botAvatar)
     .setColor(0x33ccff);
 
@@ -130,8 +116,7 @@ export function baueCommandsStatsEmbed(options: {
     );
     embed.addFields({
       name: 'Hinweis',
-      value:
-        'Es liegen noch keine Befehlsdaten für diesen Server vor.',
+      value: 'Es liegen noch keine Befehlsdaten für diesen Server vor.',
     });
     return embed;
   }
@@ -152,16 +137,11 @@ export function baueCommandsStatsEmbed(options: {
   );
 
   const lines = items.map((item) => {
-    const descPart = item.description
-      ? ` – ${item.description}`
-      : '';
+    const descPart = item.description ? ` – ${item.description}` : '';
     return `${emoji.meat_commands} \`/${item.commandName}\` – **${item.count}x**${descPart}`;
   });
 
-  embed.addFields({
-    name: 'Befehle',
-    value: lines.join('\n'),
-  });
+  embed.addFields({ name: 'Befehle', value: lines.join('\n') });
 
   return embed;
 }
@@ -180,15 +160,10 @@ export function baueMeineStatsEmbed(options: {
   const userAvatar = user.displayAvatarURL({ size: 128 });
 
   const embed = new EmbedBuilder()
-    .setTitle(
-      `${
-        texte.views?.me?.title ?? 'Deine M.E.A.T.-Stats'
-      }`,
-    )
+    .setTitle(texte.views?.me?.title ?? 'Deine M.E.A.T.-Stats')
     .setThumbnail(userAvatar)
     .setColor(0x9966ff);
 
-  // Kein Tracking erlaubt → nur Info & Hinweis
   if (trackingStatus !== 'allowed') {
     embed.setDescription(
       `${texte.views?.me?.noTracking ?? 'Keine persönlichen Statistiken verfügbar.'}\n\n${
@@ -199,11 +174,9 @@ export function baueMeineStatsEmbed(options: {
     return embed;
   }
 
-  // Tracking erlaubt, aber keine Daten
   if (!items.length) {
     embed.setDescription(
-      texte.views?.me?.noData ??
-        'Es liegen noch keine Daten zu deinen Befehlen vor.',
+      texte.views?.me?.noData ?? 'Es liegen noch keine Daten zu deinen Befehlen vor.',
     );
     return embed;
   }
@@ -218,10 +191,7 @@ export function baueMeineStatsEmbed(options: {
     return `${emoji.meat_commands} \`/${item.commandName}\` – **${item.count}x**`;
   });
 
-  embed.addFields({
-    name: 'Deine Top-Befehle',
-    value: lines.join('\n'),
-  });
+  embed.addFields({ name: 'Deine Top-Befehle', value: lines.join('\n') });
 
   return embed;
 }
