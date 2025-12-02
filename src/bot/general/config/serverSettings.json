@@ -36,5 +36,47 @@
         }
       }
     }
+  },
+  "271568768268894218": {
+    "sprache": "de",
+    "datenschutz": {
+      "userTrackingErlaubt": false
+    },
+    "logging": {
+      "aktiv": false,
+      "logLevel": "info",
+      "logChannelId": null
+    },
+    "functions": {
+      "welcome": {
+        "aktiv": true,
+        "loggingAktiv": true,
+        "logLevel": "info",
+        "logChannelId": "1373610845761962036",
+        "statsAktiv": false,
+        "ephemeralStandard": false,
+        "spezifisch": {
+          "welcomeChannelId": "390936188795617301",
+          "begruesseBots": true
+        }
+      },
+      "polls": {
+        "montag": {
+          "aktiv": true,
+          "loggingAktiv": true,
+          "logLevel": "info",
+          "logChannelId": null,
+          "statsAktiv": false,
+          "ephemeralStandard": true,
+          "spezifisch": {
+            "announcementChannelId": "375986070271033344",
+            "allowedRoleIds": [
+              "746491637227585597",
+              "876893070765998161"
+            ]
+          }
+        }
+      }
+    }
   }
 }
