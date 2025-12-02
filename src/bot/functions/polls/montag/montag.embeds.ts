@@ -74,7 +74,7 @@ export function baueMontagSetupView(params: MontagSetupViewParams): {
       : `${iconExclude} Aktuell wird kein Spiel aufgrund der letzten Gewinner ausgeschlossen.`;
 
   const embed = new EmbedBuilder()
-    .setTitle(`Montags-Runde Setup für _${serverName}_`)
+    .setTitle(`Montags-Runde Setup`)
     .setAuthor({
       name: serverName,
       iconURL: serverIconUrl ?? undefined,
@@ -171,7 +171,7 @@ export function baueMontagPreviewView(params: MontagPreviewViewParams): {
     : "_Keine Spiele ausgewählt – bitte Setup anpassen._";
 
   const embed = new EmbedBuilder()
-    .setTitle(`Montags-Runde Vorschau für _${serverName}_`)
+    .setTitle(`Montags-Runde Vorschau`)
     .setAuthor({
       name: serverName,
       iconURL: serverIconUrl ?? undefined,
