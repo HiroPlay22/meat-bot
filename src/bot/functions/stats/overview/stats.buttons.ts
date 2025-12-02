@@ -1,4 +1,4 @@
-// FILE: src/bot/functions/stats/overview/stats.buttons.ts
+﻿// FILE: src/bot/functions/stats/overview/stats.buttons.ts
 
 import {
   ActionRowBuilder,
@@ -34,7 +34,7 @@ type CommandStatItem = {
   count: number;
 };
 
-// Mapping von Button-ID → View
+// Mapping von Button-ID â†’ View
 function ermittleViewAusCustomId(customId: string): StatsView | null {
   switch (customId) {
     case STATS_BUTTON_IDS.GUILD:
@@ -80,7 +80,7 @@ async function ladeGuildCommandStats(
     );
 }
 
-// Aggregierte Befehls-Stats für einen User in einer Guild
+// Aggregierte Befehls-Stats fÃ¼r einen User in einer Guild
 async function ladeMeineCommandStats(
   guildId: string,
   userId: string,
@@ -112,7 +112,7 @@ async function ladeMeineCommandStats(
     );
 }
 
-// Öffnet das Datenschutz-Panel (wie /datenschutz), ausgelöst aus /stats
+// Ã–ffnet das Datenschutz-Panel (wie /datenschutz), ausgelÃ¶st aus /stats
 async function handleStatsDatenschutzOpen(
   interaction: ButtonInteraction,
 ): Promise<void> {
@@ -142,13 +142,13 @@ async function handleStatsDatenschutzOpen(
       ephemeral: true,
     });
 
-    logInfo('Datenschutz-Panel aus /stats geöffnet', {
+    logInfo('Datenschutz-Panel aus /stats geÃ¶ffnet', {
       functionName: 'handleStatsDatenschutzOpen',
       guildId: guild.id,
       userId: interaction.user.id,
     });
   } catch (error) {
-    logError('Fehler beim Öffnen des Datenschutz-Panels (aus /stats)', {
+    logError('Fehler beim Ã–ffnen des Datenschutz-Panels (aus /stats)', {
       functionName: 'handleStatsDatenschutzOpen',
       guildId: interaction.guildId ?? undefined,
       userId: interaction.user.id,
@@ -172,14 +172,14 @@ async function handleStatsDatenschutzOpen(
 }
 
 /**
- * Zentrale Handler-Funktion für alle /stats-Buttons.
+ * Zentrale Handler-Funktion fÃ¼r alle /stats-Buttons.
  * Wird von index.ts aufgerufen.
  */
 export async function handleStatsButtonInteraction(
   interaction: ButtonInteraction,
 ): Promise<void> {
-  // Spezialfall: öffentliches Posten der eigenen Stats
-  if (interaction.customId === STATS_ME_PUBLIC_BUTTON_ID) {
+  // Commands-Button aus /commands-Embed -> Command-Stats
+  if (interaction.customId === 'commands_show_stats') {
     const guild = interaction.guild;
     if (!guild) {
       await interaction.reply({
@@ -189,95 +189,30 @@ export async function handleStatsButtonInteraction(
       return;
     }
 
-    try {
-      const trackingStatus = await ermittleTrackingStatus(
-        guild.id,
-        interaction.user.id,
-      );
+    const items = await ladeGuildCommandStats(guild.id);
+    const embed = baueCommandsStatsEmbed({ guild, items });
+    const components = baueStatsButtons('commands', guild.name);
 
-      if (trackingStatus !== 'allowed') {
-        await interaction.reply({
-          content:
-            'Deine Statistiken dürfen nicht geteilt werden (kein Opt-in).',
-          ephemeral: true,
-        });
-        return;
-      }
+    await interaction.update({
+      embeds: [embed],
+      components,
+    });
 
-      const items = await ladeMeineCommandStats(
-        guild.id,
-        interaction.user.id,
-      );
-      const activityTotals = await ladeUserActivityTotals({
-        guildId: guild.id,
-        userId: interaction.user.id,
-      });
-
-      let member: GuildMember | null = null;
-      try {
-        member = await guild.members.fetch(interaction.user.id);
-      } catch {
-        // best effort
-      }
-
-      const embed = baueMeineStatsEmbed({
-        user: interaction.user,
-        member: member ?? undefined,
-        trackingStatus,
-        items,
-        activity: activityTotals,
-      });
-
-      await interaction.deferUpdate();
-
-      const outChannel = interaction.channel;
-      if (outChannel && outChannel.isTextBased()) {
-        await (outChannel as any).send({ embeds: [embed] });
-      } else {
-        await interaction.followUp({
-          content: 'Konnte keinen Text-Channel für die Ausgabe finden.',
-          ephemeral: true,
-        });
-        return;
-      }
-
-      try {
-        await interaction.deleteReply();
-      } catch {
-        // best effort
-      }
-    } catch (error) {
-      logError('Fehler beim öffentlichen Posten der Meine-Stats', {
-        functionName: 'handleStatsButtonInteraction',
-        guildId: interaction.guildId ?? undefined,
-        userId: interaction.user.id,
-        extra: { error },
-      });
-
-      if (interaction.replied || interaction.deferred) {
-        await interaction.followUp({
-          content:
-            'Konnte deine Stats nicht öffentlich posten. Versuch es nochmal.',
-          ephemeral: true,
-        });
-      } else {
-        await interaction.reply({
-          content:
-            'Konnte deine Stats nicht öffentlich posten. Versuch es nochmal.',
-          ephemeral: true,
-        });
-      }
-    }
+    logInfo('Commands-Stats aus /commands-Button geöffnet', {
+      functionName: 'handleStatsButtonInteraction',
+      guildId: guild.id,
+      userId: interaction.user.id,
+    });
 
     return;
   }
-  // 🔹 Spezialfall: Datenschutz-Button aus "Meine Stats"
+  // ðŸ”¹ Spezialfall: Datenschutz-Button aus "Meine Stats"
   if (interaction.customId === STATS_DATENSCHUTZ_BUTTON_ID) {
     await handleStatsDatenschutzOpen(interaction);
     return;
   }
 
-  // Spezialfall: eigene Stats öffentlich posten
+  // Spezialfall: eigene Stats Ã¶ffentlich posten
   if (interaction.customId === STATS_ME_PUBLIC_BUTTON_ID) {
     const guild = interaction.guild;
     if (!guild) {
@@ -297,7 +232,7 @@ export async function handleStatsButtonInteraction(
       if (trackingStatus !== 'allowed') {
         await interaction.reply({
           content:
-            'Deine Statistiken dürfen nicht geteilt werden (kein Opt-in).',
+            'Deine Statistiken dÃ¼rfen nicht geteilt werden (kein Opt-in).',
           ephemeral: true,
         });
         return;
@@ -334,7 +269,7 @@ export async function handleStatsButtonInteraction(
         await (outChannel as any).send({ embeds: [embed] });
       } else {
         await interaction.followUp({
-          content: 'Konnte keinen Text-Channel für die Ausgabe finden.',
+          content: 'Konnte keinen Text-Channel fÃ¼r die Ausgabe finden.',
           ephemeral: true,
         });
         return;
@@ -346,7 +281,7 @@ export async function handleStatsButtonInteraction(
         // best effort
       }
     } catch (error) {
-      logError('Fehler beim öffentlichen Posten der Meine-Stats', {
+      logError('Fehler beim Ã¶ffentlichen Posten der Meine-Stats', {
         functionName: 'handleStatsButtonInteraction',
         guildId: interaction.guildId ?? undefined,
         userId: interaction.user.id,
@@ -356,13 +291,13 @@ export async function handleStatsButtonInteraction(
       if (interaction.replied || interaction.deferred) {
         await interaction.followUp({
           content:
-            'Konnte deine Stats nicht öffentlich posten. Versuch es nochmal.',
+            'Konnte deine Stats nicht Ã¶ffentlich posten. Versuch es nochmal.',
           ephemeral: true,
         });
       } else {
         await interaction.reply({
           content:
-            'Konnte deine Stats nicht öffentlich posten. Versuch es nochmal.',
+            'Konnte deine Stats nicht Ã¶ffentlich posten. Versuch es nochmal.',
           ephemeral: true,
         });
       }
@@ -373,7 +308,7 @@ export async function handleStatsButtonInteraction(
 
   const view = ermittleViewAusCustomId(interaction.customId);
   if (!view) {
-    // Nicht unser Button → ignorieren.
+    // Nicht unser Button â†’ ignorieren.
     return;
   }
 
@@ -394,9 +329,9 @@ export async function handleStatsButtonInteraction(
       interaction.user.id,
     );
 
-    // 🔹 View: Allgemein → Haupt-Embed updaten
+    // ðŸ”¹ View: Allgemein â†’ Haupt-Embed updaten
     if (view === 'guild') {
-      // volle Memberliste laden, damit Bots/Member zuverlässig gezählt werden
+      // volle Memberliste laden, damit Bots/Member zuverlÃ¤ssig gezÃ¤hlt werden
       const memberCollection = await guild.members.fetch();
 
       const textChannelCount = guild.channels.cache.filter(
@@ -459,7 +394,7 @@ export async function handleStatsButtonInteraction(
       return;
     }
 
-    // 🔹 View: Commands → Haupt-Embed updaten
+    // ðŸ”¹ View: Commands â†’ Haupt-Embed updaten
     if (view === 'commands') {
       const items = await ladeGuildCommandStats(guild.id);
 
@@ -483,7 +418,7 @@ export async function handleStatsButtonInteraction(
       return;
     }
 
-    // 🔹 View: Meine Stats → nur ephemeres Embed, Hauptnachricht bleibt
+    // ðŸ”¹ View: Meine Stats â†’ nur ephemeres Embed, Hauptnachricht bleibt
     if (view === 'me') {
       const items =
         trackingStatus === 'allowed'
@@ -512,12 +447,12 @@ export async function handleStatsButtonInteraction(
         activity: activityTotals,
       });
 
-      // Hauptnachricht bleibt unverändert → nur Interaction bestätigen
+      // Hauptnachricht bleibt unverÃ¤ndert â†’ nur Interaction bestÃ¤tigen
       await interaction.deferUpdate();
 
       let componentsForMeView =
         trackingStatus === 'allowed'
-          ? [] // Tracking erlaubt -> keine extra Buttons nötig
+          ? [] // Tracking erlaubt -> keine extra Buttons nÃ¶tig
           : baueStatsDatenschutzButtons(); // Kein Opt-in -> Datenschutz-Button anzeigen
 
       if (trackingStatus === 'allowed') {
@@ -525,7 +460,7 @@ export async function handleStatsButtonInteraction(
           new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder()
               .setCustomId(STATS_ME_PUBLIC_BUTTON_ID)
-              .setLabel('Öffentlich anzeigen')
+              .setLabel('Oeffentlich anzeigen')
               .setStyle(ButtonStyle.Secondary),
           ),
         ];
@@ -537,7 +472,7 @@ export async function handleStatsButtonInteraction(
         ephemeral: true,
       });
 
-      logInfo('Stats-View geöffnet: me (ephemeral)', {
+      logInfo('Stats-View geÃ¶ffnet: me (ephemeral)', {
         functionName: 'handleStatsButtonInteraction',
         guildId: guild.id,
         userId: interaction.user.id,
@@ -566,3 +501,4 @@ export async function handleStatsButtonInteraction(
     }
   }
 }
+

@@ -7,6 +7,7 @@ import { datenschutzCommand } from '../functions/sentinel/datenschutz/datenschut
 import { statsCommand } from '../functions/stats/overview/stats.command.js';
 import { welcomeTestCommand } from './dev/welcomeTest.js';
 import { pollCommand } from '../functions/polls/poll.command.js';
+import { commandsCommand } from './general/commandsList.js';
 
 export const slashCommands = new Collection<string, SlashCommand>();
 
@@ -16,6 +17,7 @@ const alleCommands: SlashCommand[] = [
   statsCommand,
   welcomeTestCommand,
   pollCommand,
+  commandsCommand,
 ];
 
 for (const command of alleCommands) {
