@@ -16,7 +16,7 @@ export function bauePollCenterView(
       [
         `Willkommen im Umfrage-Hub von **${serverName}**.`,
         '',
-        'Wähle einen Poll-Typ aus, den du konfigurieren möchtest.',
+        '> Wähle einen Poll-Typ aus, den du konfigurieren möchtest.',
       ].join('\n'),
     )
     .setColor(0x5865f2);
