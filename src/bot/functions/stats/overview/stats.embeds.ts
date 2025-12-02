@@ -51,8 +51,6 @@ export function baueGuildStatsEmbed(options: {
   const boostCount = guild.premiumSubscriptionCount ?? 0;
   const boostTier = guild.premiumTier;
   const totalChannels = textChannelCount + voiceChannelCount;
-  const humanCount = Math.max(memberCount - botCount, 0);
-
   const createdAt = guild.createdAt;
   const createdDateFormatted = createdAt
     ? createdAt.toLocaleDateString('de-DE')
@@ -73,7 +71,7 @@ export function baueGuildStatsEmbed(options: {
   const leftColumn = [
     `${emoji.meat_calendar} Erstellt \`${createdDateFormatted}\``,
     `${emoji.meat_members} Mitglieder \`${memberCount}\``,
-    `${emoji.meat_users} Bots \`${botCount}\` | Humans \`${humanCount}\``,
+    `${emoji.meat_dev} Bots \`${botCount}\``,
     `${emoji.meat_boost} Boosts \`${boostCount} · lvl${boostTier}\``,
   ].join('\n');
 
