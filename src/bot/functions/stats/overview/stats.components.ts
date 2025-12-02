@@ -17,6 +17,7 @@ export const STATS_BUTTON_IDS = {
 
 // Extra-Button für "Datenschutz öffnen" in "Meine Stats" (nur bei fehlendem Opt-in)
 export const STATS_DATENSCHUTZ_BUTTON_ID = 'stats_open_datenschutz';
+export const STATS_ME_PUBLIC_BUTTON_ID = 'stats_me_public';
 
 /**
  * Baut die Tab-Buttons für /stats:

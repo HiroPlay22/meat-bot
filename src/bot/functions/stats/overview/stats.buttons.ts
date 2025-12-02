@@ -1,6 +1,9 @@
 // FILE: src/bot/functions/stats/overview/stats.buttons.ts
 
 import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
   ChannelType,
   type ButtonInteraction,
   type GuildMember,
@@ -16,6 +19,7 @@ import {
 import {
   STATS_BUTTON_IDS,
   STATS_DATENSCHUTZ_BUTTON_ID,
+  STATS_ME_PUBLIC_BUTTON_ID,
   type StatsView,
   baueStatsButtons,
   baueStatsDatenschutzButtons,
@@ -174,9 +178,196 @@ async function handleStatsDatenschutzOpen(
 export async function handleStatsButtonInteraction(
   interaction: ButtonInteraction,
 ): Promise<void> {
+  // Spezialfall: öffentliches Posten der eigenen Stats
+  if (interaction.customId === STATS_ME_PUBLIC_BUTTON_ID) {
+    const guild = interaction.guild;
+    if (!guild) {
+      await interaction.reply({
+        content: 'Dieser Button funktioniert nur auf einem Server.',
+        ephemeral: true,
+      });
+      return;
+    }
+
+    try {
+      const trackingStatus = await ermittleTrackingStatus(
+        guild.id,
+        interaction.user.id,
+      );
+
+      if (trackingStatus !== 'allowed') {
+        await interaction.reply({
+          content:
+            'Deine Statistiken dürfen nicht geteilt werden (kein Opt-in).',
+          ephemeral: true,
+        });
+        return;
+      }
+
+      const items = await ladeMeineCommandStats(
+        guild.id,
+        interaction.user.id,
+      );
+      const activityTotals = await ladeUserActivityTotals({
+        guildId: guild.id,
+        userId: interaction.user.id,
+      });
+
+      let member: GuildMember | null = null;
+      try {
+        member = await guild.members.fetch(interaction.user.id);
+      } catch {
+        // best effort
+      }
+
+      const embed = baueMeineStatsEmbed({
+        user: interaction.user,
+        member: member ?? undefined,
+        trackingStatus,
+        items,
+        activity: activityTotals,
+      });
+
+      await interaction.deferUpdate();
+
+      const outChannel = interaction.channel;
+      if (outChannel && outChannel.isTextBased()) {
+        await (outChannel as any).send({ embeds: [embed] });
+      } else {
+        await interaction.followUp({
+          content: 'Konnte keinen Text-Channel für die Ausgabe finden.',
+          ephemeral: true,
+        });
+        return;
+      }
+
+      try {
+        await interaction.deleteReply();
+      } catch {
+        // best effort
+      }
+    } catch (error) {
+      logError('Fehler beim öffentlichen Posten der Meine-Stats', {
+        functionName: 'handleStatsButtonInteraction',
+        guildId: interaction.guildId ?? undefined,
+        userId: interaction.user.id,
+        extra: { error },
+      });
+
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp({
+          content:
+            'Konnte deine Stats nicht öffentlich posten. Versuch es nochmal.',
+          ephemeral: true,
+        });
+      } else {
+        await interaction.reply({
+          content:
+            'Konnte deine Stats nicht öffentlich posten. Versuch es nochmal.',
+          ephemeral: true,
+        });
+      }
+    }
+
+    return;
+  }
   // 🔹 Spezialfall: Datenschutz-Button aus "Meine Stats"
   if (interaction.customId === STATS_DATENSCHUTZ_BUTTON_ID) {
     await handleStatsDatenschutzOpen(interaction);
+    return;
+  }
+
+  // Spezialfall: eigene Stats öffentlich posten
+  if (interaction.customId === STATS_ME_PUBLIC_BUTTON_ID) {
+    const guild = interaction.guild;
+    if (!guild) {
+      await interaction.reply({
+        content: 'Dieser Button funktioniert nur auf einem Server.',
+        ephemeral: true,
+      });
+      return;
+    }
+
+    try {
+      const trackingStatus = await ermittleTrackingStatus(
+        guild.id,
+        interaction.user.id,
+      );
+
+      if (trackingStatus !== 'allowed') {
+        await interaction.reply({
+          content:
+            'Deine Statistiken dürfen nicht geteilt werden (kein Opt-in).',
+          ephemeral: true,
+        });
+        return;
+      }
+
+      const items = await ladeMeineCommandStats(
+        guild.id,
+        interaction.user.id,
+      );
+      const activityTotals = await ladeUserActivityTotals({
+        guildId: guild.id,
+        userId: interaction.user.id,
+      });
+
+      let member: GuildMember | null = null;
+      try {
+        member = await guild.members.fetch(interaction.user.id);
+      } catch {
+        // best effort
+      }
+
+      const embed = baueMeineStatsEmbed({
+        user: interaction.user,
+        member: member ?? undefined,
+        trackingStatus,
+        items,
+        activity: activityTotals,
+      });
+
+      await interaction.deferUpdate();
+
+      const outChannel = interaction.channel;
+      if (outChannel && outChannel.isTextBased()) {
+        await (outChannel as any).send({ embeds: [embed] });
+      } else {
+        await interaction.followUp({
+          content: 'Konnte keinen Text-Channel für die Ausgabe finden.',
+          ephemeral: true,
+        });
+        return;
+      }
+
+      try {
+        await interaction.deleteReply();
+      } catch {
+        // best effort
+      }
+    } catch (error) {
+      logError('Fehler beim öffentlichen Posten der Meine-Stats', {
+        functionName: 'handleStatsButtonInteraction',
+        guildId: interaction.guildId ?? undefined,
+        userId: interaction.user.id,
+        extra: { error },
+      });
+
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp({
+          content:
+            'Konnte deine Stats nicht öffentlich posten. Versuch es nochmal.',
+          ephemeral: true,
+        });
+      } else {
+        await interaction.reply({
+          content:
+            'Konnte deine Stats nicht öffentlich posten. Versuch es nochmal.',
+          ephemeral: true,
+        });
+      }
+    }
+
     return;
   }
 
@@ -321,10 +512,21 @@ export async function handleStatsButtonInteraction(
       // Hauptnachricht bleibt unverändert → nur Interaction bestätigen
       await interaction.deferUpdate();
 
-      const componentsForMeView =
+      let componentsForMeView =
         trackingStatus === 'allowed'
-          ? [] // Tracking erlaubt → keine extra Buttons nötig
-          : baueStatsDatenschutzButtons(); // Kein Opt-in → Datenschutz-Button anzeigen
+          ? [] // Tracking erlaubt -> keine extra Buttons nötig
+          : baueStatsDatenschutzButtons(); // Kein Opt-in -> Datenschutz-Button anzeigen
+
+      if (trackingStatus === 'allowed') {
+        componentsForMeView = [
+          new ActionRowBuilder<ButtonBuilder>().addComponents(
+            new ButtonBuilder()
+              .setCustomId(STATS_ME_PUBLIC_BUTTON_ID)
+              .setLabel('Öffentlich anzeigen')
+              .setStyle(ButtonStyle.Secondary),
+          ),
+        ];
+      }
 
       await interaction.followUp({
         embeds: [embed],
