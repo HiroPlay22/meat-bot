@@ -197,7 +197,7 @@ export function baueMeineStatsEmbed(options: {
       : `${Math.round(activity.voiceSeconds / 60)}m`;
 
   embed.setDescription(
-    `Du hast insgesamt **${total}** M.E.A.T.-Befehle auf diesem Server ausgefuehrt.`,
+    `Du hast insgesamt \`${total}\` M.E.A.T.-Befehle auf diesem Server ausgefuehrt.`,
   );
 
   const createdDate =
