@@ -54,6 +54,7 @@ export const emoji = {
   meat_gm: '<:meat_boss:ID>',                       // 🧙 GM-Channel-Modus (Platzhalter)
 
   // 🔙 Fallback
+  meat_memory: '<:meat_memory:1373697433598427406>',
   meat_leer: '<:meat_leer:1373700191294722058>',
 };
 
