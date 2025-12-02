@@ -154,8 +154,6 @@ export function baueMeineStatsEmbed(options: {
   const { user, member, trackingStatus, items, activity } = options;
 
   const userAvatar = user.displayAvatarURL({ size: 128 });
-  const displayName = member?.displayName ?? user.username;
-  const profileLink = `https://discord.com/users/${user.id}`;
 
   const embed = new EmbedBuilder()
     .setTitle(texte.views?.me?.title ?? 'Deine M.E.A.T.-Stats')
@@ -197,6 +195,13 @@ export function baueMeineStatsEmbed(options: {
   const boostSince =
     member?.premiumSince?.toLocaleDateString('de-DE') ?? 'kein Booster';
 
+  const rollen =
+    member?.roles.cache
+      .filter((r) => r.id !== member.guild.id)
+      .sort((a, b) => b.position - a.position)
+      .map((r) => `<@&${r.id}>`)
+      .join(' ') || 'Keine Rollen bekannt.';
+
   embed.addFields(
     {
       name: 'Deine Top-Befehle',
@@ -204,7 +209,7 @@ export function baueMeineStatsEmbed(options: {
       inline: true,
     },
     {
-      name: `[${displayName}](${profileLink})`,
+      name: `<@${user.id}>`,
       value: [
         `${emoji.meat_calendar} Erstellt \`${createdDate}\``,
         `${emoji.meat_members} Beitritt \`${joinedDate}\``,
@@ -213,6 +218,11 @@ export function baueMeineStatsEmbed(options: {
         `${emoji.meat_voice} Voice \`${voiceFormatted}\``,
       ].join('\n'),
       inline: true,
+    },
+    {
+      name: `${emoji.meat_roles} Rollen`,
+      value: rollen,
+      inline: false,
     },
   );
 
