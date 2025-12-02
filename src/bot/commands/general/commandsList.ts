@@ -29,13 +29,24 @@ export const commandsCommand: SlashCommand = {
       return;
     }
 
+    const descriptions: Record<string, string> = {
+      ping: 'Pong!',
+      datenschutz: 'Datenschutz-Einstellung',
+      stats: 'Zeigt Statistiken',
+      'welcome-test': 'Test-Serverbeitritt',
+      poll: 'Öffnet Poll-Center',
+      commands: 'Zeigt alle Commands',
+    };
+
     const commands = slashCommandList.map((cmd) => ({
       name: cmd.data.name,
-      description: cmd.data.description ?? '',
+      description:
+        descriptions[cmd.data.name] ?? cmd.data.description ?? 'Keine Beschreibung',
     }));
 
+    const cmdIcon = '<:meat_commands:1373694040176070779>';
     const lines = commands.map(
-      (c) => `/${c.name} - ${c.description || 'Keine Beschreibung'}`,
+      (c) => `${cmdIcon} \`/${c.name}\` • ${c.description}`,
     );
 
     const half = Math.ceil(lines.length / 2);
@@ -44,7 +55,7 @@ export const commandsCommand: SlashCommand = {
 
     const embed = new EmbedBuilder()
       .setTitle(`M.E.A.T./Commands (${commands.length})`)
-      .setColor(0x5865f2)
+      .setColor(0x7a0a0a)
       .addFields(
         { name: '\u200b', value: left.join('\n') || '\u200b', inline: true },
         { name: '\u200b', value: right.join('\n') || '\u200b', inline: true },
