@@ -859,15 +859,14 @@ export async function handleMontagPollButton(
           [
             "Der Gleichstand wurde per Zufall aufgelöst.",
             "",
-            `🎉 Gewinner: **${winnerName}**`,
+            `${safe(emoji.meat_boss)} Gewonnen hat:`,
+            `> ${winnerName}`,
             game
-              ? `(_${game.isFree ? "kostenlos" : "kostenpflichtig"} • max. ${
+              ? `> (${game.isFree ? "kostenlos" : "kostenpflichtig"} • max. ${
                   game.maxPlayers ?? "unbegrenzt"
-                } Spieler_)`
+                } Spieler)`
               : "",
-          ]
-            .filter((line) => line.length > 0)
-            .join("\n"),
+          ].filter(Boolean).join("\n"),
         )
         .setColor(0x57f287);
 
