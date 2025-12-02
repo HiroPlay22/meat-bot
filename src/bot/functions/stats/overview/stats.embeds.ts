@@ -220,9 +220,8 @@ export function baueMeineStatsEmbed(options: {
       inline: true,
     },
     {
-      name: 'Profil',
+      name: `<@${user.id}>`,
       value: [
-        `<@${user.id}>`,
         `${emoji.meat_calendar} Erstellt \`${createdDate}\``,
         `${emoji.meat_members} Beitritt \`${joinedDate}\``,
         `${emoji.meat_boost} Booster seit \`${boostSince}\``,
