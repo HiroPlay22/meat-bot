@@ -1110,7 +1110,7 @@ export async function handleMontagPollButton(
             await announceChannel.send({
               content: [
                 `> ${safe(emoji.meat_game)} Neue Montags-Runde Umfrage gestartet!`,
-                `> Session: \`${nextMontagText}\``,
+                `> \`${nextMontagText}\``,
               ].join("\n"),
               components: [announceRow],
             });
