@@ -460,7 +460,7 @@ export async function handleStatsButtonInteraction(
           new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder()
               .setCustomId(STATS_ME_PUBLIC_BUTTON_ID)
-              .setLabel('Oeffentlich anzeigen')
+              .setLabel('Öffentlich anzeigen')
               .setStyle(ButtonStyle.Secondary),
           ),
         ];
