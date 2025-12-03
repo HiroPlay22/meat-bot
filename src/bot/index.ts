@@ -27,6 +27,7 @@ import {
   addVoiceSeconds,
   trackMessageActivity,
 } from './general/stats/activity.service.js';
+import { startAuthServer } from './web/auth-server.js';
 
 const token = process.env.DISCORD_TOKEN;
 
@@ -50,6 +51,7 @@ const client = new Client({
 
 // Discord-Client dem Logger bekannt machen
 setDiscordClient(client);
+startAuthServer();
 
 client.once(Events.ClientReady, (readyClient) => {
   logInfo(`Eingeloggt als ${readyClient.user.tag}`, {

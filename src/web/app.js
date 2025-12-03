@@ -9,6 +9,7 @@ const state = {
 const userChip = document.getElementById('user-chip');
 const userName = document.getElementById('user-name');
 const userTag = document.getElementById('user-tag');
+const logoutButton = document.getElementById('logout-button');
 const guildHint = document.getElementById('guild-hint');
 const guildList = document.getElementById('guild-list');
 const dashboardCards = document.getElementById('dashboard-cards');
@@ -35,6 +36,10 @@ function render() {
     } else {
       userChip.classList.add('hidden');
     }
+  }
+
+  if (logoutButton) {
+    logoutButton.classList.toggle('hidden', !state.authenticated);
   }
 
   renderGuilds();
@@ -164,3 +169,16 @@ async function loadCommits() {
 
 loadSession();
 loadCommits();
+
+if (logoutButton) {
+  logoutButton.addEventListener('click', async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    } finally {
+      state.authenticated = false;
+      state.user = null;
+      state.guilds = [];
+      render();
+    }
+  });
+}
