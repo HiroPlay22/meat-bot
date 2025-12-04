@@ -47,7 +47,6 @@ async function applyLogos() {
   if (!logoTargets.length) return;
 
   const firstImage = logoConfig.candidates.find((c) => c.type === 'image');
-  const firstVideo = logoConfig.candidates.find((c) => c.type === 'video');
 
   // Helper: set all logo targets to a given image URL
   const setImage = (url) => {
@@ -65,47 +64,9 @@ async function applyLogos() {
     });
   };
 
-  // Helper: try to load video; resolve true if playable
-  const tryVideo = (url) =>
-    new Promise((resolve) => {
-      if (!url) return resolve(false);
-      const video = document.createElement('video');
-      video.autoplay = true;
-      video.loop = true;
-      video.muted = true;
-      video.playsInline = true;
-      video.oncanplaythrough = () => resolve(true);
-      video.onerror = () => resolve(false);
-      video.src = url;
-    });
-
   // Set initial fallback image immediately
   if (firstImage) {
     setImage(firstImage.url);
-  }
-
-  // If we have a video candidate, try it and swap in if playable
-  if (firstVideo) {
-    const playable = await tryVideo(firstVideo.url);
-    if (playable) {
-      logoTargets.forEach((el) => {
-        if (el.tagName.toLowerCase() === 'img') {
-          const video = document.createElement('video');
-          video.autoplay = true;
-          video.loop = true;
-          video.muted = true;
-          video.playsInline = true;
-          video.className = el.className;
-          video.dataset.logoTarget = 'true';
-          const source = document.createElement('source');
-          source.src = firstVideo.url;
-          source.type = 'video/webm';
-          video.appendChild(source);
-          video.setAttribute('aria-label', el.getAttribute('alt') ?? 'M.E.A.T. Logo');
-          el.replaceWith(video);
-        }
-      });
-    }
   }
 }
 function render() {
