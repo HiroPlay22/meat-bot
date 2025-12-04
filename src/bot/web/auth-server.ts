@@ -335,8 +335,8 @@ function filterGuilds(guilds: Awaited<ReturnType<typeof fetchGuilds>>) {
     .map((s) => s.trim())
     .filter(Boolean);
 
-  // Wenn keine Liste gepflegt ist, zeigen wir alle Guilds des Users (kann aber mehr sein als Bot-Guilds).
-  if (allowList.length === 0) return guilds;
+  // Wenn keine Liste gepflegt ist, lieber nichts zurückgeben, um keine falschen Guilds anzuzeigen.
+  if (allowList.length === 0) return [];
 
   // Nur Guilds, auf denen der Bot laut Liste drauf ist UND der User Mitglied ist (User-Guilds sind bereits gefiltert).
   return guilds
@@ -427,6 +427,7 @@ async function handleGuilds(req: IncomingMessage, res: ServerResponse) {
         name: g.name,
         owner: g.owner,
         icon: g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png` : null,
+        botPresent: g.botPresent ?? true,
       })),
     );
   } catch (error) {

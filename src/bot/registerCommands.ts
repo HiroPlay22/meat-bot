@@ -7,6 +7,7 @@ import { slashCommandList } from './commands/index.js';
 const token = process.env.DISCORD_TOKEN;
 const rawClientId = process.env.DISCORD_CLIENT_ID;
 const rawGuildIds =
+  process.env.BOT_GUILD_IDS ??
   process.env.DEV_GUILD_IDS ??
   (process.env.DEV_GUILD_ID ? `${process.env.DEV_GUILD_ID}` : undefined);
 
@@ -21,7 +22,7 @@ if (!rawClientId) {
 }
 
 if (!rawGuildIds) {
-  console.error('[M.E.A.T.] Env-Variable DEV_GUILD_IDS oder DEV_GUILD_ID fehlt. Bitte .env pruefen.');
+  console.error('[M.E.A.T.] Env-Variable BOT_GUILD_IDS (oder DEV_GUILD_IDS/DEV_GUILD_ID) fehlt. Bitte .env pruefen.');
   process.exit(1);
 }
 

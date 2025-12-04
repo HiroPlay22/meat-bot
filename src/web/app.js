@@ -269,18 +269,18 @@ async function loadSession() {
     const guildRes = await fetch('/api/guilds', { credentials: 'include' });
     if (guildRes.ok) state.guilds = await guildRes.json();
 
-    if (!isDashboardPage) {
-      const main = document.querySelector('main');
-      if (main) {
-        main.classList.add('fade-out');
-        setTimeout(() => {
+      if (!isDashboardPage) {
+        const main = document.querySelector('main');
+        if (main) {
+          main.classList.add('fade-out');
+          setTimeout(() => {
+            window.location.href = '/dashboard.html';
+          }, 300);
+        } else {
           window.location.href = '/dashboard.html';
-        }, 200);
-      } else {
-        window.location.href = '/dashboard.html';
+        }
+        return;
       }
-      return;
-    }
   } catch {
     state.authenticated = false;
     state.user = null;
