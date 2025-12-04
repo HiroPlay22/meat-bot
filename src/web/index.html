@@ -1,317 +1,396 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de" class="h-full">
   <head>
-    <meta charset="UTF-8" />
-    <title>M.E.A.T. Control Panel (Preview)</title>
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="M.E.A.T. Modular Enhanced Assistant Technology. Zentrales Control Panel f?r den Discord-Bot. Coming soon."
-    />
+    <title>M.E.A.T. Control Center</title>
+    <meta name="description" content="M.E.A.T. Control Center – Web-Dashboard für den Discord-Bot M.E.A.T." />
 
-    <!-- Tailwind CDN f?r die statische Preview -->
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind CDN + Config -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
+            fontFamily: {
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+            },
             colors: {
               meat: {
-                bg: '#020617',
-                card: '#020617',
-                border: '#1e293b',
-                accent: '#e11d48',
-                soft: '#0f172a',
+                primary: '#6366f1',
+                accent: '#a855f7',
+                soft: '#22d3ee',
+                dark: '#020617',
+                pulse: '#ec0b60',
               },
+            },
+            boxShadow: {
+              'meat-glow': '0 0 60px rgba(129,140,248,0.35), 0 0 120px rgba(168,85,247,0.25)',
+            },
+            borderRadius: {
+              '3xl': '1.75rem',
             },
           },
         },
       };
     </script>
+    <link rel="stylesheet" href="styles.css" />
   </head>
-  <body class="h-full min-h-screen bg-meat-bg text-slate-100 antialiased flex flex-col">
-    <header class="border-b border-meat-border bg-slate-950/80 backdrop-blur sticky top-0 z-20">
-      <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-        <div class="flex items-center gap-3">
-          <div class="flex h-9 w-9 items-center justify-center rounded-xl border border-meat-border bg-meat-soft">
-            <img src="assets/img/meat_logo1.png" alt="M.E.A.T. Logo" class="h-7 w-7 object-contain" />
-          </div>
-          <div>
-            <h1 class="text-sm font-semibold uppercase tracking-widest text-slate-300">M.E.A.T. Control</h1>
-            <p class="text-xs text-slate-500">Modular Enhanced Assistant Technology ? Dashboard Preview</p>
+  <body class="h-full bg-slate-950 text-slate-100 antialiased">
+    <!-- Hintergrund -->
+    <div class="pointer-events-none fixed inset-0 -z-10 bg-slate-950">
+      <div class="bg-radial-layer absolute inset-0"></div>
+      <div class="bg-grid-layer absolute inset-0"></div>
+    </div>
+
+    <main class="relative z-10 min-h-screen">
+      <!-- LOGIN VIEW -->
+      <section id="login-view" class="min-h-screen flex items-center justify-center px-4 py-12 lg:py-16">
+        <div class="w-full max-w-6xl space-y-10">
+          <!-- Kopf -->
+          <header class="flex flex-wrap items-center justify-between gap-4 text-sm">
+            <div class="flex items-center gap-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/80 border border-slate-700/70 overflow-hidden">
+                <img data-logo-target src="assets/logo/meat_logo.png" alt="M.E.A.T. Logo" class="h-full w-full object-contain" />
+              </div>
+              <div>
+                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">M.E.A.T. · Control Center</p>
+                <p class="text-xs text-slate-500">Verbinde deinen Discord-Server mit einem zentralen Dashboard.</p>
+              </div>
+            </div>
+            <span class="inline-flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-900/70 px-3 py-1.5 text-[11px] font-medium text-slate-200">
+              <span class="inline-flex h-1.5 w-1.5 rounded-full bg-amber-400"></span>
+              WIP
+            </span>
+          </header>
+
+          <!-- Card -->
+          <div class="relative overflow-hidden rounded-3xl border border-slate-800/80 bg-slate-950/90 p-6 shadow-[0_30px_120px_rgba(15,23,42,0.9)] backdrop-blur-xl sm:p-8">
+            <div class="pointer-events-none absolute inset-px rounded-[1.65rem] border border-slate-700/60"></div>
+            <div class="relative grid gap-8 md:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+              <!-- Links -->
+              <div class="flex flex-col justify-between gap-8">
+                <div class="space-y-6">
+                  <div class="space-y-3">
+                    <span class="inline-flex items-center rounded-full bg-slate-900/90 px-3 py-1 text-[11px] font-medium text-slate-300 ring-1 ring-slate-700/80">
+                      <span class="mr-2 inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                      Ready to connect
+                    </span>
+                    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl md:text-[2.4rem]">
+                      Willkommen zurück,<br />
+                      <span class="text-slate-300">lass uns</span>
+                      <span class="logo-highlight logo-text logo-compact text-shadow-strong">M.E.A.T.</span>
+                      <span class="text-slate-300">steuern.</span>
+                    </h1>
+                    <p class="max-w-xl text-sm text-slate-400">
+                      Melde dich mit Discord an, wähle deinen Server und behalte Commands, Module und Sentinel im Blick – alles an einem Ort.
+                    </p>
+                  </div>
+
+                  <div class="space-y-3">
+                    <a
+                      href="/api/auth/login"
+                      class="group relative inline-flex w-full items-center justify-center gap-4 rounded-2xl bg-[#5865F2] px-6 py-4 text-base font-semibold text-white shadow-lg shadow-indigo-900/60 hover:bg-[#4752c4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 focus-visible:ring-[#5865F2] transition overflow-hidden"
+                      style="box-shadow: 0 10px 40px rgba(88,101,242,0.4);"
+                    >
+                      <span class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300" style="box-shadow: 0 0 40px rgba(88,101,242,0.6);"></span>
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 245 240" class="h-6 w-6 relative" aria-hidden="true">
+                        <path
+                          d="M104.4 104.0c-5.7 0-10.2 5-10.2 11.1s4.6 11.1 10.2 11.1c5.7 0 10.2-5 10.2-11.1.1-6.1-4.5-11.1-10.2-11.1Zm36.2 0c-5.7 0-10.2 5-10.2 11.1s4.6 11.1 10.2 11.1c5.7 0 10.2-5 10.2-11.1s-4.5-11.1-10.2-11.1Z"
+                          fill="currentColor"
+                        />
+                        <path
+                          d="M189.5 20h-134C44.2 20 35 29.2 35 40.5v134c0 11.3 9.2 20.5 20.5 20.5h113.4l-5.3-18.3 12.8 11.9 12.1 11.2 21.5 18.8V40.5C210 29.2 200.8 20 189.5 20Zm-35.2 132.6s-3.3-3.9-6-7.3c12-3.4 16.6-11 16.6-11-3.8 2.5-7.4 4.2-10.6 5.4-4.6 1.9-9.1 3.1-13.4 3.9-8.9 1.7-17 1.2-23.9-.1-5.3-1-9.8-2.3-13.6-3.9-2.1-.8-4.4-1.8-6.7-3.1-.3-.2-.6-.3-.9-.5-.2-.1-.3-.2-.4-.3-1.8-1-2.8-1.7-2.8-1.7s4.4 7.3 16 10.8c-2.7 3.4-6.1 7.6-6.1 7.6-20.1-.6-27.7-13.8-27.7-13.8 0-29.3 13.2-53.1 13.2-53.1C81.4 74 92 73.6 92 73.6l1.1 1.3C76.2 79.3 68 86 68 86s2.3-1.3 6.2-3.1c11.3-5 20.3-6.3 24-6.6.6-.1 1.1-.2 1.7-.2a102.5 102.5 0 0 1 24.5-.1c11.5 1.4 23.8 4.9 36.4 12.1 0 0-7.9-7.5-24.8-11.7l1.5-1.7s10.6.4 21.8 8.1c0 0 13.2 23.8 13.2 53.1 0-.1-7.7 13.1-27.8 13.7Z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                      <span class="relative text-base font-bold">Login mit Discord</span>
+                      <span class="relative ml-1 inline-flex items-center justify-center rounded-full bg-indigo-500/40 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.18em]">OAuth2</span>
+                    </a>
+                    <p class="text-[11px] text-slate-500">
+                      Beim Login sehen wir nur deine Discord-ID, deinen Nutzernamen, dein Avatar und die Server, auf denen du Admin/Owner bist – keine Nachrichteninhalte.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 text-[11px] text-slate-300"></div>
+              </div>
+
+              <!-- Rechts -->
+              <div class="flex flex-col justify-between gap-6 rounded-3xl bg-gradient-to-br from-meat.primary via-meat.accent to-meat.soft p-[1px] shadow-meat-glow">
+                <div class="flex flex-1 flex-col justify-between rounded-[1.55rem] bg-slate-950/90 p-5">
+                  <div class="flex items-center justify-between gap-3">
+                    <div>
+                      <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-300/90">Live Pulse</p>
+                      <p class="mt-1 text-sm text-slate-200">Aktivität auf deinem Hauptserver</p>
+                    </div>
+                    <span id="status-badge" data-status="online" class="inline-flex items-center gap-1 rounded-full bg-slate-900/80 px-2.5 py-1 text-[10px] font-medium text-slate-200">
+                      <span class="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-300" id="status-dot"></span>
+                      <span id="status-text">Online</span>
+                    </span>
+                  </div>
+
+                  <div class="mt-6 flex flex-col items-center gap-6">
+                    <div class="relative flex h-52 w-52 items-center justify-center">
+                      <div class="absolute inset-0 rounded-full status-ring" data-status="online"></div>
+                      <div class="absolute inset-[12%] rounded-full bg-slate-950/95 flex items-center justify-center">
+                        <img data-logo-target class="h-28 w-28 object-contain" src="assets/logo/meat_logo.png" alt="M.E.A.T. Logo" />
+                      </div>
+                    </div>
+
+                    <div class="grid w-full grid-cols-2 gap-3 text-xs"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="inline-flex items-center gap-1 rounded-full border border-amber-500/50 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
-            <span class="h-2 w-2 animate-pulse rounded-full bg-amber-400"></span>
-            WIP
-          </span>
+      </section>
+
+      <!-- DASHBOARD VIEW (wird nach Login gezeigt) -->
+      <section id="dashboard-view" class="hidden min-h-screen px-3 py-4 sm:px-4 sm:py-6 lg:px-6" data-requires-auth>
+        <div class="mx-auto flex max-w-7xl flex-col gap-4 lg:flex-row">
+          <aside class="flex w-full items-center justify-between rounded-3xl border border-slate-800/80 bg-slate-950/90 px-3 py-3 shadow-lg shadow-slate-950/70 backdrop-blur-xl lg:h-[min(640px,90vh)] lg:w-16 lg:flex-col lg:px-2 lg:py-4">
+            <div class="flex items-center gap-2 lg:flex-col lg:gap-3">
+              <button type="button" class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/90 ring-1 ring-slate-700/80">
+                <img data-logo-target src="assets/logo/meat_logo.png" alt="M.E.A.T." class="h-full w-full rounded-2xl object-contain" />
+              </button>
+              <button type="button" class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900 text-meat.soft shadow-inner shadow-slate-900/80" title="Dashboard">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="7" rx="2" />
+                  <rect x="14" y="3" width="7" height="7" rx="2" />
+                  <rect x="3" y="14" width="7" height="7" rx="2" />
+                  <rect x="14" y="14" width="7" height="7" rx="2" />
+                </svg>
+              </button>
+              <button type="button" class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/70 text-slate-400 hover:text-slate-100" title="Stats">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 3v18h18" />
+                  <rect x="7" y="10" width="3" height="7" rx="1" />
+                  <rect x="12" y="7" width="3" height="10" rx="1" />
+                  <rect x="17" y="4" width="3" height="13" rx="1" />
+                </svg>
+              </button>
+              <button type="button" class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/70 text-slate-400 hover:text-slate-100" title="Sentinel">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 3 5 6v6c0 5 3.5 8.8 7 9.5 3.5-.7 7-4.5 7-9.5V6z" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+              </button>
+            </div>
+            <div class="flex items-center gap-2 lg:flex-col lg:gap-3">
+              <button type="button" id="logout-button-secondary" class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-900/80 text-slate-400 hover:text-rose-300" title="Abmelden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15" />
+                  <path d="M18 12H9" />
+                  <path d="m15 9 3 3-3 3" />
+                </svg>
+              </button>
+              <div class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-slate-700/80 bg-slate-900/80">
+                <img data-logo-target src="assets/logo/meat_logo.png" alt="User Avatar" class="h-full w-full object-cover" />
+              </div>
+            </div>
+          </aside>
+
+          <div class="flex min-h-[calc(100vh-4rem)] flex-1 flex-col gap-4 rounded-3xl border border-slate-800/80 bg-slate-950/90 p-4 shadow-lg shadow-slate-950/70 backdrop-blur-xl sm:p-5">
+            <header class="flex flex-col gap-4 border-b border-slate-800/80 pb-4 md:flex-row md:items-center md:justify-between">
+              <div class="space-y-1">
+                <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Dashboard</h1>
+                <div class="flex flex-wrap items-center gap-2 text-[11px]">
+                  <span class="text-xs text-slate-500">Deine Server:</span>
+                  <div class="flex flex-wrap gap-2">
+                    <button type="button" class="server-pill relative inline-flex items-center justify-center overflow-hidden rounded-full p-[1px] text-[11px] font-medium bg-gradient-to-r from-pink-500 via-orange-400 to-amber-300 transition-all duration-200">
+                      <span class="inner flex h-8 items-center gap-1.5 rounded-full px-3 bg-slate-950/95 text-slate-100 leading-none transition-all duration-200">
+                        <span class="status-dot inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                        <span>GamingFriends</span>
+                      </span>
+                    </button>
+                    <button type="button" class="server-pill relative inline-flex items-center justify-center overflow-hidden rounded-full p-[1px] text-[11px] font-medium bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 transition-all duration-200">
+                      <span class="inner flex h-8 items-center gap-1.5 rounded-full px-3 bg-slate-950/95 text-slate-100 leading-none transition-all duration-200">
+                        <span class="status-dot inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                        <span>M.E.A.T.</span>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-wrap items-center gap-3 text-[11px] md:justify-end">
+                <div class="flex items-center gap-2 rounded-full bg-slate-900/80 px-3 py-1.5 ring-1 ring-slate-800/90">
+                  <span class="text-slate-400">Server</span>
+                  <span class="h-1 w-1 rounded-full bg-slate-700"></span>
+                  <span class="text-slate-200">5</span>
+                </div>
+                <div class="flex items-center gap-2 rounded-full bg-slate-900/80 px-3 py-1.5 ring-1 ring-slate-800/90">
+                  <span class="text-slate-400">Mode</span>
+                  <span class="h-1 w-1 rounded-full bg-slate-700"></span>
+                  <span class="text-slate-200">Construct</span>
+                </div>
+              </div>
+            </header>
+
+            <div class="grid flex-1 grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+              <section class="flex flex-col overflow-hidden rounded-3xl bg-gradient-to-br from-meat.primary via-meat.accent to-meat.soft p-[1px] shadow-meat-glow">
+                <div class="flex flex-1 flex-col justify-between rounded-[1.55rem] bg-slate-950/95 p-5 sm:p-6">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-300/90">Command Activity</p>
+                      <p class="mt-1 text-sm text-slate-200">Die wichtigsten Zahlen auf einen Blick.</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-slate-900/90 px-2.5 py-1 text-[11px] font-medium text-slate-200">
+                      <span class="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-300"></span>
+                      Stable
+                    </span>
+                  </div>
+                  <div class="mt-6 grid grid-cols-2 gap-4 text-xs sm:grid-cols-3">
+                    <div>
+                      <p class="text-slate-300/90">Total Commands</p>
+                      <p class="mt-1 text-2xl font-semibold">327</p>
+                      <p class="mt-1 text-[11px] text-emerald-200">+12% vs. letzte Woche</p>
+                    </div>
+                    <div>
+                      <p class="text-slate-300/90">MEAT Modules</p>
+                      <p class="mt-1 text-2xl font-semibold">9</p>
+                      <p class="mt-1 text-[11px] text-slate-200/80">Einb., GPT, Sentinel, Polls …</p>
+                    </div>
+                    <div>
+                      <p class="text-slate-300/90">Fehlerquote</p>
+                      <p class="mt-1 text-2xl font-semibold">0,7%</p>
+                      <p class="mt-1 text-[11px] text-emerald-200">nice &amp; clean</p>
+                    </div>
+                  </div>
+                  <div class="mt-6">
+                    <div class="h-24 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/60 to-slate-900 relative overflow-hidden">
+                      <div class="absolute inset-x-0 bottom-0 h-20 bg-[radial-gradient(circle_at_bottom,_rgba(56,189,248,0.4),_transparent_60%)] opacity-70"></div>
+                      <div class="absolute inset-3 flex items-end gap-1">
+                        <div class="flex-1 rounded-full bg-meat.soft/40" style="height: 30%"></div>
+                        <div class="flex-1 rounded-full bg-meat.soft/60" style="height: 60%"></div>
+                        <div class="flex-1 rounded-full bg-meat.accent/70" style="height: 85%"></div>
+                        <div class="flex-1 rounded-full bg-meat.primary/60" style="height: 55%"></div>
+                        <div class="flex-1 rounded-full bg-meat.soft/40" style="height: 40%"></div>
+                        <div class="flex-1 rounded-full bg-meat.accent/40" style="height: 65%"></div>
+                        <div class="flex-1 rounded-full bg-meat.primary/70" style="height: 90%"></div>
+                      </div>
+                    </div>
+                    <div class="mt-2 flex items-center justify-between text-[11px] text-slate-300/90">
+                      <span>Letzte 7 Tage</span>
+                      <span>/poll · /einbuergerung · /dinoname</span>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <div class="grid grid-cols-1 gap-4">
+                <section class="flex flex-col justify-between rounded-3xl border border-slate-800/80 bg-slate-900/70 p-4">
+                  <div class="mb-3 flex items-center justify-between gap-2">
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Bot Status</p>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[11px] font-medium text-emerald-300">
+                      <span class="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                      Online
+                    </span>
+                  </div>
+                  <dl class="space-y-2 text-xs">
+                    <div class="flex items-center justify-between">
+                      <dt class="text-slate-400">Uptime</dt>
+                      <dd class="font-medium text-slate-100">3 Tage 12 Std</dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <dt class="text-slate-400">Durchschnitts-Ping</dt>
+                      <dd class="font-medium text-slate-100">42 ms</dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <dt class="text-slate-400">Shards / Guilds</dt>
+                      <dd class="font-medium text-slate-100">1 Shard · 5 Guilds</dd>
+                    </div>
+                  </dl>
+                </section>
+
+                <section class="grid grid-cols-2 gap-3 rounded-3xl border border-slate-800/80 bg-slate-900/70 p-4 text-xs">
+                  <div class="flex flex-col justify-between rounded-2xl bg-slate-950/80 p-3">
+                    <p class="text-slate-400">Nächste Session</p>
+                    <p class="mt-1 text-sm font-semibold text-slate-100">Montagsrunde</p>
+                    <p class="mt-1 text-[11px] text-slate-500">Heute · 20:00 Uhr</p>
+                  </div>
+                  <div class="flex flex-col justify-between rounded-2xl bg-slate-950/80 p-3">
+                    <p class="text-slate-400">Sentinel Events</p>
+                    <p class="mt-1 text-sm font-semibold text-slate-100">0 kritisch</p>
+                    <p class="mt-1 text-[11px] text-emerald-300">alles ruhig</p>
+                  </div>
+                </section>
+
+                <section class="rounded-3xl border border-slate-800/80 bg-slate-900/70 p-4 text-xs">
+                  <div class="mb-2 flex items-center justify-between gap-2">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">DevLog</p>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-slate-800/90 px-2.5 py-0.5 text-[10px] font-medium text-slate-300">v0.0.7 · CONSTRUCT-MEAT</span>
+                  </div>
+                  <ul class="space-y-1.5">
+                    <li class="flex items-center justify-between">
+                      <span class="truncate text-slate-200">feat: /einbuergerung dashboard</span>
+                      <span class="text-[10px] text-slate-500">17.11.</span>
+                    </li>
+                    <li class="flex items-center justify-between">
+                      <span class="truncate text-slate-200">chore: sentinel privacy flags</span>
+                      <span class="text-[10px] text-slate-500">16.11.</span>
+                    </li>
+                    <li class="flex items-center justify-between">
+                      <span class="truncate text-slate-200">fix: GPT timeout handling</span>
+                      <span class="text-[10px] text-slate-500">15.11.</span>
+                    </li>
+                  </ul>
+                </section>
+              </div>
+            </div>
+
+            <section class="mt-2 rounded-3xl border border-slate-800/80 bg-slate-900/70 p-4 text-xs">
+              <div class="mb-2 flex items-center justify-between gap-2">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Live Activity</p>
+                <span class="text-[11px] text-slate-400">Letzte 5 Befehle (Demo)</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="min-w-full text-left">
+                  <thead class="text-[11px] text-slate-500">
+                    <tr>
+                      <th class="py-1.5 pr-4">Command</th>
+                      <th class="py-1.5 px-4">User</th>
+                      <th class="py-1.5 px-4 hidden sm:table-cell">Channel</th>
+                      <th class="py-1.5 px-4 text-right">Zeitpunkt</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-800/80">
+                    <tr>
+                      <td class="py-2 pr-4 text-slate-100">/poll montag</td>
+                      <td class="py-2 px-4 text-slate-300">Hiro</td>
+                      <td class="py-2 px-4 text-slate-400 hidden sm:table-cell">#voting</td>
+                      <td class="py-2 px-4 text-right text-slate-400">vor 2 Min.</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 pr-4 text-slate-100">/dinoname</td>
+                      <td class="py-2 px-4 text-slate-300">Player_23</td>
+                      <td class="py-2 px-4 text-slate-400 hidden sm:table-cell">#ark</td>
+                      <td class="py-2 px-4 text-right text-slate-400">vor 7 Min.</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 pr-4 text-slate-100">/einbuergerung</td>
+                      <td class="py-2 px-4 text-slate-300">Nova</td>
+                      <td class="py-2 px-4 text-slate-400 hidden sm:table-cell">#welcome</td>
+                      <td class="py-2 px-4 text-right text-slate-400">vor 15 Min.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <footer class="mt-3 flex flex-col gap-2 text-[11px] text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+                <p>Demo-Daten · später Live-Feed direkt aus MEAT-Bot.</p>
+                <p>M.E.A.T. · CONSTRUCT-MEAT · v0.0.7</p>
+              </footer>
+            </section>
+          </div>
         </div>
-      </div>
-    </header>
-
-    <main class="flex-1">
-      <div class="mx-auto max-w-6xl px-4 py-6 md:py-10 space-y-8">
-        <section class="grid gap-6 lg:grid-cols-[minmax(0,2fr),minmax(0,1.4fr)]">
-          <!-- Hero -->
-          <div class="relative overflow-hidden rounded-2xl border border-meat-border bg-gradient-to-br from-slate-900 via-slate-950 to-slate-950 p-6 md:p-7">
-            <div class="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-rose-500/10 blur-3xl"></div>
-            <div class="pointer-events-none absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-sky-500/10 blur-3xl"></div>
-            <div class="relative space-y-5">
-              <div class="space-y-2">
-                <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">
-                  Willkommen in der<br />
-                  <span class="text-rose-400">M.E.A.T.-Zentrale</span>
-                </h2>
-                <p class="text-sm text-slate-400 md:text-[0.9rem] max-w-xl">
-                  Hier landen k?nftig deine Server-Settings, Module, Statistiken, Clip-Queue, Events und alles, was M.E.A.T. f?r dein Gaming-?kosystem ?bernimmt.
-                </p>
-              </div>
-
-              <div class="flex flex-wrap gap-3">
-                <div class="flex items-center gap-2 rounded-xl bg-slate-900/70 px-3 py-2 text-xs border border-slate-800/80">
-                  <div class="flex h-5 w-5 items-center justify-center overflow-hidden rounded-md bg-slate-950">
-                    <img src="assets/img/meat_logo1.png" alt="Verbundener Server" class="h-5 w-5 object-cover" />
-                  </div>
-                  <span class="font-medium text-slate-200">Verbundener Server</span>
-                </div>
-                <div id="user-chip" class="hidden items-center gap-2 rounded-xl bg-slate-900/70 px-3 py-2 text-xs border border-slate-800/80">
-                  <span class="h-2 w-2 rounded-full bg-sky-400"></span>
-                  <span class="font-medium text-slate-200" id="user-name"></span>
-                  <span class="text-slate-500" id="user-tag"></span>
-                </div>
-              </div>
-
-              <div class="flex flex-wrap gap-3">
-                <a
-                  id="login-button"
-                  href="/api/auth/login"
-                  class="inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-[#5865f2] via-[#4f63e3] to-[#3b51c9] px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-indigo-900/40 hover:from-[#6b74f5] hover:to-[#4a56d1] transition"
-                >
-                  <span class="text-base font-bold">Login mit Discord</span>
-                </a>
-                <button
-                  id="logout-button"
-                  class="hidden inline-flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3 text-sm font-semibold text-slate-200 hover:border-rose-500 hover:text-rose-100 transition"
-                  type="button"
-                >
-                  Abmelden
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bot Card -->
-          <div class="space-y-4">
-            <div class="rounded-2xl border border-meat-border bg-meat-soft/80 px-4 py-6 sm:px-6">
-              <div class="flex flex-col items-center text-center gap-4">
-                <div class="flex h-32 w-32 items-center justify-center overflow-hidden rounded-3xl bg-slate-900 border border-slate-700/80">
-                  <img src="assets/img/meat_logo1.png" alt="M.E.A.T." class="h-28 w-28 object-contain" />
-                </div>
-                <div class="space-y-1">
-                  <p class="text-[0.7rem] uppercase tracking-[0.16em] text-slate-500">Bot-Profil</p>
-                  <h3 class="text-base font-semibold text-slate-100">M.E.A.T. Core</h3>
-                  <p class="text-xs text-slate-400">Modularer Discord-Assistent f?r Server-Stats, Polls, Events und mehr.</p>
-                </div>
-              </div>
-
-              <div class="mt-5 flex flex-wrap items-center justify-center gap-2 text-[0.8rem]">
-                <span class="inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/80 px-3 py-1 text-xs text-slate-200">
-                  <span class="h-2 w-2 animate-pulse rounded-full bg-emerald-400"></span>
-                  Bot-Status: <span class="text-emerald-300">Online</span>
-                </span>
-                <span class="inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/80 px-3 py-1 text-xs text-slate-200">
-                  <span class="h-2 w-2 rounded-full bg-rose-400"></span>
-                  CONSTRUCT-MEAT - v0.1 - Early Build
-                </span>
-              </div>
-            </div>
-
-            <div class="rounded-2xl border border-meat-border bg-meat-soft/80 px-4 py-4 sm:px-5 hidden" data-requires-auth id="bot-snapshot">
-              <div class="flex items-start justify-between gap-3">
-                <div class="flex items-center gap-3">
-                  <div class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-slate-900 border border-slate-700/80">
-                    <img src="assets/img/meat_logo1.png" alt="M.E.A.T." class="h-8 w-8 object-contain" />
-                  </div>
-                  <div>
-                    <p class="text-[0.7rem] uppercase tracking-[0.16em] text-slate-500">Bot Snapshot</p>
-                    <h3 class="mt-1 text-sm font-semibold text-slate-100">M.E.A.T./Core - Cluster</h3>
-                  </div>
-                </div>
-                <div class="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[0.7rem] text-emerald-300 border border-emerald-500/40">
-                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <span id="bot-status-pill">Online</span>
-                </div>
-              </div>
-              <dl class="mt-4 grid grid-cols-2 gap-3 text-xs text-slate-400">
-                <div class="space-y-1">
-                  <dt class="text-[0.7rem] uppercase tracking-wide text-slate-500">Verbundene Server</dt>
-                  <dd id="stat-guilds" class="text-sm font-semibold text-slate-100">Server werden geladen...</dd>
-                </div>
-                <div class="space-y-1">
-                  <dt class="text-[0.7rem] uppercase tracking-wide text-slate-500">Module (aktiv)</dt>
-                  <dd class="text-sm font-semibold text-slate-100">Sentinel - Stats - Ping</dd>
-                </div>
-                <div class="space-y-1">
-                  <dt class="text-[0.7rem] uppercase tracking-wide text-slate-500">Versions-Codename</dt>
-                  <dd class="text-sm font-semibold text-slate-100">CONSTRUCT-MEAT</dd>
-                </div>
-                <div class="space-y-1">
-                  <dt class="text-[0.7rem] uppercase tracking-wide text-slate-500">Build-Kanal</dt>
-                  <dd class="text-sm font-semibold text-slate-100">Internal</dd>
-                </div>
-              </dl>
-            </div>
-
-            <div class="rounded-2xl border border-meat-border bg-meat-soft/80 px-4 py-4 sm:px-5 hidden" data-requires-auth id="quick-links">
-              <p class="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Schnellzugriff</p>
-              <div class="mt-3 flex flex-wrap gap-2">
-                <a href="/datenschutz" class="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2 text-xs text-slate-200 hover:border-rose-500 hover:text-rose-100 hover:bg-slate-900 transition">
-                  <span class="inline-flex h-5 w-5 items-center justify-center rounded-md bg-slate-950 text-[0.7rem]">DS</span>
-                  <span>Datenschutz und Tracking</span>
-                </a>
-                <button type="button" class="inline-flex cursor-default items-center gap-2 rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-xs text-slate-500">
-                  <span class="inline-flex h-5 w-5 items-center justify-center rounded-md bg-slate-900 text-[0.7rem]">ST</span>
-                  <span>Stats-Dashboard</span>
-                  <span class="rounded-full bg-slate-800 px-2 py-[2px] text-[0.65rem] uppercase tracking-widest text-slate-400">Coming Soon</span>
-                </button>
-                <button type="button" class="inline-flex cursor-default items-center gap-2 rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-xs text-slate-500">
-                  <span class="inline-flex h-5 w-5 items-center justify-center rounded-md bg-slate-900 text-[0.7rem]">EV</span>
-                  <span>Games und Events</span>
-                  <span class="rounded-full bg-slate-800 px-2 py-[2px] text-[0.65rem] uppercase tracking-widest text-slate-400">Planned</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="guild-auswahl" class="space-y-4 rounded-2xl border border-meat-border bg-meat-soft/70 px-4 py-5 md:px-5">
-          <header class="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p class="text-[0.7rem] uppercase tracking-[0.16em] text-slate-500">Server-Auswahl</p>
-              <h3 class="mt-1 text-sm font-semibold text-slate-100">W?hle den Server f?r dein Dashboard</h3>
-            </div>
-            <span id="guild-hint" class="inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-950/70 px-3 py-1 text-xs text-slate-400">Login erforderlich</span>
-          </header>
-          <p class="text-xs text-slate-500">Nach dem Login siehst du hier nur Server, auf denen der Bot installiert ist und auf denen du ausreichend Rechte hast. Whitelist/Invite-Policy wird ber?cksichtigt.</p>
-          <div id="guild-list" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-requires-auth></div>
-        </section>
-
-        <section class="space-y-4">
-          <header class="flex items-center justify-between">
-            <div>
-              <p class="text-[0.7rem] uppercase tracking-[0.16em] text-slate-500">Dashboard</p>
-              <h3 class="mt-1 text-sm font-semibold text-slate-100">Preview der Karten</h3>
-            </div>
-            <span id="locked-dashboard-hint" class="inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-950/70 px-3 py-1 text-xs text-slate-400">Login und Server-Auswahl n?tig</span>
-          </header>
-          <div id="dashboard-cards" class="grid gap-6 md:grid-cols-2 xl:grid-cols-3 hidden" data-requires-auth>
-            <article class="rounded-2xl border border-meat-border bg-meat-soft/80 p-5 flex flex-col">
-              <header class="flex items-center justify-between gap-2">
-                <div>
-                  <p class="text-[0.7rem] uppercase tracking-[0.16em] text-slate-500">Server und Commands</p>
-                  <h3 class="mt-1 text-sm font-semibold text-slate-100">Aktivit?t (Preview)</h3>
-                </div>
-                <span class="inline-flex items-center rounded-full bg-slate-900/80 px-2.5 py-1 text-[0.65rem] text-slate-400 border border-slate-700/80">Live-Daten sp?ter</span>
-              </header>
-              <div class="mt-4">
-                <div class="flex items-end gap-2 h-32">
-                  <div class="flex-1 flex flex-col items-center gap-1">
-                    <div class="w-full rounded-md bg-slate-900 border border-slate-800 flex items-end justify-center">
-                      <div class="w-3/4 rounded-md bg-rose-500/80 h-6"></div>
-                    </div>
-                    <span class="text-[0.7rem] text-slate-500">Mo</span>
-                  </div>
-                  <div class="flex-1 flex flex-col items-center gap-1">
-                    <div class="w-full rounded-md bg-slate-900 border border-slate-800 flex items-end justify-center">
-                      <div class="w-3/4 rounded-md bg-rose-500/80 h-10"></div>
-                    </div>
-                    <span class="text-[0.7rem] text-slate-500">Di</span>
-                  </div>
-                  <div class="flex-1 flex flex-col items-center gap-1">
-                    <div class="w-full rounded-md bg-slate-900 border border-slate-800 flex items-end justify-center">
-                      <div class="w-3/4 rounded-md bg-rose-500/80 h-16"></div>
-                    </div>
-                    <span class="text-[0.7rem] text-slate-500">Mi</span>
-                  </div>
-                  <div class="flex-1 flex flex-col items-center gap-1">
-                    <div class="w-full rounded-md bg-slate-900 border border-slate-800 flex items-end justify-center">
-                      <div class="w-3/4 rounded-md bg-rose-500/80 h-12"></div>
-                    </div>
-                    <span class="text-[0.7rem] text-slate-500">Do</span>
-                  </div>
-                  <div class="flex-1 flex flex-col items-center gap-1">
-                    <div class="w-full rounded-md bg-slate-900 border border-slate-800 flex items-end justify-center">
-                      <div class="w-3/4 rounded-md bg-rose-500/80 h-20"></div>
-                    </div>
-                    <span class="text-[0.7rem] text-slate-500">Fr</span>
-                  </div>
-                </div>
-                <p class="mt-3 text-[0.72rem] text-slate-500">Die Balken stehen aktuell nur symbolisch f?r Befehlsaktivit?t pro Tag. Sp?ter kommen echte Stats aus dem Command-Tracking.</p>
-              </div>
-            </article>
-
-            <article class="rounded-2xl border border-meat-border bg-meat-soft/80 p-5 flex flex-col">
-              <header class="flex items-center justify-between">
-                <div>
-                  <p class="text-[0.7rem] uppercase tracking-[0.16em] text-slate-500">Dev-Status</p>
-                  <h3 class="mt-1 text-sm font-semibold text-slate-100">Roadmap (Kurzfassung)</h3>
-                </div>
-              </header>
-
-              <ol class="mt-4 space-y-3 text-xs text-slate-400">
-                <li class="flex gap-3">
-                  <span class="mt-0.5 h-5 w-5 shrink-0 rounded-full bg-emerald-500/15 text-emerald-300 flex items-center justify-center text-[0.7rem]">1</span>
-                  <div>
-                    <p class="font-medium text-slate-200">Core-Setup und Grundstruktur</p>
-                    <p class="text-[0.75rem] text-slate-500">Bot-Basis, Slash-Commands, Logging, Prisma, Railway, Sentinel (Opt-in) - <span class="text-emerald-300">l?uft</span>.</p>
-                  </div>
-                </li>
-                <li class="flex gap-3">
-                  <span class="mt-0.5 h-5 w-5 shrink-0 rounded-full bg-sky-500/15 text-sky-300 flex items-center justify-center text-[0.7rem]">2</span>
-                  <div>
-                    <p class="font-medium text-slate-200">Stats und Clip-/Event-System</p>
-                    <p class="text-[0.75rem] text-slate-500">Server- und User-Stats, Command-Tracking, Clip-Queue, Event-Module - <span class="text-sky-300">in Arbeit</span>.</p>
-                  </div>
-                </li>
-                <li class="flex gap-3">
-                  <span class="mt-0.5 h-5 w-5 shrink-0 rounded-full bg-rose-500/15 text-rose-300 flex items-center justify-center text-[0.7rem]">3</span>
-                  <div>
-                    <p class="font-medium text-slate-200">Vollwertiges Web-Dashboard</p>
-                    <p class="text-[0.75rem] text-slate-500">Multi-Server-Konfiguration, Rechte-Matrix, Empfehlungen, visuelle Server-Profile - <span class="text-slate-400">planned</span>.</p>
-                  </div>
-                </li>
-              </ol>
-            </article>
-
-            <article class="rounded-2xl border border-meat-border bg-meat-soft/80 p-5 flex flex-col">
-              <header class="flex items-center justify-between gap-2">
-                <div>
-                  <p class="text-[0.7rem] uppercase tracking-[0.16em] text-slate-500">Git Activity</p>
-                  <h3 class="mt-1 text-sm font-semibold text-slate-100">Letzte Commits (meat-bot)</h3>
-                </div>
-                <a href="https://github.com/HiroPlay22/meat-bot" target="_blank" rel="noreferrer" class="text-[0.7rem] text-slate-400 hover:text-rose-300">Zum Repo</a>
-              </header>
-
-              <ul id="git-commits" class="mt-4 space-y-3 text-xs text-slate-400">
-                <li class="text-[0.75rem] text-slate-500">Lade Commits von GitHub ...</li>
-              </ul>
-
-              <p class="mt-4 text-[0.7rem] text-slate-500">
-                Datenquelle: <span class="text-slate-400"><code>GitHub REST API - main</code></span>
-              </p>
-            </article>
-          </div>
-        </section>
-      </div>
+      </section>
     </main>
-
-    <footer class="border-t border-meat-border bg-slate-950/90 text-[0.7rem] text-slate-500">
-      <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-3 text-center sm:flex-row sm:text-left">
-        <p><span class="text-slate-400">M.E.A.T.</span> - Modular Enhanced Assistant Technology - <span class="text-slate-500">CONSTRUCT-MEAT</span></p>
-        <p class="text-slate-500">Dashboard-Preview - <span class="text-slate-400">Weitere Module folgen.</span></p>
-      </div>
-    </footer>
 
     <script type="module" src="app.js"></script>
   </body>

@@ -10,12 +10,101 @@ const userChip = document.getElementById('user-chip');
 const userName = document.getElementById('user-name');
 const userTag = document.getElementById('user-tag');
 const logoutButton = document.getElementById('logout-button');
+const logoutButtonSecondary = document.getElementById('logout-button-secondary');
 const guildHint = document.getElementById('guild-hint');
 const guildList = document.getElementById('guild-list');
 const dashboardCards = document.getElementById('dashboard-cards');
 const lockedDashboardHint = document.getElementById('locked-dashboard-hint');
 const authOnlyElements = document.querySelectorAll('[data-requires-auth]');
+const loginView = document.getElementById('login-view');
+const dashboardView = document.getElementById('dashboard-view');
+const logoTargets = document.querySelectorAll('[data-logo-target]');
+const statusRing = document.querySelector('.status-ring');
+const statusDot = document.getElementById('status-dot');
+const statusText = document.getElementById('status-text');
 
+const logoConfig = (() => {
+  const now = new Date();
+  const isDecember = now.getMonth() === 11;
+  return {
+    candidates: isDecember
+      ? [
+          { type: 'video', url: 'assets/logo/meat_logo_xmas_ani.webm' },
+          { type: 'image', url: 'assets/logo/meat_logo_xmas.png' },
+          { type: 'image', url: 'assets/logo/meat_logo.png' },
+        ]
+      : [
+          { type: 'video', url: 'assets/logo/meat_logo_ani.webm' }, // optional, falls später vorhanden
+          { type: 'image', url: 'assets/logo/meat_logo.png' },
+        ],
+  };
+})();
+
+async function applyLogos() {
+  if (!logoTargets.length) return;
+
+  const firstImage = logoConfig.candidates.find((c) => c.type === 'image');
+  const firstVideo = logoConfig.candidates.find((c) => c.type === 'video');
+
+  // Helper: set all logo targets to a given image URL
+  const setImage = (url) => {
+    logoTargets.forEach((el) => {
+      if (el.tagName.toLowerCase() === 'img') {
+        el.setAttribute('src', url);
+      } else if (el.tagName.toLowerCase() === 'video') {
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = el.className;
+        img.dataset.logoTarget = 'true';
+        img.alt = el.getAttribute('aria-label') ?? 'M.E.A.T. Logo';
+        el.replaceWith(img);
+      }
+    });
+  };
+
+  // Helper: try to load video; resolve true if playable
+  const tryVideo = (url) =>
+    new Promise((resolve) => {
+      if (!url) return resolve(false);
+      const video = document.createElement('video');
+      video.autoplay = true;
+      video.loop = true;
+      video.muted = true;
+      video.playsInline = true;
+      video.oncanplaythrough = () => resolve(true);
+      video.onerror = () => resolve(false);
+      video.src = url;
+    });
+
+  // Set initial fallback image immediately
+  if (firstImage) {
+    setImage(firstImage.url);
+  }
+
+  // If we have a video candidate, try it and swap in if playable
+  if (firstVideo) {
+    const playable = await tryVideo(firstVideo.url);
+    if (playable) {
+      logoTargets.forEach((el) => {
+        if (el.tagName.toLowerCase() === 'img') {
+          const video = document.createElement('video');
+          video.autoplay = true;
+          video.loop = true;
+          video.muted = true;
+          video.playsInline = true;
+          video.className = el.className;
+          video.dataset.logoTarget = 'true';
+          const source = document.createElement('source');
+          source.src = firstVideo.url;
+          source.type = 'video/webm';
+          video.appendChild(source);
+          video.setAttribute('aria-label', el.getAttribute('alt') ?? 'M.E.A.T. Logo');
+          el.replaceWith(video);
+        }
+      });
+    }
+  }
+}
 function render() {
   authOnlyElements.forEach((el) => {
     if (state.authenticated) {
@@ -27,6 +116,9 @@ function render() {
 
   if (dashboardCards) dashboardCards.classList.toggle('hidden', !state.authenticated);
   if (lockedDashboardHint) lockedDashboardHint.classList.toggle('hidden', state.authenticated);
+
+  if (loginView) loginView.classList.toggle('hidden', state.authenticated);
+  if (dashboardView) dashboardView.classList.toggle('hidden', !state.authenticated);
 
   if (userChip && userName && userTag) {
     if (state.authenticated && state.user) {
@@ -40,6 +132,9 @@ function render() {
 
   if (logoutButton) {
     logoutButton.classList.toggle('hidden', !state.authenticated);
+  }
+  if (logoutButtonSecondary) {
+    logoutButtonSecondary.classList.toggle('hidden', !state.authenticated);
   }
 
   renderGuilds();
@@ -92,6 +187,17 @@ function renderGuilds() {
 
     guildList.appendChild(card);
   });
+}
+
+function setStatusBadge(status = 'online') {
+  const isOnline = status === 'online';
+  const ringStatus = isOnline ? 'online' : 'offline';
+  if (statusRing) statusRing.setAttribute('data-status', ringStatus);
+  if (statusDot) {
+    statusDot.classList.remove('bg-emerald-300', 'bg-rose-400');
+    statusDot.classList.add(isOnline ? 'bg-emerald-300' : 'bg-rose-400');
+  }
+  if (statusText) statusText.textContent = isOnline ? 'Online' : 'Offline';
 }
 
 async function loadSession() {
@@ -169,9 +275,39 @@ async function loadCommits() {
 
 loadSession();
 loadCommits();
+applyLogos();
+setStatusBadge('online');
+
+async function loadStatus() {
+  try {
+    const res = await fetch('/api/status', { credentials: 'include' });
+    if (!res.ok) throw new Error('status failed');
+    const data = await res.json();
+    const isOnline = Boolean(data?.online ?? true);
+    setStatusBadge(isOnline ? 'online' : 'offline');
+  } catch {
+    setStatusBadge('offline');
+  }
+}
+
+loadStatus();
+setInterval(loadStatus, 30_000);
 
 if (logoutButton) {
   logoutButton.addEventListener('click', async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    } finally {
+      state.authenticated = false;
+      state.user = null;
+      state.guilds = [];
+      render();
+    }
+  });
+}
+
+if (logoutButtonSecondary) {
+  logoutButtonSecondary.addEventListener('click', async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
     } finally {

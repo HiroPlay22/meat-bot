@@ -1,0 +1,87 @@
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.bg-radial-layer {
+  background: radial-gradient(circle at top, rgba(129, 140, 248, 0.25), transparent 55%),
+    radial-gradient(circle at bottom, rgba(56, 189, 248, 0.16), transparent 60%);
+}
+
+.bg-grid-layer {
+  opacity: 0.12;
+  background-image: linear-gradient(to right, #1f2937 1px, transparent 1px),
+    linear-gradient(to bottom, #111827 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.status-ring {
+  border: 6px solid transparent;
+}
+
+.status-ring[data-status='online'] {
+  animation: pulse-green 4s ease-in-out infinite;
+  border-color: rgba(52, 211, 153, 0.9);
+  box-shadow: 0 0 30px rgba(52, 211, 153, 0.35);
+}
+
+.status-ring[data-status='offline'] {
+  animation: pulse-red 4s ease-in-out infinite;
+  border-color: rgba(248, 113, 113, 0.9);
+  box-shadow: 0 0 30px rgba(248, 113, 113, 0.35);
+}
+
+@keyframes pulse-green {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(52, 211, 153, 0.35);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 45px rgba(52, 211, 153, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(52, 211, 153, 0.35);
+  }
+}
+
+@keyframes pulse-red {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(248, 113, 113, 0.35);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 45px rgba(248, 113, 113, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(248, 113, 113, 0.35);
+  }
+}
+
+.logo-text {
+  text-shadow: 0 8px 30px rgba(99, 102, 241, 0.35);
+}
+
+.text-shadow-strong {
+  text-shadow: 0 0 25px rgba(236, 11, 96, 0.6), 0 0 45px rgba(168, 85, 247, 0.35);
+}
+
+.logo-highlight {
+  background: linear-gradient(90deg, #ec0b60 0%, #ff6ac1 50%, #ffc2e8 100%);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.logo-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.08em;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-weight: 800;
+}
