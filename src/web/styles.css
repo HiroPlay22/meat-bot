@@ -15,20 +15,22 @@ body {
 }
 
 .status-ring {
+  position: relative;
   border: 6px solid transparent;
-  box-shadow: inset 0 0 25px rgba(52, 211, 153, 0.35), 0 0 30px rgba(52, 211, 153, 0.35);
+  box-shadow: inset 0 0 32px rgba(52, 211, 153, 0.4), 0 0 32px rgba(52, 211, 153, 0.35);
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.18), transparent 62%);
 }
 
 .status-ring[data-status='online'] {
   animation: pulse-green 4s ease-in-out infinite;
   border-color: rgba(52, 211, 153, 0.9);
-  box-shadow: inset 0 0 32px rgba(52, 211, 153, 0.4), 0 0 38px rgba(52, 211, 153, 0.45);
+  box-shadow: inset 0 0 42px rgba(52, 211, 153, 0.45), 0 0 48px rgba(52, 211, 153, 0.48);
 }
 
 .status-ring[data-status='offline'] {
   animation: pulse-red 4s ease-in-out infinite;
   border-color: rgba(248, 113, 113, 0.9);
-  box-shadow: inset 0 0 32px rgba(248, 113, 113, 0.4), 0 0 38px rgba(248, 113, 113, 0.45);
+  box-shadow: inset 0 0 42px rgba(248, 113, 113, 0.45), 0 0 48px rgba(248, 113, 113, 0.48);
 }
 
 @keyframes pulse-green {
@@ -100,17 +102,12 @@ body {
 }
 
 .fade-out {
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  animation: fadeOut 0.25s ease forwards;
   pointer-events: none;
 }
 
 .fade-in {
-  animation: fadeIn 0.25s ease;
-}
-
-.fade-out {
-  animation: fadeOut 0.2s ease forwards;
+  animation: fadeIn 0.25s ease forwards;
 }
 
 @keyframes fadeIn {

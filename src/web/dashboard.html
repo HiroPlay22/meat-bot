@@ -39,98 +39,99 @@
     </div>
 
     <main class="relative z-10 min-h-screen px-3 py-4 sm:px-4 sm:py-6 lg:px-6 fade-in">
-      <div class="mx-auto flex max-w-7xl gap-4 lg:flex-row">
+      <div class="mx-auto flex max-w-screen-2xl gap-4 lg:flex-row">
         <!-- Sidebar -->
         <aside
           data-sidebar
-          class="flex h-full w-16 flex-shrink-0 flex-col justify-between rounded-3xl border border-slate-800/80 bg-slate-950/90 px-2 py-4 shadow-lg shadow-slate-950/70 backdrop-blur-xl transition-all duration-200"
+          class="flex h-full w-64 flex-shrink-0 flex-col justify-between rounded-3xl border border-slate-800/80 bg-slate-950/90 px-4 py-6 shadow-lg shadow-slate-950/70 backdrop-blur-xl"
         >
-          <div class="flex flex-col gap-3">
-            <button
-              type="button"
-              class="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900/90 ring-1 ring-slate-700/80"
-              title="M.E.A.T."
-            >
-              <img data-logo-target src="assets/logo/meat_logo.png" alt="M.E.A.T." class="h-full w-full rounded-2xl object-contain" />
-            </button>
-
-            <nav class="flex flex-col gap-2 text-[11px] font-medium text-slate-300">
-              <a
-                href="#"
-                class="group flex items-center gap-3 rounded-2xl bg-slate-900 text-meat.soft shadow-inner shadow-slate-900/70 px-3 py-3"
-                title="Dashboard"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="3" width="7" height="7" rx="2" />
-                  <rect x="14" y="3" width="7" height="7" rx="2" />
-                  <rect x="3" y="14" width="7" height="7" rx="2" />
-                  <rect x="14" y="14" width="7" height="7" rx="2" />
-                </svg>
-                <span class="sidebar-label">Dashboard</span>
-              </a>
-              <a
-                href="#"
-                class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-slate-900/70 hover:text-slate-50 transition"
-                title="Statistiken"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 3v18h18" />
-                  <rect x="7" y="10" width="3" height="7" rx="1" />
-                  <rect x="12" y="7" width="3" height="10" rx="1" />
-                  <rect x="17" y="4" width="3" height="13" rx="1" />
-                </svg>
-                <span class="sidebar-label">Stats</span>
-              </a>
-              <a
-                href="#"
-                class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-slate-900/70 hover:text-slate-50 transition"
-                title="Sentinel"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 3 5 6v6c0 5 3.5 8.8 7 9.5 3.5-.7 7-4.5 7-9.5V6z" />
-                  <path d="m9 12 2 2 4-4" />
-                </svg>
-                <span class="sidebar-label">Sentinel</span>
-              </a>
-              <a
-                href="#"
-                class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-slate-900/70 hover:text-slate-50 transition"
-                title="Module"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M8 3h4a2 2 0 0 1 2 2v1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v3h-3a2 2 0 0 0-2 2v3h-3a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H4v-3a2 2 0 0 1 2-2h1a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Z" />
-                </svg>
-                <span class="sidebar-label">Module</span>
-              </a>
-            </nav>
+          <div id="sidebar-skeleton" class="flex flex-col gap-4 animate-pulse text-slate-700">
+            <div class="h-12 w-12 rounded-2xl bg-slate-900/70 border border-slate-800/80"></div>
+            <div class="space-y-2">
+              <div class="h-10 w-full rounded-2xl bg-slate-900/70"></div>
+              <div class="h-10 w-full rounded-2xl bg-slate-900/70"></div>
+              <div class="h-10 w-full rounded-2xl bg-slate-900/70"></div>
+              <div class="h-10 w-full rounded-2xl bg-slate-900/70"></div>
+            </div>
+            <div class="h-10 w-full rounded-2xl bg-slate-900/70"></div>
           </div>
 
-          <div class="flex flex-col items-center gap-3">
-            <button
-              id="sidebar-toggle"
-              type="button"
-              class="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-2 py-2 text-[11px] text-slate-300 hover:border-rose-500 hover:text-rose-200 transition"
-              title="Sidebar umschalten"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m15 18-6-6 6-6" />
-              </svg>
-              <span class="sidebar-label">Einklappen</span>
-            </button>
+          <div id="sidebar-real" class="hidden flex flex-1 flex-col justify-between">
+            <div class="flex flex-col gap-3">
+              <button
+                type="button"
+                class="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900/90 ring-1 ring-slate-700/80"
+                title="M.E.A.T."
+              >
+                <img data-logo-target src="assets/logo/meat_logo.png" alt="M.E.A.T." class="h-full w-full rounded-2xl object-contain" />
+              </button>
 
-            <button
-              type="button"
-              id="logout-button-secondary"
-              class="flex h-10 w-full items-center justify-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-2 py-2 text-[11px] text-slate-300 hover:border-rose-500 hover:text-rose-200 transition"
-              title="Abmelden"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15" />
-                <path d="M18 12H9" />
-                <path d="m15 9 3 3-3 3" />
-              </svg>
-              <span class="sidebar-label">Logout</span>
-            </button>
+              <nav class="flex flex-col gap-2 text-[11px] font-medium text-slate-300">
+                <a
+                  href="#"
+                  class="group flex items-center gap-3 rounded-2xl bg-slate-900 text-meat.soft shadow-inner shadow-slate-900/70 px-3 py-3"
+                  title="Dashboard"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="2" />
+                    <rect x="14" y="3" width="7" height="7" rx="2" />
+                    <rect x="3" y="14" width="7" height="7" rx="2" />
+                    <rect x="14" y="14" width="7" height="7" rx="2" />
+                  </svg>
+                  <span class="text-sm">Dashboard</span>
+                </a>
+                <a
+                  href="#"
+                  class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-slate-900/70 hover:text-slate-50 transition"
+                  title="Statistiken"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 3v18h18" />
+                    <rect x="7" y="10" width="3" height="7" rx="1" />
+                    <rect x="12" y="7" width="3" height="10" rx="1" />
+                    <rect x="17" y="4" width="3" height="13" rx="1" />
+                  </svg>
+                  <span class="text-sm">Stats</span>
+                </a>
+                <a
+                  href="#"
+                  class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-slate-900/70 hover:text-slate-50 transition"
+                  title="Sentinel"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3 5 6v6c0 5 3.5 8.8 7 9.5 3.5-.7 7-4.5 7-9.5V6z" />
+                    <path d="m9 12 2 2 4-4" />
+                  </svg>
+                  <span class="text-sm">Sentinel</span>
+                </a>
+                <a
+                  href="#"
+                  class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-slate-900/70 hover:text-slate-50 transition"
+                  title="Module"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 3h4a2 2 0 0 1 2 2v1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v3h-3a2 2 0 0 0-2 2v3h-3a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H4v-3a2 2 0 0 1 2-2h1a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Z" />
+                  </svg>
+                  <span class="text-sm">Module</span>
+                </a>
+              </nav>
+            </div>
+
+            <div class="flex flex-col items-center gap-3">
+              <button
+                type="button"
+                id="logout-button-secondary"
+                class="flex h-10 w-full items-center justify-center gap-2 rounded-2xl border border-rose-800/70 bg-rose-900/40 px-2 py-2 text-[11px] text-rose-100 hover:border-rose-400 hover:text-rose-50 hover:bg-rose-900/60 transition"
+                title="Abmelden"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15" />
+                  <path d="M18 12H9" />
+                  <path d="m15 9 3 3-3 3" />
+                </svg>
+                <span class="text-sm">Logout</span>
+              </button>
+            </div>
           </div>
         </aside>
 
@@ -374,7 +375,6 @@
             <h3 class="text-lg font-semibold text-slate-100">Für welchen Server soll das Dashboard laden?</h3>
             <p class="text-[11px] text-slate-500 mt-1">Nur freigeschaltete Server werden angezeigt.</p>
           </div>
-          <button id="guild-modal-close" class="rounded-full bg-slate-800 px-3 py-1 text-[11px] text-slate-300 hover:text-rose-300" type="button">Schließen</button>
         </div>
         <div id="guild-modal-list" class="mt-4 grid gap-3 sm:grid-cols-2"></div>
       </div>

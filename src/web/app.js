@@ -1,4 +1,4 @@
-// Minimaler Auth- und UI-Loader für die statische Preview
+﻿// Minimaler Auth- und UI-Loader fÃ¼r die statische Preview
 
 const state = {
   authenticated: false,
@@ -22,14 +22,13 @@ const logoTargets = document.querySelectorAll('[data-logo-target]');
 const statusRing = document.querySelector('.status-ring');
 const statusDot = document.getElementById('status-dot');
 const statusText = document.getElementById('status-text');
-const sidebar = document.querySelector('[data-sidebar]');
-const sidebarToggle = document.getElementById('sidebar-toggle');
+const sidebarReal = document.getElementById('sidebar-real');
+const sidebarSkeleton = document.getElementById('sidebar-skeleton');
 const isDashboardPage = window.location.pathname.includes('dashboard');
 const dashboardContent = document.getElementById('dashboard-content');
 const dashboardSkeleton = document.getElementById('dashboard-skeleton');
 const guildModal = document.getElementById('guild-modal');
 const guildModalList = document.getElementById('guild-modal-list');
-const guildModalClose = document.getElementById('guild-modal-close');
 
 const logoConfig = (() => {
   const now = new Date();
@@ -37,14 +36,10 @@ const logoConfig = (() => {
   return {
     candidates: isDecember
       ? [
-          { type: 'video', url: 'assets/logo/meat_logo_xmas_ani.webm' },
           { type: 'image', url: 'assets/logo/meat_logo_xmas.png' },
           { type: 'image', url: 'assets/logo/meat_logo.png' },
         ]
-      : [
-          { type: 'video', url: 'assets/logo/meat_logo_ani.webm' }, // optional, falls später vorhanden
-          { type: 'image', url: 'assets/logo/meat_logo.png' },
-        ],
+      : [{ type: 'image', url: 'assets/logo/meat_logo.png' }],
   };
 })();
 
@@ -190,8 +185,8 @@ function renderGuilds() {
         </div>
       </div>
       <button type="button" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-2 text-xs text-slate-100 hover:border-rose-500 hover:text-rose-100 transition">
-        <span>Öffnen</span>
-        <span class="text-lg">→</span>
+        <span>Ã–ffnen</span>
+        <span class="text-lg">â†’</span>
       </button>
     `;
 
@@ -240,7 +235,7 @@ function showGuildModal() {
           <p class="text-[0.7rem] text-slate-500">${guild.owner ? 'Owner/Admin' : 'Berechtigt'}</p>
           ${
             unavailable
-              ? '<p class="mt-1 text-[0.7rem] text-amber-400">Bot nicht installiert – jetzt einladen?</p>'
+              ? '<p class="mt-1 text-[0.7rem] text-amber-400">Bot nicht installiert â€“ jetzt einladen?</p>'
               : ''
           }
         </div>
@@ -257,6 +252,8 @@ function showGuildModal() {
       guildModal.classList.remove('flex');
       if (dashboardSkeleton) dashboardSkeleton.classList.add('hidden');
       if (dashboardContent) dashboardContent.classList.remove('hidden');
+      if (sidebarSkeleton) sidebarSkeleton.classList.add('hidden');
+      if (sidebarReal) sidebarReal.classList.remove('hidden');
     });
     guildModalList.appendChild(card);
   });
@@ -315,6 +312,8 @@ async function loadSession() {
       main.classList.remove('fade-out');
       main.classList.add('fade-in');
     }
+    if (sidebarSkeleton) sidebarSkeleton.classList.remove('hidden');
+    if (sidebarReal) sidebarReal.classList.add('hidden');
   }
 }
 
@@ -376,35 +375,24 @@ async function loadCommits() {
 loadSession();
 loadCommits();
 applyLogos();
-setStatusBadge('online');
+let lastStatus = 'online';
+setStatusBadge(lastStatus);
 
 async function loadStatus() {
   try {
     const res = await fetch('/api/status', { credentials: 'include' });
     if (!res.ok) throw new Error('status failed');
     const data = await res.json();
-    const isOnline = Boolean(data?.online ?? true);
-    setStatusBadge(isOnline ? 'online' : 'offline');
+    lastStatus = Boolean(data?.online ?? true) ? 'online' : 'offline';
+    setStatusBadge(lastStatus);
   } catch {
-    setStatusBadge('offline');
+    // bei Fehler den letzten bekannten Status beibehalten
+    setStatusBadge(lastStatus);
   }
 }
 
 loadStatus();
 setInterval(loadStatus, 30_000);
-
-if (sidebarToggle && sidebar) {
-  sidebarToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('sidebar-expanded');
-  });
-}
-
-if (guildModalClose && guildModal) {
-  guildModalClose.addEventListener('click', () => {
-    guildModal.classList.add('hidden');
-    guildModal.classList.remove('flex');
-  });
-}
 
 if (logoutButton) {
   logoutButton.addEventListener('click', async () => {
@@ -414,7 +402,7 @@ if (logoutButton) {
       state.authenticated = false;
       state.user = null;
       state.guilds = [];
-      render();
+      window.location.href = '/';
     }
   });
 }
@@ -427,7 +415,8 @@ if (logoutButtonSecondary) {
       state.authenticated = false;
       state.user = null;
       state.guilds = [];
-      render();
+      window.location.href = '/';
     }
   });
 }
+
