@@ -296,6 +296,8 @@ async function loadSession() {
   if (isDashboardPage) {
     pushDashboardUrl();
     showGuildModal();
+    const main = document.querySelector('main');
+    if (main) main.classList.add('fade-in');
   }
 }
 

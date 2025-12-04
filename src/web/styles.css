@@ -104,3 +104,16 @@ body {
   transition: opacity 0.2s ease;
   pointer-events: none;
 }
+
+.fade-in {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

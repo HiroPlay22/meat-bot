@@ -37,6 +37,7 @@ const env = {
   redirectUri: process.env.DISCORD_REDIRECT_URI ?? '',
   allowedOrigin: process.env.ALLOWED_ORIGIN ?? '',
   redisUrl: process.env.REDIS_URL ?? '',
+  botGuildIds: process.env.BOT_GUILD_IDS ?? process.env.DEV_GUILD_IDS ?? '',
 };
 
 function isEnvReady() {
@@ -329,14 +330,16 @@ async function fetchGuilds(accessToken: string) {
 }
 
 function filterGuilds(guilds: Awaited<ReturnType<typeof fetchGuilds>>) {
-  const whitelist = (process.env.DEV_GUILD_IDS ?? '')
+  const allowList = env.botGuildIds
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
 
-  const byWhitelist = whitelist.length === 0 ? guilds : guilds.filter((g) => whitelist.includes(g.id));
+  if (allowList.length === 0) return [];
+
+  const byAllow = guilds.filter((g) => allowList.includes(g.id));
   // nur Guilds anzeigen, auf denen der Bot vorhanden ist (botPresent true oder nicht explizit false)
-  return byWhitelist.filter((g) => g.botPresent !== false);
+  return byAllow.map((g) => ({ ...g, botPresent: g.botPresent ?? true }));
 }
 
 async function handleCallback(req: IncomingMessage, res: ServerResponse, query: URLSearchParams) {
