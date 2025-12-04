@@ -323,6 +323,7 @@ async function fetchGuilds(accessToken: string) {
       owner: boolean;
       permissions: number;
       icon: string | null;
+      botPresent?: boolean;
     }>
   >;
 }
@@ -333,8 +334,9 @@ function filterGuilds(guilds: Awaited<ReturnType<typeof fetchGuilds>>) {
     .map((s) => s.trim())
     .filter(Boolean);
 
-  if (whitelist.length === 0) return guilds;
-  return guilds.filter((g) => whitelist.includes(g.id));
+  const byWhitelist = whitelist.length === 0 ? guilds : guilds.filter((g) => whitelist.includes(g.id));
+  // nur Guilds anzeigen, auf denen der Bot vorhanden ist (botPresent true oder nicht explizit false)
+  return byWhitelist.filter((g) => g.botPresent !== false);
 }
 
 async function handleCallback(req: IncomingMessage, res: ServerResponse, query: URLSearchParams) {

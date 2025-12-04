@@ -24,7 +24,12 @@ const statusDot = document.getElementById('status-dot');
 const statusText = document.getElementById('status-text');
 const sidebar = document.querySelector('[data-sidebar]');
 const sidebarToggle = document.getElementById('sidebar-toggle');
-const isDashboardPage = window.location.pathname.endsWith('dashboard.html');
+const isDashboardPage = window.location.pathname.includes('dashboard');
+const dashboardContent = document.getElementById('dashboard-content');
+const dashboardSkeleton = document.getElementById('dashboard-skeleton');
+const guildModal = document.getElementById('guild-modal');
+const guildModalList = document.getElementById('guild-modal-list');
+const guildModalClose = document.getElementById('guild-modal-close');
 
 const logoConfig = (() => {
   const now = new Date();
@@ -194,6 +199,55 @@ function renderGuilds() {
   });
 }
 
+function pushDashboardUrl() {
+  if (window.location.pathname.endsWith('dashboard.html')) {
+    window.history.replaceState({}, '', '/dashboard');
+  }
+}
+
+function showGuildModal() {
+  if (!guildModal || !guildModalList) return;
+  guildModal.classList.remove('hidden');
+  guildModal.classList.add('flex');
+  guildModalList.innerHTML = '';
+  if (!state.guilds.length) {
+    guildModalList.innerHTML =
+      '<div class="rounded-xl border border-slate-800 bg-slate-900/80 p-4 text-sm text-slate-300">Keine Server gefunden. Stelle sicher, dass du Admin/Owner bist und der Bot freigeschaltet ist.</div>';
+    return;
+  }
+  state.guilds.forEach((guild) => {
+    // nur zeigen, wenn der Bot wirklich auf der Guild ist
+    if (guild.botPresent === false) return;
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className =
+      'w-full text-left rounded-xl border border-slate-800 bg-slate-900/80 p-4 hover:border-rose-500 hover:text-rose-100 transition';
+    const initial = guild.name ? guild.name.charAt(0).toUpperCase() : '?';
+    card.innerHTML = `
+      <div class="flex items-center gap-3">
+        <div class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-slate-900 border border-slate-800">
+          ${
+            guild.icon
+              ? `<img src="${guild.icon}" alt="${guild.name}" class="h-10 w-10 object-cover" />`
+              : `<span class="text-lg text-slate-400">${initial}</span>`
+          }
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-slate-100">${guild.name}</p>
+          <p class="text-[0.7rem] text-slate-500">${guild.owner ? 'Owner/Admin' : 'Berechtigt'}</p>
+        </div>
+      </div>
+    `;
+    card.addEventListener('click', () => {
+      guildModal.classList.add('hidden');
+      guildModal.classList.remove('flex');
+      if (dashboardSkeleton) dashboardSkeleton.classList.add('hidden');
+      if (dashboardContent) dashboardContent.classList.remove('hidden');
+    });
+    guildModalList.appendChild(card);
+  });
+}
+
 function setStatusBadge(status = 'online') {
   const isOnline = status === 'online';
   const ringStatus = isOnline ? 'online' : 'offline';
@@ -216,7 +270,15 @@ async function loadSession() {
     if (guildRes.ok) state.guilds = await guildRes.json();
 
     if (!isDashboardPage) {
-      window.location.href = '/dashboard.html';
+      const main = document.querySelector('main');
+      if (main) {
+        main.classList.add('fade-out');
+        setTimeout(() => {
+          window.location.href = '/dashboard.html';
+        }, 200);
+      } else {
+        window.location.href = '/dashboard.html';
+      }
       return;
     }
   } catch {
@@ -231,6 +293,10 @@ async function loadSession() {
   }
 
   render();
+  if (isDashboardPage) {
+    pushDashboardUrl();
+    showGuildModal();
+  }
 }
 
 async function loadCommits() {
@@ -311,6 +377,13 @@ setInterval(loadStatus, 30_000);
 if (sidebarToggle && sidebar) {
   sidebarToggle.addEventListener('click', () => {
     sidebar.classList.toggle('sidebar-expanded');
+  });
+}
+
+if (guildModalClose && guildModal) {
+  guildModalClose.addEventListener('click', () => {
+    guildModal.classList.add('hidden');
+    guildModal.classList.remove('flex');
   });
 }
 
