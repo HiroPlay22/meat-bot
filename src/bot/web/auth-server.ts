@@ -107,10 +107,30 @@ function applySecurityHeaders(res: ServerResponse) {
   Object.entries(headers).forEach(([key, value]) => res.setHeader(key, value));
 }
 
-function setCookie(res: ServerResponse, name: string, value: string, options: { maxAge?: number; httpOnly?: boolean } = {}) {
+function setCookie(
+  res: ServerResponse,
+  name: string,
+  value: string,
+  options: { maxAge?: number; httpOnly?: boolean; sameSite?: 'Lax' | 'None' } = {},
+) {
   const parts = [`${name}=${encodeURIComponent(value)}`, 'Path=/'];
+
   if (options.httpOnly !== false) parts.push('HttpOnly');
-  if (process.env.NODE_ENV === 'production') parts.push('Secure', 'SameSite=Lax');
+
+  if (process.env.NODE_ENV === 'production') {
+    // Set Domain, Secure und SameSite, damit der Cookie über Cloudflare/Worker und die Hauptdomain gültig bleibt.
+    try {
+      const originHost = new URL(env.allowedOrigin).hostname;
+      if (originHost) parts.push(`Domain=.${originHost}`);
+    } catch {
+      // Fallback: kein Domain-Attribut
+    }
+    parts.push('Secure');
+    parts.push(`SameSite=${options.sameSite ?? 'Lax'}`);
+  } else if (options.sameSite) {
+    parts.push(`SameSite=${options.sameSite}`);
+  }
+
   if (options.maxAge) parts.push(`Max-Age=${options.maxAge}`);
   const existing = res.getHeader('Set-Cookie');
   if (Array.isArray(existing)) {
