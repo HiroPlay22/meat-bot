@@ -297,7 +297,10 @@ async function loadSession() {
     pushDashboardUrl();
     showGuildModal();
     const main = document.querySelector('main');
-    if (main) main.classList.add('fade-in');
+    if (main) {
+      main.classList.remove('fade-out');
+      main.classList.add('fade-in');
+    }
   }
 }
 

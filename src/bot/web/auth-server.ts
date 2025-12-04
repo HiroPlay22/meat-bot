@@ -335,11 +335,13 @@ function filterGuilds(guilds: Awaited<ReturnType<typeof fetchGuilds>>) {
     .map((s) => s.trim())
     .filter(Boolean);
 
-  if (allowList.length === 0) return [];
+  // Wenn keine Liste gepflegt ist, zeigen wir alle Guilds des Users (kann aber mehr sein als Bot-Guilds).
+  if (allowList.length === 0) return guilds;
 
-  const byAllow = guilds.filter((g) => allowList.includes(g.id));
-  // nur Guilds anzeigen, auf denen der Bot vorhanden ist (botPresent true oder nicht explizit false)
-  return byAllow.map((g) => ({ ...g, botPresent: g.botPresent ?? true }));
+  // Nur Guilds, auf denen der Bot laut Liste drauf ist UND der User Mitglied ist (User-Guilds sind bereits gefiltert).
+  return guilds
+    .filter((g) => allowList.includes(g.id))
+    .map((g) => ({ ...g, botPresent: true }));
 }
 
 async function handleCallback(req: IncomingMessage, res: ServerResponse, query: URLSearchParams) {
