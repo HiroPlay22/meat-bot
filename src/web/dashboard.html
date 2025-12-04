@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="de" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>M.E.A.T. Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+            colors: {
+              meat: {
+                primary: '#6366f1',
+                accent: '#a855f7',
+                soft: '#22d3ee',
+                dark: '#020617',
+                pulse: '#ec0b60',
+              },
+            },
+            boxShadow: {
+              'meat-glow': '0 0 60px rgba(129,140,248,0.35), 0 0 120px rgba(168,85,247,0.25)',
+            },
+            borderRadius: { '3xl': '1.75rem' },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="h-full bg-slate-950 text-slate-100 antialiased">
+    <div class="pointer-events-none fixed inset-0 -z-10 bg-slate-950">
+      <div class="bg-radial-layer absolute inset-0"></div>
+      <div class="bg-grid-layer absolute inset-0"></div>
+    </div>
+
+    <main class="relative z-10 min-h-screen px-3 py-4 sm:px-4 sm:py-6 lg:px-6">
+      <div class="mx-auto flex max-w-7xl gap-4 lg:flex-row">
+        <!-- Sidebar -->
+        <aside
+          data-sidebar
+          class="flex h-full w-16 flex-shrink-0 flex-col justify-between rounded-3xl border border-slate-800/80 bg-slate-950/90 px-2 py-4 shadow-lg shadow-slate-950/70 backdrop-blur-xl transition-all duration-200"
+        >
+          <div class="flex flex-col gap-3">
+            <button
+              type="button"
+              class="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900/90 ring-1 ring-slate-700/80"
+              title="M.E.A.T."
+            >
+              <img data-logo-target src="assets/logo/meat_logo.png" alt="M.E.A.T." class="h-full w-full rounded-2xl object-contain" />
+            </button>
+
+            <nav class="flex flex-col gap-2 text-[11px] font-medium text-slate-300">
+              <a
+                href="#"
+                class="group flex items-center gap-3 rounded-2xl bg-slate-900 text-meat.soft shadow-inner shadow-slate-900/70 px-3 py-3"
+                title="Dashboard"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="7" rx="2" />
+                  <rect x="14" y="3" width="7" height="7" rx="2" />
+                  <rect x="3" y="14" width="7" height="7" rx="2" />
+                  <rect x="14" y="14" width="7" height="7" rx="2" />
+                </svg>
+                <span class="sidebar-label">Dashboard</span>
+              </a>
+              <a
+                href="#"
+                class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-slate-900/70 hover:text-slate-50 transition"
+                title="Statistiken"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 3v18h18" />
+                  <rect x="7" y="10" width="3" height="7" rx="1" />
+                  <rect x="12" y="7" width="3" height="10" rx="1" />
+                  <rect x="17" y="4" width="3" height="13" rx="1" />
+                </svg>
+                <span class="sidebar-label">Stats</span>
+              </a>
+              <a
+                href="#"
+                class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-slate-900/70 hover:text-slate-50 transition"
+                title="Sentinel"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 3 5 6v6c0 5 3.5 8.8 7 9.5 3.5-.7 7-4.5 7-9.5V6z" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+                <span class="sidebar-label">Sentinel</span>
+              </a>
+              <a
+                href="#"
+                class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-slate-900/70 hover:text-slate-50 transition"
+                title="Module"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M8 3h4a2 2 0 0 1 2 2v1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v3h-3a2 2 0 0 0-2 2v3h-3a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H4v-3a2 2 0 0 1 2-2h1a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Z" />
+                </svg>
+                <span class="sidebar-label">Module</span>
+              </a>
+            </nav>
+          </div>
+
+          <div class="flex flex-col items-center gap-3">
+            <button
+              id="sidebar-toggle"
+              type="button"
+              class="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-2 py-2 text-[11px] text-slate-300 hover:border-rose-500 hover:text-rose-200 transition"
+              title="Sidebar umschalten"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+              <span class="sidebar-label">Einklappen</span>
+            </button>
+
+            <button
+              type="button"
+              id="logout-button-secondary"
+              class="flex h-10 w-full items-center justify-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-2 py-2 text-[11px] text-slate-300 hover:border-rose-500 hover:text-rose-200 transition"
+              title="Abmelden"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15" />
+                <path d="M18 12H9" />
+                <path d="m15 9 3 3-3 3" />
+              </svg>
+              <span class="sidebar-label">Logout</span>
+            </button>
+          </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="flex min-h-[calc(100vh-4rem)] flex-1 flex-col gap-4 rounded-3xl border border-slate-800/80 bg-slate-950/90 p-4 shadow-lg shadow-slate-950/70 backdrop-blur-xl sm:p-5">
+          <header class="flex flex-col gap-4 border-b border-slate-800/80 pb-4 lg:flex-row lg:items-center lg:justify-between">
+            <div class="space-y-1">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Statistiken & Monitoring</p>
+              <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Aktivität & Modul-Nutzung</h1>
+              <p class="text-xs text-slate-500">Live-Daten folgen – Dashboard ist bereit, sobald der Bot angemeldet ist.</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="flex flex-col items-end gap-1">
+                <span class="inline-flex items-center gap-1 rounded-full border border-slate-800 bg-slate-900/80 px-3 py-1 text-[11px] font-medium text-slate-200">
+                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  WIP
+                </span>
+                <span class="text-[11px] text-slate-500">Serverstatus</span>
+              </div>
+              <div class="relative flex items-center gap-3">
+                <div class="status-ring h-16 w-16 rounded-full flex items-center justify-center" data-status="online">
+                  <div class="h-11 w-11 overflow-hidden rounded-full bg-slate-900/90 shadow-inner shadow-slate-900">
+                    <img data-logo-target src="assets/logo/meat_logo.png" alt="M.E.A.T. Logo" class="h-full w-full object-contain" />
+                  </div>
+                </div>
+                <div class="flex flex-col">
+                  <span id="status-text" class="text-sm font-semibold text-slate-100">Online</span>
+                  <span class="text-[11px] text-slate-500">M.E.A.T. Bot</span>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <section class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Statistiken & Monitoring</p>
+                <h2 class="text-base font-semibold sm:text-lg">Aktivität & Modul-Nutzung</h2>
+                <p class="mt-1 text-xs text-slate-400">
+                  Platzhalter-Grafiken für M.E.A.T. – sobald Live, ziehen wir echte Discord- und Sentinel-Daten.
+                </p>
+              </div>
+              <div class="flex flex-col items-start gap-2 sm:items-end">
+                <div class="flex items-center gap-2">
+                  <span class="whitespace-nowrap inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-1 text-[11px] font-medium text-emerald-300">
+                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Demo-Livefeed
+                  </span>
+                  <span class="whitespace-nowrap inline-flex items-center gap-1 rounded-full border border-slate-700/80 bg-slate-900/80 px-2 py-1 text-[11px] font-medium text-slate-300">
+                    7 Tage
+                  </span>
+                </div>
+                <p class="text-[11px] text-slate-500">
+                  Zuletzt aktualisiert: <span class="font-medium text-slate-200">—</span>
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Aktive User heute</p>
+                  <p class="mt-2 text-2xl font-semibold text-slate-50">128</p>
+                </div>
+                <span class="whitespace-nowrap inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-[11px] text-emerald-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 15l5-5 4 4 5-9"></path>
+                  </svg>
+                  +12,4 %
+                </span>
+              </div>
+              <p class="mt-2 text-[11px] text-slate-500">Im Vergleich zum Durchschnitt der letzten 7 Tage.</p>
+            </div>
+
+            <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Commands gesamt</p>
+                  <p class="mt-2 text-2xl font-semibold text-slate-50">1.482</p>
+                </div>
+                <span class="whitespace-nowrap inline-flex items-center gap-1 rounded-full bg-slate-800/80 px-2 py-1 text-[11px] text-slate-300">
+                  7 Tage
+                </span>
+              </div>
+              <p class="mt-2 text-[11px] text-slate-500">Globaler Meta-Counter über alle Module deines Servers.</p>
+            </div>
+
+            <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Aktive Module</p>
+                  <p class="mt-2 text-2xl font-semibold text-slate-50">9<span class="text-base text-slate-500">/12</span></p>
+                </div>
+                <span class="whitespace-nowrap inline-flex items-center gap-1 rounded-full bg-indigo-500/10 px-2 py-1 text-[11px] text-indigo-300">
+                  Profil
+                </span>
+              </div>
+              <p class="mt-2 text-[11px] text-slate-500">Module, die mindestens 1x in den letzten 7 Tagen genutzt wurden.</p>
+            </div>
+
+            <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Ø Reaktionszeit</p>
+                  <p class="mt-2 text-2xl font-semibold text-slate-50">213<span class="text-base text-slate-400"> ms</span></p>
+                </div>
+                <span class="whitespace-nowrap inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-1 text-[11px] text-amber-300">
+                  Ping
+                </span>
+              </div>
+              <p class="mt-2 text-[11px] text-slate-500">Gemessen über alle Commands der letzten Stunde (Demo).</p>
+            </div>
+          </div>
+
+          <div class="grid gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1.1fr)]">
+            <section class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 md:p-5">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Server-Aktivität</p>
+                  <h3 class="mt-1 text-sm font-semibold text-slate-50">Nachrichten & Commands (7 Tage)</h3>
+                  <p class="mt-1 text-[11px] text-slate-400">Zusammengefasste Demo-Werte für Messages & MEAT-Commands.</p>
+                </div>
+                <div class="flex flex-col items-end gap-1 text-[11px]">
+                  <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-emerald-300">
+                      <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                      Messages
+                    </span>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-sky-500/10 px-2 py-0.5 text-sky-300">
+                      <span class="h-1.5 w-1.5 rounded-full bg-sky-400"></span>
+                      Commands
+                    </span>
+                  </div>
+                  <p class="text-slate-500">Peaks: Mo & Do · 20–21 Uhr</p>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <div class="h-64 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800/60 to-slate-900 shadow-inner shadow-slate-950/40"></div>
+              </div>
+
+              <div class="mt-4 grid gap-3 border-t border-slate-800/80 pt-4 text-[11px] sm:grid-cols-3">
+                <div class="space-y-1">
+                  <p class="uppercase tracking-[0.16em] text-slate-500">Aktivste Tage</p>
+                  <p class="text-slate-100">Montag & Donnerstag</p>
+                </div>
+                <div class="space-y-1">
+                  <p class="uppercase tracking-[0.16em] text-slate-500">MEAT-Anteil</p>
+                  <p class="text-slate-100">37 % der Interaktionen</p>
+                </div>
+                <div class="space-y-1">
+                  <p class="uppercase tracking-[0.16em] text-slate-500">Nächster Schritt</p>
+                  <p class="text-slate-100">Anbindung an Sentinel & DB.</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="flex flex-col rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 md:p-5">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Modul-Nutzung</p>
+                  <h3 class="mt-1 text-sm font-semibold text-slate-50">Verteilung der MEAT-Module</h3>
+                  <p class="mt-1 text-[11px] text-slate-400">Welche Module aktuell am meisten Action sehen (Demo).</p>
+                </div>
+                <span class="whitespace-nowrap inline-flex items-center gap-1 rounded-full border border-slate-700/80 bg-slate-950/90 px-2 py-1 text-[10px] text-slate-300">
+                  Demo · 100%
+                </span>
+              </div>
+
+              <div class="mt-4 flex flex-1 items-center justify-center">
+                <div class="h-60 w-full rounded-full bg-gradient-to-br from-slate-900 via-slate-800/60 to-slate-900 shadow-inner shadow-slate-950/30"></div>
+              </div>
+
+              <div class="mt-4 grid gap-2 text-[11px] text-slate-300">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                    <span>Core Utility / Meta-Stats</span>
+                  </div>
+                  <span class="text-slate-400">42 %</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="h-2 w-2 rounded-full bg-sky-400"></span>
+                    <span>Games & League-Module</span>
+                  </div>
+                  <span class="text-slate-400">28 %</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="h-2 w-2 rounded-full bg-fuchsia-400"></span>
+                    <span>ARK / Dino-NameGen</span>
+                  </div>
+                  <span class="text-slate-400">17 %</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="h-2 w-2 rounded-full bg-amber-400"></span>
+                    <span>Feedback & Utility</span>
+                  </div>
+                  <span class="text-slate-400">13 %</span>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <footer class="mt-2 flex flex-col gap-2 border-t border-slate-800/80 pt-3 text-[11px] text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+            <p>M.E.A.T. · CONSTRUCT-MEAT · v0.0.7</p>
+            <p>UI: Tailwind · Worker-Routing via Cloudflare</p>
+          </footer>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

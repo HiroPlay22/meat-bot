@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="de" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>M.E.A.T. Control Center · Login</title>
+    <meta name="description" content="M.E.A.T. Control Center – Login für das Dashboard." />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+            colors: {
+              meat: {
+                primary: '#6366f1',
+                accent: '#a855f7',
+                soft: '#22d3ee',
+                dark: '#020617',
+                pulse: '#ec0b60',
+              },
+            },
+            boxShadow: {
+              'meat-glow': '0 0 60px rgba(129,140,248,0.35), 0 0 120px rgba(168,85,247,0.25)',
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="h-full bg-slate-950 text-slate-100 antialiased">
+    <div class="pointer-events-none fixed inset-0 -z-10 bg-slate-950">
+      <div class="bg-radial-layer absolute inset-0"></div>
+      <div class="bg-grid-layer absolute inset-0"></div>
+    </div>
+
+    <main class="relative z-10 min-h-screen flex items-center justify-center px-4 py-12 lg:py-16">
+      <div class="w-full max-w-6xl space-y-10">
+        <header class="flex flex-wrap items-center justify-between gap-4 text-sm">
+          <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/80 border border-slate-700/70 overflow-hidden">
+              <img data-logo-target src="assets/logo/meat_logo.png" alt="M.E.A.T. Logo" class="h-full w-full object-contain" />
+            </div>
+            <div>
+              <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">M.E.A.T. · Control Center</p>
+              <p class="text-xs text-slate-500">Verbinde deinen Discord-Server mit einem zentralen Dashboard.</p>
+            </div>
+          </div>
+          <span class="inline-flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-900/70 px-3 py-1.5 text-[11px] font-medium text-slate-200">
+            <span class="inline-flex h-1.5 w-1.5 rounded-full bg-amber-400"></span>
+            WIP
+          </span>
+        </header>
+
+        <section class="relative overflow-hidden rounded-3xl border border-slate-800/80 bg-slate-950/90 p-6 shadow-[0_30px_120px_rgba(15,23,42,0.9)] backdrop-blur-xl sm:p-8">
+          <div class="relative grid gap-10 md:grid-cols-2 items-center">
+            <!-- Left column -->
+            <div class="flex flex-col gap-8">
+              <div class="space-y-6">
+                <div class="space-y-3">
+                  <span class="inline-flex items-center rounded-full bg-slate-900/90 px-3 py-1 text-[11px] font-medium text-slate-300 ring-1 ring-slate-700/80">
+                    <span class="mr-2 inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                    Ready to connect
+                  </span>
+                  <h1 class="text-3xl font-bold tracking-tight sm:text-4xl md:text-[2.4rem]">
+                    Willkommen zurück,<br />
+                    <span class="text-slate-300">lass uns</span>
+                    <span class="logo-highlight logo-text logo-compact text-shadow-strong">M.E.A.T.</span>
+                    <span class="text-slate-300">steuern.</span>
+                  </h1>
+                  <p class="max-w-xl text-sm text-slate-400">
+                    Melde dich mit Discord an, wähle deinen Server und behalte Commands, Module und Sentinel im Blick – alles an einem Ort.
+                  </p>
+                </div>
+
+                <div class="space-y-3">
+                  <a
+                    href="/api/auth/login"
+                    class="group relative inline-flex w-full items-center justify-center gap-4 rounded-2xl bg-[#5865F2] px-6 py-4 text-base font-semibold text-white shadow-lg shadow-indigo-900/60 hover:bg-[#4752c4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 focus-visible:ring-[#5865F2] transition overflow-hidden"
+                    style="box-shadow: 0 10px 40px rgba(88,101,242,0.4);"
+                  >
+                    <span class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300" style="box-shadow: 0 0 40px rgba(88,101,242,0.6);"></span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 245 240" class="h-6 w-6 relative" aria-hidden="true">
+                      <path
+                        d="M104.4 104.0c-5.7 0-10.2 5-10.2 11.1s4.6 11.1 10.2 11.1c5.7 0 10.2-5 10.2-11.1.1-6.1-4.5-11.1-10.2-11.1Zm36.2 0c-5.7 0-10.2 5-10.2 11.1s4.6 11.1 10.2 11.1c5.7 0 10.2-5 10.2-11.1s-4.5-11.1-10.2-11.1Z"
+                        fill="currentColor"
+                      />
+                      <path
+                        d="M189.5 20h-134C44.2 20 35 29.2 35 40.5v134c0 11.3 9.2 20.5 20.5 20.5h113.4l-5.3-18.3 12.8 11.9 12.1 11.2 21.5 18.8V40.5C210 29.2 200.8 20 189.5 20Zm-35.2 132.6s-3.3-3.9-6-7.3c12-3.4 16.6-11 16.6-11-3.8 2.5-7.4 4.2-10.6 5.4-4.6 1.9-9.1 3.1-13.4 3.9-8.9 1.7-17 1.2-23.9-.1-5.3-1-9.8-2.3-13.6-3.9-2.1-.8-4.4-1.8-6.7-3.1-.3-.2-.6-.3-.9-.5-.2-.1-.3-.2-.4-.3-1.8-1-2.8-1.7-2.8-1.7s4.4 7.3 16 10.8c-2.7 3.4-6.1 7.6-6.1 7.6-20.1-.6-27.7-13.8-27.7-13.8 0-29.3 13.2-53.1 13.2-53.1C81.4 74 92 73.6 92 73.6l1.1 1.3C76.2 79.3 68 86 68 86s2.3-1.3 6.2-3.1c11.3-5 20.3-6.3 24-6.6.6-.1 1.1-.2 1.7-.2a102.5 102.5 0 0 1 24.5-.1c11.5 1.4 23.8 4.9 36.4 12.1 0 0-7.9-7.5-24.8-11.7l1.5-1.7s10.6.4 21.8 8.1c0 0 13.2 23.8 13.2 53.1 0-.1-7.7 13.1-27.8 13.7Z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                    <span class="relative text-base font-bold">Login mit Discord</span>
+                    <span class="relative ml-1 inline-flex items-center justify-center rounded-full bg-indigo-500/40 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.18em]">OAuth2</span>
+                  </a>
+                  <p class="text-[11px] text-slate-500">
+                    Beim Login sehen wir nur deine Discord-ID, deinen Nutzernamen, dein Avatar und die Server, auf denen du Admin/Owner bist – keine Nachrichteninhalte.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right column -->
+            <div class="flex flex-col justify-between gap-6 rounded-3xl bg-gradient-to-br from-meat.primary via-meat.accent to-meat.soft p-[1px] shadow-meat-glow">
+              <div class="flex flex-1 flex-col justify-between rounded-[1.55rem] bg-slate-950/90 p-5">
+                <div class="flex items-center justify-between gap-3">
+                  <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-300/90">Live Pulse</p>
+                  <span id="status-badge" data-status="online" class="inline-flex items-center gap-1 rounded-full bg-slate-900/80 px-2.5 py-1 text-[10px] font-medium text-slate-200">
+                    <span class="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-300" id="status-dot"></span>
+                    <span id="status-text">Online</span>
+                  </span>
+                </div>
+
+                <div class="mt-6 flex flex-col items-center gap-6">
+                  <div class="relative flex h-52 w-52 items-center justify-center">
+                    <div class="absolute inset-0 rounded-full status-ring" data-status="online"></div>
+                    <div class="absolute inset-[12%] rounded-full bg-slate-950/95 flex items-center justify-center">
+                      <img data-logo-target class="h-28 w-28 object-contain" src="assets/logo/meat_logo.png" alt="M.E.A.T. Logo" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
+
+

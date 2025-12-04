@@ -22,6 +22,9 @@ const logoTargets = document.querySelectorAll('[data-logo-target]');
 const statusRing = document.querySelector('.status-ring');
 const statusDot = document.getElementById('status-dot');
 const statusText = document.getElementById('status-text');
+const sidebar = document.querySelector('[data-sidebar]');
+const sidebarToggle = document.getElementById('sidebar-toggle');
+const isDashboardPage = window.location.pathname.endsWith('dashboard.html');
 
 const logoConfig = (() => {
   const now = new Date();
@@ -117,8 +120,10 @@ function render() {
   if (dashboardCards) dashboardCards.classList.toggle('hidden', !state.authenticated);
   if (lockedDashboardHint) lockedDashboardHint.classList.toggle('hidden', state.authenticated);
 
-  if (loginView) loginView.classList.toggle('hidden', state.authenticated);
-  if (dashboardView) dashboardView.classList.toggle('hidden', !state.authenticated);
+  if (!isDashboardPage) {
+    if (loginView) loginView.classList.toggle('hidden', state.authenticated);
+    if (dashboardView) dashboardView.classList.toggle('hidden', !state.authenticated);
+  }
 
   if (userChip && userName && userTag) {
     if (state.authenticated && state.user) {
@@ -209,10 +214,20 @@ async function loadSession() {
 
     const guildRes = await fetch('/api/guilds', { credentials: 'include' });
     if (guildRes.ok) state.guilds = await guildRes.json();
+
+    if (!isDashboardPage) {
+      window.location.href = '/dashboard.html';
+      return;
+    }
   } catch {
     state.authenticated = false;
     state.user = null;
     state.guilds = [];
+
+    if (isDashboardPage) {
+      window.location.href = '/';
+      return;
+    }
   }
 
   render();
@@ -292,6 +307,12 @@ async function loadStatus() {
 
 loadStatus();
 setInterval(loadStatus, 30_000);
+
+if (sidebarToggle && sidebar) {
+  sidebarToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('sidebar-expanded');
+  });
+}
 
 if (logoutButton) {
   logoutButton.addEventListener('click', async () => {
