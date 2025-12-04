@@ -216,12 +216,15 @@ function showGuildModal() {
     return;
   }
   state.guilds.forEach((guild) => {
-    // nur zeigen, wenn der Bot wirklich auf der Guild ist
-    if (guild.botPresent === false) return;
     const card = document.createElement('button');
     card.type = 'button';
-    card.className =
-      'w-full text-left rounded-xl border border-slate-800 bg-slate-900/80 p-4 hover:border-rose-500 hover:text-rose-100 transition';
+    const unavailable = guild.botPresent === false;
+    card.className = [
+      'w-full text-left rounded-xl border bg-slate-900/80 p-4 transition',
+      unavailable
+        ? 'border-slate-800/60 text-slate-500 opacity-70 cursor-not-allowed'
+        : 'border-slate-800 hover:border-rose-500 hover:text-rose-100',
+    ].join(' ');
     const initial = guild.name ? guild.name.charAt(0).toUpperCase() : '?';
     card.innerHTML = `
       <div class="flex items-center gap-3">
@@ -235,10 +238,21 @@ function showGuildModal() {
         <div>
           <p class="text-sm font-semibold text-slate-100">${guild.name}</p>
           <p class="text-[0.7rem] text-slate-500">${guild.owner ? 'Owner/Admin' : 'Berechtigt'}</p>
+          ${
+            unavailable
+              ? '<p class="mt-1 text-[0.7rem] text-amber-400">Bot nicht installiert – jetzt einladen?</p>'
+              : ''
+          }
         </div>
       </div>
     `;
     card.addEventListener('click', () => {
+      if (unavailable) {
+        if (guild.inviteUrl) {
+          window.open(guild.inviteUrl, '_blank', 'noopener,noreferrer');
+        }
+        return;
+      }
       guildModal.classList.add('hidden');
       guildModal.classList.remove('flex');
       if (dashboardSkeleton) dashboardSkeleton.classList.add('hidden');

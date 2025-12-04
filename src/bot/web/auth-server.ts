@@ -38,6 +38,8 @@ const env = {
   allowedOrigin: process.env.ALLOWED_ORIGIN ?? '',
   redisUrl: process.env.REDIS_URL ?? '',
   botGuildIds: process.env.BOT_GUILD_IDS ?? process.env.DEV_GUILD_IDS ?? '',
+  botToken: process.env.DISCORD_TOKEN ?? '',
+  invitePermissions: process.env.BOT_INVITE_PERMISSIONS ?? '0',
 };
 
 function isEnvReady() {
@@ -329,6 +331,36 @@ async function fetchGuilds(accessToken: string) {
   >;
 }
 
+const botPresenceCache = new Map<
+  string,
+  {
+    present: boolean;
+    checkedAt: number;
+  }
+>();
+
+async function checkBotPresence(guildId: string): Promise<boolean> {
+  if (!env.botToken) return true; // ohne Token nicht blockieren
+  const cached = botPresenceCache.get(guildId);
+  const now = Date.now();
+  const ttl = 10 * 60 * 1000; // 10 Minuten
+  if (cached && now - cached.checkedAt < ttl) {
+    return cached.present;
+  }
+
+  try {
+    const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}`, {
+      headers: { Authorization: `Bot ${env.botToken}` },
+    });
+    const present = res.ok;
+    botPresenceCache.set(guildId, { present, checkedAt: now });
+    return present;
+  } catch {
+    botPresenceCache.set(guildId, { present: false, checkedAt: now });
+    return false;
+  }
+}
+
 function filterGuilds(guilds: Awaited<ReturnType<typeof fetchGuilds>>) {
   const allowList = env.botGuildIds
     .split(',')
@@ -338,10 +370,8 @@ function filterGuilds(guilds: Awaited<ReturnType<typeof fetchGuilds>>) {
   // Wenn keine Liste gepflegt ist, lieber nichts zurückgeben, um keine falschen Guilds anzuzeigen.
   if (allowList.length === 0) return [];
 
-  // Nur Guilds, auf denen der Bot laut Liste drauf ist UND der User Mitglied ist (User-Guilds sind bereits gefiltert).
-  return guilds
-    .filter((g) => allowList.includes(g.id))
-    .map((g) => ({ ...g, botPresent: true }));
+  // Nur freigegebene Guilds; botPresent setzen wir später via Bot-Check
+  return guilds.filter((g) => allowList.includes(g.id));
 }
 
 async function handleCallback(req: IncomingMessage, res: ServerResponse, query: URLSearchParams) {
@@ -419,16 +449,27 @@ async function handleGuilds(req: IncomingMessage, res: ServerResponse) {
   try {
     const guilds = await fetchGuilds(session.accessToken);
     const filtered = filterGuilds(guilds);
+
+    const enriched = await Promise.all(
+      filtered.map(async (g) => {
+        const present = await checkBotPresence(g.id);
+        const inviteUrl = present
+          ? undefined
+          : `https://discord.com/api/oauth2/authorize?client_id=${env.clientId}&scope=bot%20applications.commands&permissions=${env.invitePermissions}&guild_id=${g.id}&disable_guild_select=true`;
+        return {
+          id: g.id,
+          name: g.name,
+          owner: g.owner,
+          icon: g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png` : null,
+          botPresent: present,
+          inviteUrl,
+        };
+      }),
+    );
     return json(
       res,
       200,
-      filtered.map((g) => ({
-        id: g.id,
-        name: g.name,
-        owner: g.owner,
-        icon: g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png` : null,
-        botPresent: g.botPresent ?? true,
-      })),
+      enriched,
     );
   } catch (error) {
     logError('Fehler beim Laden der Guilds', { functionName: 'apiGuilds', extra: { error } });
