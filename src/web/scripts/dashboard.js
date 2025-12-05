@@ -27,6 +27,9 @@ const heroGuildTitle = document.getElementById('hero-guild-title');
 const heroUserName = document.getElementById('hero-user-name');
 const profileCardTitle = document.getElementById('card-profile-title');
 const userRoleBadge = document.getElementById('user-role-badge');
+const userRoleTags = document.getElementById('user-role-tags');
+const roleContent = document.getElementById('role-content');
+const profileSkeleton = document.getElementById('profile-skeleton');
 
 function showDashboardSkeleton(showSkeleton) {
   if (dashboardSkeleton) dashboardSkeleton.classList.toggle('hidden', !showSkeleton);
@@ -56,6 +59,14 @@ function updateGuildHeader() {
   }
 }
 
+function setProfileAccent(color) {
+  const root = document.documentElement;
+  const targetColor = color || '';
+  root.style.setProperty('--meat-user-accent', targetColor);
+  if (profileCardTitle) profileCardTitle.style.color = targetColor || '';
+  if (userRoleBadge) userRoleBadge.style.borderColor = targetColor || '';
+}
+
 function applyUserDisplayName(displayName) {
   const label = displayName || 'User';
   if (heroUserName) heroUserName.textContent = label;
@@ -66,11 +77,40 @@ function updateUserRoleBadge(role) {
   if (!userRoleBadge) return;
   if (!role) {
     userRoleBadge.innerHTML = '<span class="inline-flex h-1.5 w-1.5 rounded-full bg-slate-500"></span>Rolle unbekannt';
+    setProfileAccent('');
     return;
   }
   const color = role.color != null ? `#${role.color.toString(16).padStart(6, '0')}` : null;
   const dotStyle = color ? `style="background:${color}"` : '';
-  userRoleBadge.innerHTML = `<span class="inline-flex h-1.5 w-1.5 rounded-full" ${dotStyle}></span>${role.name}`;
+    userRoleBadge.innerHTML = `<span class="inline-flex h-1.5 w-1.5 rounded-full" ${dotStyle}></span>${role.name}`;
+  setProfileAccent(color);
+}
+
+function updateUserRoleTags(roles = []) {
+  if (!userRoleTags) return;
+  userRoleTags.innerHTML = '';
+  if (!roles.length) return;
+
+  const top = roles.slice(0, 4);
+  top.forEach((role) => {
+    const color = role.color != null ? `#${role.color.toString(16).padStart(6, '0')}` : null;
+    const tag = document.createElement('span');
+    tag.className = 'inline-flex items-center gap-2 rounded-full bg-slate-900/80 px-2.5 py-1 text-[11px] text-slate-100 border border-slate-800';
+    tag.innerHTML = `<span class="inline-flex h-1.5 w-1.5 rounded-full" style="background:${color ?? '#94a3b8'}"></span>${role.name}`;
+    userRoleTags.appendChild(tag);
+  });
+
+  if (roles.length > 4) {
+    const more = document.createElement('span');
+    more.className = 'inline-flex items-center gap-2 rounded-full bg-slate-900/80 px-2.5 py-1 text-[11px] text-slate-300 border border-slate-800';
+    more.textContent = `+${roles.length - 4}`;
+    userRoleTags.appendChild(more);
+  }
+}
+
+function toggleRoleSkeleton(isLoading) {
+  if (profileSkeleton) profileSkeleton.classList.toggle('hidden', !isLoading);
+  if (roleContent) roleContent.classList.toggle('hidden', isLoading);
 }
 
 function setupDropdownExclusivity() {
@@ -93,13 +133,22 @@ function setupDropdownExclusivity() {
 
 async function loadGuildMemberData() {
   if (!state.selectedGuildId) return;
+  toggleRoleSkeleton(true);
   try {
     const data = await fetchGuildMember(state.selectedGuildId);
     const displayName = data?.member?.displayName || state.user?.displayName || state.user?.username || 'User';
     applyUserDisplayName(displayName);
-    updateUserRoleBadge(data?.highestRoleResolved || null);
+    const rolesSorted = Array.isArray(data?.roles)
+      ? [...data.roles].sort((a, b) => (b.position ?? 0) - (a.position ?? 0))
+      : [];
+    const highest = data?.highestRoleResolved || rolesSorted[0] || null;
+    updateUserRoleBadge(highest || null);
+    updateUserRoleTags(rolesSorted);
+    toggleRoleSkeleton(false);
   } catch (error) {
     updateUserRoleBadge(null);
+    updateUserRoleTags([]);
+    toggleRoleSkeleton(false);
   }
 }
 

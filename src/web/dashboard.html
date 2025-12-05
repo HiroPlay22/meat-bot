@@ -377,11 +377,22 @@
                           <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Profil</p>
                           <h3 class="text-lg font-bold text-slate-50" id="card-profile-title">Profil @User</h3>
                           <p class="text-sm text-slate-400">Displayname, Avatar und Rollen bleiben verknuepft.</p>
-                          <div class="flex flex-wrap items-center gap-2">
-                            <span class="inline-flex items-center gap-2 rounded-full bg-slate-800/80 px-2.5 py-1 text-[11px] text-slate-200" id="user-role-badge">
-                              <span class="inline-flex h-1.5 w-1.5 rounded-full bg-slate-500"></span>
-                              Rolle unbekannt
-                            </span>
+                          <div id="role-content" class="flex flex-col gap-2">
+                            <div class="flex flex-wrap items-center gap-2">
+                              <span class="inline-flex items-center gap-2 rounded-full bg-slate-800/80 px-2.5 py-1 text-[11px] text-slate-200" id="user-role-badge">
+                                <span class="inline-flex h-1.5 w-1.5 rounded-full bg-slate-500"></span>
+                                Rolle unbekannt
+                              </span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2" id="user-role-tags"></div>
+                          </div>
+                          <div id="profile-skeleton" class="flex flex-col gap-2 rounded-xl border border-slate-800/70 bg-slate-900/60 p-3 animate-pulse">
+                            <div class="h-4 w-40 rounded-full bg-slate-800/60"></div>
+                            <div class="flex gap-2">
+                              <div class="h-6 w-24 rounded-full bg-slate-800/60"></div>
+                              <div class="h-6 w-20 rounded-full bg-slate-800/60"></div>
+                              <div class="h-6 w-12 rounded-full bg-slate-800/60"></div>
+                            </div>
                           </div>
                         </div>
                         <span class="rounded-2xl bg-slate-900/80 p-3 text-slate-200 shadow-inner shadow-slate-900/50">
@@ -390,10 +401,6 @@
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                           </svg>
                         </span>
-                      </div>
-                      <div class="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-300">
-                        <span class="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-300"></span>
-                        Live im Dashboard
                       </div>
                     </article>
 
