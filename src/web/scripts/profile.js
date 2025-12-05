@@ -18,8 +18,9 @@ function toggle(el) {
 
 export function renderProfile(user) {
   if (!user) return;
-  if (profileName) profileName.textContent = user.username ?? 'User';
-  const initial = user.username ? user.username.charAt(0).toUpperCase() : '?';
+  const displayName = user.displayName || user.username || 'User';
+  if (profileName) profileName.textContent = displayName;
+  const initial = displayName ? displayName.charAt(0).toUpperCase() : '?';
   if (user.avatar && profileAvatarImg) {
     const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`;
     profileAvatar?.classList.add('hidden');

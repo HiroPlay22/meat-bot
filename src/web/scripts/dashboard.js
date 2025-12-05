@@ -20,6 +20,7 @@ const dashboardContent = document.getElementById('dashboard-content');
 const dashboardSkeleton = document.getElementById('dashboard-skeleton');
 const currentGuildName = document.getElementById('current-guild-name');
 const currentGuildAvatar = document.getElementById('current-guild-avatar');
+const navProfileLabel = document.getElementById('nav-profile-label');
 
 function showDashboardSkeleton(showSkeleton) {
   if (dashboardSkeleton) dashboardSkeleton.classList.toggle('hidden', !showSkeleton);
@@ -75,8 +76,14 @@ function ensureSelectedGuild() {
 async function loadSession() {
   try {
     const me = await fetchMe();
-    setUser(me);
-    renderProfile(me);
+    const displayName = me?.displayName || me?.username || 'User';
+    setUser({ ...me, displayName });
+    renderProfile({ ...me, displayName });
+
+    if (navProfileLabel) {
+      const possessive = /[sS]$/.test(displayName) ? `${displayName}' Profil` : `${displayName}'s Profil`;
+      navProfileLabel.textContent = possessive;
+    }
 
     await ensureGuildsLoaded();
 
