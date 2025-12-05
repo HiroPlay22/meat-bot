@@ -61,25 +61,6 @@ async function ensureGuildsLoaded() {
   refreshGuildSwitch();
 }
 
-function ensureSelectedGuild() {
-  if (!state.user || !state.guilds.length) return;
-  const cached = loadCachedSelected(state.user.id);
-  if (cached && state.guilds.some((g) => g.id === cached)) {
-    setSelectedGuild(cached, { persist: false });
-    updateGuildHeader();
-    refreshGuildSwitch();
-    return true;
-  }
-  const preferred = state.guilds.find((g) => g.botPresent !== false) || state.guilds[0];
-  if (preferred) {
-    setSelectedGuild(preferred.id);
-    updateGuildHeader();
-    refreshGuildSwitch();
-    return true;
-  }
-  return false;
-}
-
 async function loadSession() {
   try {
     const me = await fetchMe();
@@ -88,17 +69,12 @@ async function loadSession() {
 
     await ensureGuildsLoaded();
 
-    const hasSelected = ensureSelectedGuild();
-    if (!hasSelected) {
-      showDashboardSkeleton(true);
-      openGuildSelectModal(() => {
-        showDashboardSkeleton(false);
-        refreshGuildSwitch();
-      });
-    } else {
+    // Immer Modal anzeigen nach Login, damit explizite Auswahl erfolgt
+    showDashboardSkeleton(true);
+    openGuildSelectModal(() => {
       showDashboardSkeleton(false);
       refreshGuildSwitch();
-    }
+    });
 
     // URL /dashboard
     if (window.location.pathname.endsWith('dashboard.html')) {
