@@ -47,7 +47,7 @@
               <img data-logo-target src="assets/logo/meat_logo.png" alt="M.E.A.T. Logo" class="h-full w-full object-contain" />
             </div>
             <div>
-              <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">M.E.A.T. - Control Center</p>
+              <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400" id="header-guild-title">Control Center</p>
               <p class="text-xs text-slate-500">Verbinde deinen Discord-Server mit einem zentralen Dashboard.</p>
             </div>
           </div>
@@ -301,14 +301,15 @@
                   <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                     <div class="space-y-1">
                       <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Dashboard</p>
-                      <h1 class="text-xl font-bold text-slate-100">M.E.A.T. Control Center</h1>
+                      <h1 class="text-xl font-bold text-slate-100" id="hero-guild-title">Control Center</h1>
+                      <p class="text-sm text-slate-400">Angemeldet als <span id="hero-user-name" class="font-semibold text-slate-100">User</span></p>
                     </div>
                     <div class="flex flex-wrap items-center gap-3">
                       <div class="relative inline-flex">
                         <button
                           id="guild-switch-button"
                           type="button"
-                          class="flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-2 text-sm font-semibold text-slate-100 hover:border-rose-500 transition"
+                          class="relative z-30 flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-2 text-sm font-semibold text-slate-100 hover:border-rose-500 transition"
                         >
                           <span id="current-guild-avatar" class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-slate-900 border border-slate-800"></span>
                           <span id="current-guild-name" class="text-base">Keine Guild gewaehlt</span>
@@ -318,7 +319,7 @@
                         </button>
                         <div
                           id="guild-switch-menu"
-                          class="hidden absolute left-0 top-full z-20 mt-2 w-72 rounded-2xl border border-slate-800 bg-slate-950/95 p-2 shadow-xl shadow-slate-900/60 backdrop-blur-xl"
+                          class="hidden absolute left-0 top-full z-50 mt-2 w-72 rounded-2xl border border-slate-800 bg-slate-950/95 p-2 shadow-xl shadow-slate-900/60 backdrop-blur-xl"
                         ></div>
                       </div>
 
@@ -326,7 +327,7 @@
                         <button
                           id="profile-button"
                           type="button"
-                          class="flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 hover:border-rose-500 transition"
+                          class="relative z-30 flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 hover:border-rose-500 transition"
                         >
                           <span id="profile-avatar" class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-slate-100">U</span>
                           <img id="profile-avatar-img" class="hidden h-9 w-9 rounded-full object-cover" alt="Profil" />
@@ -337,9 +338,9 @@
                         </button>
                         <div
                           id="profile-dropdown"
-                          class="hidden absolute right-0 mt-2 w-56 rounded-2xl border border-slate-800 bg-slate-950/95 p-2 text-sm text-slate-100 shadow-xl shadow-slate-900/60 backdrop-blur-xl"
+                          class="hidden absolute right-0 z-50 mt-2 w-56 rounded-2xl border border-slate-800 bg-slate-950/95 p-2 text-sm text-slate-100 shadow-xl shadow-slate-900/60 backdrop-blur-xl"
                         >
-                          <p class="px-3 py-2 text-[11px] text-slate-400">Einstellungen</p>
+                          <p class="px-3 py-2 text-[11px] text-slate-400">Sprache</p>
                           <div class="flex flex-col gap-1 px-1">
                             <button id="lang-de" type="button" class="flex items-center justify-between rounded-xl px-3 py-2 hover:bg-slate-900/70">
                               <span>Deutsch</span>
@@ -374,8 +375,14 @@
                       <div class="flex items-start justify-between">
                         <div class="space-y-2">
                           <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Profil</p>
-                          <h3 class="text-lg font-bold text-slate-50">Community Identitaet</h3>
+                          <h3 class="text-lg font-bold text-slate-50" id="card-profile-title">Profil @User</h3>
                           <p class="text-sm text-slate-400">Displayname, Avatar und Rollen bleiben verknuepft.</p>
+                          <div class="flex flex-wrap items-center gap-2">
+                            <span class="inline-flex items-center gap-2 rounded-full bg-slate-800/80 px-2.5 py-1 text-[11px] text-slate-200" id="user-role-badge">
+                              <span class="inline-flex h-1.5 w-1.5 rounded-full bg-slate-500"></span>
+                              Rolle unbekannt
+                            </span>
+                          </div>
                         </div>
                         <span class="rounded-2xl bg-slate-900/80 p-3 text-slate-200 shadow-inner shadow-slate-900/50">
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">

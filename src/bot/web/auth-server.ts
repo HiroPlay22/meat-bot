@@ -332,6 +332,42 @@ async function fetchGuilds(accessToken: string) {
   >;
 }
 
+async function fetchGuildRoles(guildId: string) {
+  if (!env.botToken) throw new Error('Bot-Token fehlt');
+  const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, {
+    headers: { Authorization: `Bot ${env.botToken}` },
+  });
+  if (!res.ok) throw new Error(`Roles-Request fehlgeschlagen: ${res.status}`);
+  return res.json() as Promise<
+    Array<{
+      id: string;
+      name: string;
+      color: number;
+      position: number;
+    }>
+  >;
+}
+
+async function fetchGuildMember(guildId: string, userId: string) {
+  if (!env.botToken) throw new Error('Bot-Token fehlt');
+  const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${userId}`, {
+    headers: { Authorization: `Bot ${env.botToken}` },
+  });
+  if (!res.ok) throw new Error(`Member-Request fehlgeschlagen: ${res.status}`);
+  return res.json() as Promise<{
+    user: {
+      id: string;
+      username: string;
+      global_name?: string | null;
+      avatar?: string | null;
+    };
+    nick?: string | null;
+    roles: string[];
+    avatar?: string | null;
+    communication_disabled_until?: string | null;
+  }>;
+}
+
 const botPresenceCache = new Map<
   string,
   {
@@ -373,6 +409,15 @@ function filterGuilds(guilds: Awaited<ReturnType<typeof fetchGuilds>>) {
 
   // Nur freigegebene Guilds; botPresent setzen wir später via Bot-Check
   return guilds.filter((g) => allowList.includes(g.id));
+}
+
+function isGuildAllowed(guildId: string) {
+  const allowList = env.botGuildIds
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (allowList.length === 0) return false;
+  return allowList.includes(guildId);
 }
 
 async function handleCallback(req: IncomingMessage, res: ServerResponse, query: URLSearchParams) {
@@ -487,6 +532,59 @@ async function handleGuilds(req: IncomingMessage, res: ServerResponse) {
   }
 }
 
+async function handleGuildMember(req: IncomingMessage, res: ServerResponse, guildId: string) {
+  const sessionId = getSession(req);
+  if (!sessionId) return json(res, 401, { error: 'unauthorized' });
+  const session = await loadSession(sessionId);
+  if (!session) return json(res, 401, { error: 'unauthorized' });
+
+  if (!isGuildAllowed(guildId)) return json(res, 403, { error: 'forbidden' });
+
+  try {
+    const present = await checkBotPresence(guildId);
+    if (!present) return json(res, 400, { error: 'bot_not_present' });
+
+    const [roles, member, guildInfo] = await Promise.all([
+      fetchGuildRoles(guildId),
+      fetchGuildMember(guildId, session.user.id),
+      fetch(`https://discord.com/api/v10/guilds/${guildId}`, { headers: { Authorization: `Bot ${env.botToken}` } }).then((r) => r.json()),
+    ]);
+
+    const memberRoles = roles.filter((r) => member.roles.includes(r.id));
+    const highestRole = memberRoles.sort((a, b) => b.position - a.position)[0];
+    const resolvedHighest = highestRole
+      ? {
+          id: highestRole.id,
+          name: highestRole.name,
+          color: highestRole.color,
+          position: highestRole.position,
+        }
+      : null;
+
+    const displayName = member.nick || member.user.global_name || member.user.username;
+    return json(res, 200, {
+      guild: {
+        id: guildId,
+        name: guildInfo?.name,
+        icon: guildInfo?.icon ? `https://cdn.discordapp.com/icons/${guildId}/${guildInfo.icon}.png` : null,
+      },
+      member: {
+        id: member.user.id,
+        displayName,
+        avatar: member.user.avatar
+          ? `https://cdn.discordapp.com/avatars/${member.user.id}/${member.user.avatar}.png`
+          : null,
+        roles: member.roles,
+      },
+      roles: roles.map((r) => ({ id: r.id, name: r.name, color: r.color, position: r.position })),
+      highestRoleResolved: resolvedHighest,
+    });
+  } catch (error) {
+    logError('Fehler beim Laden von Guild-Member', { functionName: 'apiGuildMember', extra: { error, guildId } });
+    return json(res, 500, { error: 'guild_member_failed' });
+  }
+}
+
 function handleOptions(res: ServerResponse) {
   applySecurityHeaders(res);
   res.writeHead(204, {
@@ -563,6 +661,13 @@ export function startAuthServer() {
     if (path === '/api/guilds' && req.method === 'GET') {
       applySecurityHeaders(res);
       await handleGuilds(req, res);
+      return;
+    }
+
+    const guildMeMatch = path.match(/^\/api\/guilds\/([^/]+)\/me$/);
+    if (guildMeMatch && req.method === 'GET') {
+      applySecurityHeaders(res);
+      await handleGuildMember(req, res, guildMeMatch[1]);
       return;
     }
 

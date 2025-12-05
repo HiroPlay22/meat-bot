@@ -19,6 +19,10 @@ export async function fetchGuilds() {
   return doFetch('/api/guilds');
 }
 
+export async function fetchGuildMember(guildId) {
+  return doFetch(`/api/guilds/${guildId}/me`);
+}
+
 export async function fetchStatus() {
   return doFetch('/api/status');
 }
