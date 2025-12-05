@@ -39,206 +39,213 @@
     </div>
 
     <main class="relative z-10 min-h-screen px-3 py-4 sm:px-4 sm:py-6 lg:px-6 fade-in">
-      <div class="mx-auto flex max-w-screen-2xl gap-4 lg:flex-row">
-        <!-- Sidebar -->
-        <aside
-          data-sidebar
-          class="flex h-full w-64 flex-shrink-0 flex-col justify-between rounded-3xl border border-slate-800/80 bg-slate-950/90 px-4 py-6 shadow-lg shadow-slate-950/70 backdrop-blur-xl"
-        >
-          <div id="sidebar-skeleton" class="flex flex-col gap-4 animate-pulse text-slate-700">
-            <div class="h-12 w-12 rounded-2xl bg-slate-900/70 border border-slate-800/80"></div>
-            <div class="space-y-2">
-              <div class="h-10 w-full rounded-2xl bg-slate-900/70"></div>
-              <div class="h-10 w-full rounded-2xl bg-slate-900/70"></div>
-              <div class="h-10 w-full rounded-2xl bg-slate-900/70"></div>
-              <div class="h-10 w-full rounded-2xl bg-slate-900/70"></div>
+      <div class="mx-auto flex max-w-screen-2xl flex-col gap-4">
+        <header class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/80 border border-slate-700/70 overflow-hidden">
+              <img data-logo-target src="assets/logo/meat_logo.png" alt="M.E.A.T. Logo" class="h-full w-full object-contain" />
             </div>
-            <div class="h-10 w-full rounded-2xl bg-slate-900/70"></div>
-          </div>
-
-          <div id="sidebar-real" class="hidden flex flex-1 flex-col justify-between">
-            <div class="flex flex-col gap-3">
-              <button
-                type="button"
-                class="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900/90 ring-1 ring-slate-700/80"
-                title="M.E.A.T."
-              >
-                <img data-logo-target src="assets/logo/meat_logo.png" alt="M.E.A.T." class="h-full w-full rounded-2xl object-contain" />
-              </button>
-
-              <nav class="flex flex-col gap-2 text-[11px] font-medium text-slate-300">
-                <a
-                  href="#"
-                  class="group flex items-center gap-3 rounded-2xl bg-slate-900 text-meat.soft shadow-inner shadow-slate-900/70 px-3 py-3"
-                  title="Dashboard"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="7" height="7" rx="2" />
-                    <rect x="14" y="3" width="7" height="7" rx="2" />
-                    <rect x="3" y="14" width="7" height="7" rx="2" />
-                    <rect x="14" y="14" width="7" height="7" rx="2" />
-                  </svg>
-                  <span class="text-sm">Dashboard</span>
-                </a>
-                <a
-                  href="#"
-                  class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-slate-900/70 hover:text-slate-50 transition"
-                  title="Statistiken"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 3v18h18" />
-                    <rect x="7" y="10" width="3" height="7" rx="1" />
-                    <rect x="12" y="7" width="3" height="10" rx="1" />
-                    <rect x="17" y="4" width="3" height="13" rx="1" />
-                  </svg>
-                  <span class="text-sm">Stats</span>
-                </a>
-                <a
-                  href="#"
-                  class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-slate-900/70 hover:text-slate-50 transition"
-                  title="Sentinel"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 3 5 6v6c0 5 3.5 8.8 7 9.5 3.5-.7 7-4.5 7-9.5V6z" />
-                    <path d="m9 12 2 2 4-4" />
-                  </svg>
-                  <span class="text-sm">Sentinel</span>
-                </a>
-                <a
-                  href="#"
-                  class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-slate-900/70 hover:text-slate-50 transition"
-                  title="Module"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M8 3h4a2 2 0 0 1 2 2v1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v3h-3a2 2 0 0 0-2 2v3h-3a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H4v-3a2 2 0 0 1 2-2h1a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Z" />
-                  </svg>
-                  <span class="text-sm">Module</span>
-                </a>
-              </nav>
-            </div>
-
-            <div class="flex flex-col items-center gap-3">
-              <button
-                type="button"
-                id="logout-button-secondary"
-                class="flex h-10 w-full items-center justify-center gap-2 rounded-2xl border border-rose-800/70 bg-rose-900/40 px-2 py-2 text-[11px] text-rose-100 hover:border-rose-400 hover:text-rose-50 hover:bg-rose-900/60 transition"
-                title="Abmelden"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15" />
-                  <path d="M18 12H9" />
-                  <path d="m15 9 3 3-3 3" />
-                </svg>
-                <span class="text-sm">Logout</span>
-              </button>
+            <div>
+              <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">M.E.A.T. · Control Center</p>
+              <p class="text-xs text-slate-500">Verbinde deinen Discord-Server mit einem zentralen Dashboard.</p>
             </div>
           </div>
-        </aside>
+          <span class="inline-flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-900/70 px-3 py-1.5 text-[11px] font-medium text-slate-200">
+            <span class="inline-flex h-1.5 w-1.5 rounded-full bg-amber-400"></span>
+            WIP
+          </span>
+        </header>
 
-        <!-- Main -->
-        <div class="flex min-h-[calc(100vh-4rem)] flex-1 flex-col gap-4 rounded-3xl border border-slate-800/80 bg-slate-950/90 p-4 shadow-lg shadow-slate-950/70 backdrop-blur-xl sm:p-5">
-          <!-- Skeleton -->
-          <div id="dashboard-skeleton" class="flex flex-col gap-4 animate-pulse text-slate-700">
-            <div class="h-10 w-1/3 rounded-2xl bg-slate-800/60"></div>
-            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <div class="h-24 rounded-2xl bg-slate-900/70"></div>
-              <div class="h-24 rounded-2xl bg-slate-900/70"></div>
-              <div class="h-24 rounded-2xl bg-slate-900/70"></div>
-              <div class="h-24 rounded-2xl bg-slate-900/70"></div>
-            </div>
-            <div class="grid gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1.1fr)]">
-              <div class="h-72 rounded-2xl bg-slate-900/70"></div>
-              <div class="h-72 rounded-2xl bg-slate-900/70"></div>
-            </div>
-          </div>
-
-          <!-- Real content -->
-          <div id="dashboard-content" class="hidden flex-1 flex-col gap-4">
-            <header class="flex flex-col gap-4 border-b border-slate-800/80 pb-4 lg:flex-row lg:items-center lg:justify-between">
-              <div class="space-y-2">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">M.E.A.T. Dashboard</p>
-                <div class="relative inline-flex">
-                  <button
-                    id="guild-switch-button"
-                    type="button"
-                    class="flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-2 text-sm font-semibold text-slate-100 hover:border-rose-500 transition"
-                  >
-                    <span id="current-guild-avatar" class="flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl bg-slate-900 border border-slate-800"></span>
-                    <span id="current-guild-name" class="text-base">Keine Guild gewählt</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </button>
-                  <div
-                    id="guild-switch-menu"
-                    class="hidden absolute left-0 top-full z-20 mt-2 w-72 rounded-2xl border border-slate-800 bg-slate-950/95 p-2 shadow-xl shadow-slate-900/60 backdrop-blur-xl"
-                  ></div>
+        <section class="relative overflow-hidden rounded-3xl border border-slate-800/80 bg-slate-950/90 p-4 shadow-[0_30px_120px_rgba(15,23,42,0.9)] backdrop-blur-xl sm:p-6">
+          <div class="pointer-events-none absolute inset-px rounded-[1.65rem] border border-slate-700/60"></div>
+          <div class="relative flex gap-4 lg:flex-row">
+            <aside
+              data-sidebar
+              class="flex h-full w-64 flex-shrink-0 flex-col justify-between rounded-3xl border border-slate-800/80 bg-slate-950/90 px-4 py-6 shadow-lg shadow-slate-950/70 backdrop-blur-xl"
+            >
+              <div id="sidebar-skeleton" class="flex flex-col gap-4 animate-pulse text-slate-700">
+                <div class="h-12 w-12 rounded-2xl bg-slate-900/70 border border-slate-800/80"></div>
+                <div class="space-y-2">
+                  <div class="h-10 w-full rounded-2xl bg-slate-900/70"></div>
+                  <div class="h-10 w-full rounded-2xl bg-slate-900/70"></div>
+                  <div class="h-10 w-full rounded-2xl bg-slate-900/70"></div>
+                  <div class="h-10 w-full rounded-2xl bg-slate-900/70"></div>
                 </div>
-                <p class="text-xs text-slate-500">Guild-spezifische Ansicht. Wechsel über die Auswahl oben.</p>
+                <div class="h-10 w-full rounded-2xl bg-slate-900/70"></div>
               </div>
 
-              <div class="flex flex-wrap items-center gap-4">
-                <div class="relative flex items-center gap-3">
-                  <div class="status-ring h-16 w-16 rounded-full flex items-center justify-center" data-status="online">
-                    <div class="h-11 w-11 overflow-hidden rounded-full bg-slate-900/90 shadow-inner shadow-slate-900">
-                      <img data-logo-target src="assets/logo/meat_logo.png" alt="M.E.A.T. Logo" class="h-full w-full object-contain" />
-                    </div>
-                  </div>
-                  <div class="flex flex-col">
-                    <span id="status-text" class="text-sm font-semibold text-slate-100">Online</span>
-                    <span class="text-[11px] text-slate-500">M.E.A.T. Bot</span>
-                  </div>
-                </div>
-
-                <div class="relative">
+              <div id="sidebar-real" class="hidden flex flex-1 flex-col justify-between">
+                <div class="flex flex-col gap-3">
                   <button
-                    id="profile-button"
                     type="button"
-                    class="flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 hover:border-rose-500 transition"
+                    class="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900/90 ring-1 ring-slate-700/80"
+                    title="M.E.A.T."
                   >
-                    <span
-                      id="profile-avatar"
-                      class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-slate-100"
-                    >
-                      U
-                    </span>
-                    <span id="profile-name" class="text-sm font-semibold">User</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
+                    <img data-logo-target src="assets/logo/meat_logo.png" alt="M.E.A.T." class="h-full w-full rounded-2xl object-contain" />
                   </button>
-                  <div
-                    id="profile-dropdown"
-                    class="hidden absolute right-0 mt-2 w-56 rounded-2xl border border-slate-800 bg-slate-950/95 p-2 text-sm text-slate-100 shadow-xl shadow-slate-900/60 backdrop-blur-xl"
-                  >
-                    <p class="px-3 py-2 text-[11px] text-slate-400">Einstellungen</p>
-                    <div class="flex flex-col gap-1 px-1">
-                      <button id="lang-de" type="button" class="flex items-center justify-between rounded-xl px-3 py-2 hover:bg-slate-900/70">
-                        <span>Deutsch</span>
-                        <span class="text-[10px] text-emerald-400">Aktiv</span>
-                      </button>
-                      <button id="lang-en" type="button" class="flex items-center justify-between rounded-xl px-3 py-2 hover:bg-slate-900/70">
-                        <span>English</span>
-                        <span class="text-[10px] text-slate-500">bald</span>
-                      </button>
-                    </div>
-                    <div class="my-2 h-px bg-slate-800/70"></div>
-                    <button
-                      id="profile-logout"
-                      type="button"
-                      class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-rose-200 hover:bg-rose-900/30 hover:text-rose-100"
+
+                  <nav class="flex flex-col gap-2 text-[11px] font-medium text-slate-300">
+                    <a
+                      href="#"
+                      class="group flex items-center gap-3 rounded-2xl bg-slate-900 text-meat.soft shadow-inner shadow-slate-900/70 px-3 py-3"
+                      title="Dashboard"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="2" />
+                        <rect x="14" y="3" width="7" height="7" rx="2" />
+                        <rect x="3" y="14" width="7" height="7" rx="2" />
+                        <rect x="14" y="14" width="7" height="7" rx="2" />
+                      </svg>
+                      <span class="text-sm">Dashboard</span>
+                    </a>
+                    <a
+                      href="#"
+                      class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-slate-900/70 hover:text-slate-50 transition"
+                      title="Statistiken"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 3v18h18" />
+                        <rect x="7" y="10" width="3" height="7" rx="1" />
+                        <rect x="12" y="7" width="3" height="10" rx="1" />
+                        <rect x="17" y="4" width="3" height="13" rx="1" />
+                      </svg>
+                      <span class="text-sm">Stats</span>
+                    </a>
+                    <a
+                      href="#"
+                      class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-slate-900/70 hover:text-slate-50 transition"
+                      title="Sentinel"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3 5 6v6c0 5 3.5 8.8 7 9.5 3.5-.7 7-4.5 7-9.5V6z" />
+                        <path d="m9 12 2 2 4-4" />
+                      </svg>
+                      <span class="text-sm">Sentinel</span>
+                    </a>
+                    <a
+                      href="#"
+                      class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-slate-900/70 hover:text-slate-50 transition"
+                      title="Module"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8 3h4a2 2 0 0 1 2 2v1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v3h-3a2 2 0 0 0-2 2v3h-3a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H4v-3a2 2 0 0 1 2-2h1a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Z" />
+                      </svg>
+                      <span class="text-sm">Module</span>
+                    </a>
+                    <a
+                      href="/"
+                      class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-rose-900/40 hover:border hover:border-rose-600 transition text-rose-200"
+                      title="Logout"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15" />
                         <path d="M18 12H9" />
                         <path d="m15 9 3 3-3 3" />
                       </svg>
-                      Logout
-                    </button>
-                  </div>
+                      <span class="text-sm">Logout</span>
+                    </a>
+                  </nav>
+                </div>
+
+                <div class="flex flex-col items-center gap-3">
+                  <button
+                    type="button"
+                    id="logout-button-secondary"
+                    class="hidden"
+                    aria-hidden="true"
+                  ></button>
                 </div>
               </div>
-            </header>
+            </aside>
+
+            <!-- Main -->
+            <div class="flex min-h-[calc(100vh-4rem)] flex-1 flex-col gap-4 rounded-3xl border border-slate-800/80 bg-slate-950/90 p-4 shadow-lg shadow-slate-950/70 backdrop-blur-xl sm:p-5">
+              <!-- Skeleton -->
+              <div id="dashboard-skeleton" class="flex flex-col gap-4 animate-pulse text-slate-700">
+                <div class="h-10 w-1/3 rounded-2xl bg-slate-800/60"></div>
+                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                  <div class="h-24 rounded-2xl bg-slate-900/70"></div>
+                  <div class="h-24 rounded-2xl bg-slate-900/70"></div>
+                  <div class="h-24 rounded-2xl bg-slate-900/70"></div>
+                  <div class="h-24 rounded-2xl bg-slate-900/70"></div>
+                </div>
+                <div class="grid gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1.1fr)]">
+                  <div class="h-72 rounded-2xl bg-slate-900/70"></div>
+                  <div class="h-72 rounded-2xl bg-slate-900/70"></div>
+                </div>
+              </div>
+
+              <!-- Real content -->
+              <div id="dashboard-content" class="hidden flex-1 flex-col gap-4">
+                <header class="flex flex-col gap-4 border-b border-slate-800/80 pb-4 lg:flex-row lg:items-center lg:justify-between">
+                  <div class="space-y-2">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">M.E.A.T. Dashboard</p>
+                    <div class="relative inline-flex">
+                      <button
+                        id="guild-switch-button"
+                        type="button"
+                        class="flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-2 text-sm font-semibold text-slate-100 hover:border-rose-500 transition"
+                      >
+                        <span id="current-guild-avatar" class="flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl bg-slate-900 border border-slate-800"></span>
+                        <span id="current-guild-name" class="text-base">Keine Guild gewählt</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      </button>
+                      <div
+                        id="guild-switch-menu"
+                        class="hidden absolute left-0 top-full z-20 mt-2 w-72 rounded-2xl border border-slate-800 bg-slate-950/95 p-2 shadow-xl shadow-slate-900/60 backdrop-blur-xl"
+                      ></div>
+                    </div>
+                    <p class="text-xs text-slate-500">Guild-spezifische Ansicht. Wechsel über die Auswahl oben.</p>
+                  </div>
+
+                  <div class="flex flex-wrap items-center gap-4">
+                    <div class="relative">
+                      <button
+                        id="profile-button"
+                        type="button"
+                        class="flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 hover:border-rose-500 transition"
+                      >
+                        <span id="profile-avatar" class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-slate-100">U</span>
+                        <img id="profile-avatar-img" class="hidden h-8 w-8 rounded-full object-cover" alt="Profil" />
+                        <span id="profile-name" class="text-sm font-semibold">User</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      </button>
+                      <div
+                        id="profile-dropdown"
+                        class="hidden absolute right-0 mt-2 w-56 rounded-2xl border border-slate-800 bg-slate-950/95 p-2 text-sm text-slate-100 shadow-xl shadow-slate-900/60 backdrop-blur-xl"
+                      >
+                        <p class="px-3 py-2 text-[11px] text-slate-400">Einstellungen</p>
+                        <div class="flex flex-col gap-1 px-1">
+                          <button id="lang-de" type="button" class="flex items-center justify-between rounded-xl px-3 py-2 hover:bg-slate-900/70">
+                            <span>Deutsch</span>
+                            <span class="text-[10px] text-emerald-400">Aktiv</span>
+                          </button>
+                          <button id="lang-en" type="button" class="flex items-center justify-between rounded-xl px-3 py-2 hover:bg-slate-900/70">
+                            <span>English</span>
+                            <span class="text-[10px] text-slate-500">bald</span>
+                          </button>
+                        </div>
+                        <div class="my-2 h-px bg-slate-800/70"></div>
+                        <button
+                          id="profile-logout"
+                          type="button"
+                          class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-rose-200 hover:bg-rose-900/30 hover:text-rose-100"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15" />
+                            <path d="M18 12H9" />
+                            <path d="m15 9 3 3-3 3" />
+                          </svg>
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </header>
 
             <section class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4">
               <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">

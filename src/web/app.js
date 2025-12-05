@@ -38,6 +38,7 @@ const profileButton = document.getElementById('profile-button');
 const profileDropdown = document.getElementById('profile-dropdown');
 const profileName = document.getElementById('profile-name');
 const profileAvatar = document.getElementById('profile-avatar');
+const profileAvatarImg = document.getElementById('profile-avatar-img');
 
 const logoConfig = (() => {
   const now = new Date();
@@ -109,7 +110,17 @@ function render() {
     if (state.authenticated && state.user) {
       profileName.textContent = state.user.username ?? 'User';
       const initial = state.user.username ? state.user.username.charAt(0).toUpperCase() : '?';
-      profileAvatar.textContent = initial;
+      if (state.user.avatar && profileAvatarImg) {
+        const avatarUrl = `https://cdn.discordapp.com/avatars/${state.user.id}/${state.user.avatar}.png?size=64`;
+        profileAvatar.classList.add('hidden');
+        profileAvatarImg.classList.remove('hidden');
+        profileAvatarImg.src = avatarUrl;
+        profileAvatarImg.alt = state.user.username;
+      } else {
+        profileAvatar.classList.remove('hidden');
+        if (profileAvatarImg) profileAvatarImg.classList.add('hidden');
+        profileAvatar.textContent = initial;
+      }
     }
   }
 

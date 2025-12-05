@@ -437,6 +437,7 @@ async function handleMe(req: IncomingMessage, res: ServerResponse) {
     id: user.id,
     username: user.username,
     discriminator: user.discriminator,
+    avatar: user.avatar ?? null,
   });
 }
 
