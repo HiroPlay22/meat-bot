@@ -1,6 +1,6 @@
 // FILE: src/web/scripts/index.js
 import { applyLogos } from './logo.js';
-import { fetchStatus } from './api.js';
+import { fetchStatus, fetchMe } from './api.js';
 import { setStatus } from './state.js';
 
 const statusRing = document.querySelector('.status-ring');
@@ -29,5 +29,17 @@ async function initStatus() {
   }
 }
 
+async function checkSessionAndRedirect() {
+  try {
+    const me = await fetchMe();
+    if (me?.id) {
+      window.location.href = '/dashboard.html';
+    }
+  } catch {
+    // keine Session, bleibt auf Login
+  }
+}
+
 applyLogos();
 initStatus();
+checkSessionAndRedirect();

@@ -96,6 +96,7 @@ async function loadSession() {
       });
     } else {
       showDashboardSkeleton(false);
+      refreshGuildSwitch();
     }
 
     // URL /dashboard

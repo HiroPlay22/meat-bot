@@ -112,7 +112,6 @@ export function refreshGuildSwitch() {
 }
 
 export function openGuildSelectModal(onSelect) {
-  if (!state.guilds.length) return;
   const backdrop = document.createElement('div');
   backdrop.className =
     'fixed inset-0 z-30 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm px-4';
@@ -128,6 +127,16 @@ export function openGuildSelectModal(onSelect) {
 
   const list = document.createElement('div');
   list.className = 'mt-3 space-y-2 max-h-80 overflow-y-auto pr-1';
+
+  if (!state.guilds.length) {
+    list.innerHTML =
+      '<div class="rounded-xl border border-slate-800 bg-slate-900/80 p-4 text-sm text-slate-300">Keine freigegebenen Server gefunden. Bitte stelle sicher, dass der Bot eingeladen ist.</div>';
+    modal.appendChild(title);
+    modal.appendChild(list);
+    backdrop.appendChild(modal);
+    document.body.appendChild(backdrop);
+    return;
+  }
 
   const sorted = [...state.guilds].sort((a, b) => {
     const pa = a.botPresent === false ? 1 : 0;
