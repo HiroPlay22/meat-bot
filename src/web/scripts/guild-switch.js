@@ -12,7 +12,7 @@ function renderHeader() {
   if (!currentGuildName || !currentGuildAvatar) return;
   const guild = state.guilds.find((g) => g.id === state.selectedGuildId);
   if (!guild) {
-    currentGuildName.textContent = 'Keine Guild gewählt';
+    currentGuildName.textContent = 'Keine Guild gewaehlt';
     currentGuildAvatar.innerHTML = '';
     return;
   }
