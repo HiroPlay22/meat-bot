@@ -5,6 +5,8 @@ const guildSwitchButton = document.getElementById('guild-switch-button');
 const guildSwitchMenu = document.getElementById('guild-switch-menu');
 const currentGuildName = document.getElementById('current-guild-name');
 const currentGuildAvatar = document.getElementById('current-guild-avatar');
+const guildModal = document.getElementById('guild-modal');
+const guildModalList = document.getElementById('guild-modal-list');
 
 function renderHeader() {
   if (!currentGuildName || !currentGuildAvatar) return;
@@ -112,31 +114,9 @@ export function refreshGuildSwitch() {
 }
 
 export function openGuildSelectModal(onSelect) {
-  const backdrop = document.createElement('div');
-  backdrop.className =
-    'fixed inset-0 z-30 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm px-4';
+  if (!guildModal || !guildModalList) return;
 
-  const modal = document.createElement('div');
-  modal.className =
-    'w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-950/95 p-4 shadow-2xl shadow-slate-900/70';
-
-  const title = document.createElement('div');
-  title.className = 'flex items-center justify-between pb-3 border-b border-slate-800/80';
-  title.innerHTML =
-    '<div><p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Server wählen</p><p class="text-sm text-slate-200">Wähle den Server für dein Dashboard.</p></div>';
-
-  const list = document.createElement('div');
-  list.className = 'mt-3 space-y-2 max-h-80 overflow-y-auto pr-1';
-
-  if (!state.guilds.length) {
-    list.innerHTML =
-      '<div class="rounded-xl border border-slate-800 bg-slate-900/80 p-4 text-sm text-slate-300">Keine freigegebenen Server gefunden. Bitte stelle sicher, dass der Bot eingeladen ist.</div>';
-    modal.appendChild(title);
-    modal.appendChild(list);
-    backdrop.appendChild(modal);
-    document.body.appendChild(backdrop);
-    return;
-  }
+  guildModalList.innerHTML = '';
 
   const sorted = [...state.guilds].sort((a, b) => {
     const pa = a.botPresent === false ? 1 : 0;
@@ -144,8 +124,14 @@ export function openGuildSelectModal(onSelect) {
     return pa - pb;
   });
 
+  if (!sorted.length) {
+    guildModalList.innerHTML =
+      '<div class="rounded-xl border border-slate-800 bg-slate-900/80 p-4 text-sm text-slate-300">Keine freigegebenen Server gefunden. Bitte stelle sicher, dass der Bot eingeladen ist.</div>';
+  }
+
   sorted.forEach((guild) => {
     const unavailable = guild.botPresent === false;
+    const initial = guild.name ? guild.name.charAt(0).toUpperCase() : '?';
     const card = document.createElement('button');
     card.type = 'button';
     card.className = [
@@ -154,7 +140,6 @@ export function openGuildSelectModal(onSelect) {
         ? 'border-slate-800/60 text-slate-500 opacity-70 cursor-not-allowed'
         : 'border-slate-800 hover:border-rose-500 hover:text-rose-100',
     ].join(' ');
-    const initial = guild.name ? guild.name.charAt(0).toUpperCase() : '?';
     card.innerHTML = `
       <div class="flex items-center gap-3">
         <div class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-slate-900 border border-slate-800">
@@ -184,13 +169,12 @@ export function openGuildSelectModal(onSelect) {
       renderHeader();
       renderMenu();
       if (onSelect) onSelect(guild.id);
-      backdrop.remove();
+      guildModal.classList.add('hidden');
+      guildModal.classList.remove('flex');
     });
-    list.appendChild(card);
+    guildModalList.appendChild(card);
   });
 
-  modal.appendChild(title);
-  modal.appendChild(list);
-  backdrop.appendChild(modal);
-  document.body.appendChild(backdrop);
+  guildModal.classList.remove('hidden');
+  guildModal.classList.add('flex');
 }

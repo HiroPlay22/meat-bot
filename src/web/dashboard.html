@@ -77,14 +77,6 @@
 
               <div id="sidebar-real" class="hidden flex flex-1 flex-col justify-between">
                 <div class="flex flex-col gap-3">
-                  <button
-                    type="button"
-                    class="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900/90 ring-1 ring-slate-700/80"
-                    title="M.E.A.T."
-                  >
-                    <img data-logo-target src="assets/logo/meat_logo.png" alt="M.E.A.T." class="h-full w-full rounded-2xl object-contain" />
-                  </button>
-
                   <nav class="flex flex-col gap-2 text-[11px] font-medium text-slate-300">
                     <a
                       href="#"
@@ -133,8 +125,9 @@
                       </svg>
                       <span class="text-sm">Module</span>
                     </a>
-                    <a
-                      href="/"
+                    <button
+                      type="button"
+                      data-logout
                       class="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-rose-900/40 transition text-rose-200"
                       title="Logout"
                     >
@@ -144,7 +137,7 @@
                         <path d="m15 9 3 3-3 3" />
                       </svg>
                       <span class="text-sm">Logout</span>
-                    </a>
+                    </button>
                   </nav>
                 </div>
 
