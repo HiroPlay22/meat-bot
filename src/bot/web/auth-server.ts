@@ -30,6 +30,7 @@ type SessionData = {
 const stateStore = new Map<string, OAuthState>();
 const sessionStore = new Map<string, SessionData>();
 const rateLimits = new Map<string, RateLimitEntry>();
+const serverStartedAt = Date.now();
 
 const env = {
   clientId: process.env.DISCORD_CLIENT_ID ?? '',
@@ -441,6 +442,14 @@ async function handleMe(req: IncomingMessage, res: ServerResponse) {
   });
 }
 
+async function handleStatus(res: ServerResponse) {
+  // Minimaler Status-Endpunkt; kann bei Bedarf um echte Bot-Daten erweitert werden.
+  return json(res, 200, {
+    online: true,
+    startedAt: serverStartedAt,
+  });
+}
+
 async function handleGuilds(req: IncomingMessage, res: ServerResponse) {
   const sessionId = getSession(req);
   if (!sessionId) return json(res, 401, { error: 'unauthorized' });
@@ -542,6 +551,12 @@ export function startAuthServer() {
     if (path === '/api/me' && req.method === 'GET') {
       applySecurityHeaders(res);
       await handleMe(req, res);
+      return;
+    }
+
+    if (path === '/api/status' && req.method === 'GET') {
+      applySecurityHeaders(res);
+      await handleStatus(res);
       return;
     }
 
