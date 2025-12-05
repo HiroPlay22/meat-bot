@@ -403,7 +403,7 @@ async function handleCallback(req: IncomingMessage, res: ServerResponse, query: 
 
     setCookie(res, 'meat_session', sessionId, { maxAge: 60 * 60 * 24 * 7 });
     applySecurityHeaders(res);
-    res.writeHead(302, { Location: '/' });
+    res.writeHead(302, { Location: '/dashboard.html' });
     res.end();
   } catch (error) {
     logError('Callback fehlgeschlagen', { functionName: 'authCallback', extra: { error } });
