@@ -1,5 +1,4 @@
 // FILE: src/web/scripts/index.js
-import { applyLogos } from './logo.js';
 import { fetchStatus, fetchMe } from './api.js';
 import { setStatus } from './state.js';
 
@@ -40,6 +39,5 @@ async function checkSessionAndRedirect() {
   }
 }
 
-applyLogos();
 initStatus();
 checkSessionAndRedirect();

@@ -1,6 +1,5 @@
 // FILE: src/web/scripts/dashboard.js
 import { fetchGuilds, fetchMe, logout } from './api.js';
-import { applyLogos } from './logo.js';
 import {
   cacheGuilds,
   loadCachedGuilds,
@@ -61,6 +60,18 @@ async function ensureGuildsLoaded() {
   refreshGuildSwitch();
 }
 
+function ensureSelectedGuild() {
+  if (!state.user || !state.guilds.length) return false;
+  const cached = loadCachedSelected(state.user.id);
+  if (cached && state.guilds.some((g) => g.id === cached)) {
+    setSelectedGuild(cached, { persist: false });
+    updateGuildHeader();
+    refreshGuildSwitch();
+    return true;
+  }
+  return false;
+}
+
 async function loadSession() {
   try {
     const me = await fetchMe();
@@ -69,12 +80,18 @@ async function loadSession() {
 
     await ensureGuildsLoaded();
 
-    // Immer Modal anzeigen nach Login, damit explizite Auswahl erfolgt
-    showDashboardSkeleton(true);
-    openGuildSelectModal(() => {
+    const hasSelection = ensureSelectedGuild();
+
+    if (!hasSelection) {
+      showDashboardSkeleton(true);
+      openGuildSelectModal(() => {
+        showDashboardSkeleton(false);
+        refreshGuildSwitch();
+      });
+    } else {
       showDashboardSkeleton(false);
       refreshGuildSwitch();
-    });
+    }
 
     // URL /dashboard
     if (window.location.pathname.endsWith('dashboard.html')) {
@@ -99,7 +116,6 @@ function initLogoutFallback() {
   });
 }
 
-applyLogos();
 initGuildSwitch();
 initProfile();
 initLogoutFallback();
