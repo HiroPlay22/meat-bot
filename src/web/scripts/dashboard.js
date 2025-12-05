@@ -67,6 +67,7 @@ function ensureSelectedGuild() {
   if (cached && state.guilds.some((g) => g.id === cached)) {
     setSelectedGuild(cached, { persist: false });
     updateGuildHeader();
+    refreshGuildSwitch();
     return true;
   }
   const preferred = state.guilds.find((g) => g.botPresent !== false) || state.guilds[0];
