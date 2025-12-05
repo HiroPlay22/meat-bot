@@ -11,7 +11,7 @@ import {
   setUser,
   state,
 } from './state.js';
-import { initGuildSwitch, openGuildSelectModal } from './guild-switch.js';
+import { initGuildSwitch, openGuildSelectModal, refreshGuildSwitch } from './guild-switch.js';
 import { initProfile, renderProfile } from './profile.js';
 import { startStatusPolling } from './status.js';
 
@@ -52,11 +52,13 @@ async function ensureGuildsLoaded() {
   const cached = loadCachedGuilds(state.user.id);
   if (cached.length) {
     setGuilds(cached);
+    refreshGuildSwitch();
     return;
   }
   const guilds = await fetchGuilds();
   setGuilds(guilds);
   cacheGuilds(state.user.id, guilds);
+  refreshGuildSwitch();
 }
 
 function ensureSelectedGuild() {
@@ -65,6 +67,13 @@ function ensureSelectedGuild() {
   if (cached && state.guilds.some((g) => g.id === cached)) {
     setSelectedGuild(cached, { persist: false });
     updateGuildHeader();
+    return true;
+  }
+  const preferred = state.guilds.find((g) => g.botPresent !== false) || state.guilds[0];
+  if (preferred) {
+    setSelectedGuild(preferred.id);
+    updateGuildHeader();
+    refreshGuildSwitch();
     return true;
   }
   return false;
@@ -83,6 +92,7 @@ async function loadSession() {
       showDashboardSkeleton(true);
       openGuildSelectModal(() => {
         showDashboardSkeleton(false);
+        refreshGuildSwitch();
       });
     } else {
       showDashboardSkeleton(false);

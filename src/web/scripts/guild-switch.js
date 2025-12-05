@@ -32,7 +32,13 @@ function renderMenu() {
     return;
   }
 
-  state.guilds.forEach((guild) => {
+  const sorted = [...state.guilds].sort((a, b) => {
+    const pa = a.botPresent === false ? 1 : 0;
+    const pb = b.botPresent === false ? 1 : 0;
+    return pa - pb;
+  });
+
+  sorted.forEach((guild) => {
     const unavailable = guild.botPresent === false;
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -100,6 +106,11 @@ export function initGuildSwitch() {
   });
 }
 
+export function refreshGuildSwitch() {
+  renderHeader();
+  renderMenu();
+}
+
 export function openGuildSelectModal(onSelect) {
   if (!state.guilds.length) return;
   const backdrop = document.createElement('div');
@@ -118,7 +129,13 @@ export function openGuildSelectModal(onSelect) {
   const list = document.createElement('div');
   list.className = 'mt-3 space-y-2 max-h-80 overflow-y-auto pr-1';
 
-  state.guilds.forEach((guild) => {
+  const sorted = [...state.guilds].sort((a, b) => {
+    const pa = a.botPresent === false ? 1 : 0;
+    const pb = b.botPresent === false ? 1 : 0;
+    return pa - pb;
+  });
+
+  sorted.forEach((guild) => {
     const unavailable = guild.botPresent === false;
     const card = document.createElement('button');
     card.type = 'button';
