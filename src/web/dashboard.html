@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="de" class="h-full">
   <head>
     <meta charset="utf-8" />
@@ -185,7 +185,7 @@
                           <path d="m3 3 2.64 2.64" />
                           <path d="M12 7v5" />
                         </svg>
-                        <span class="text-sm">Berechtigungen & Kanäle</span>
+                        <span class="text-sm">Berechtigungen & KanÃ¤le</span>
                       </div>
                       <span class="text-[10px] text-slate-500">WIP</span>
                     </a>
@@ -293,10 +293,10 @@
               </div>
 
               <!-- Real content -->
-              <div id="dashboard-content" class="hidden flex-1 flex-col gap-4">
+                            <div id="dashboard-content" class="hidden flex-1 flex-col gap-6">
                 <header class="flex flex-col gap-4 border-b border-slate-800/80 pb-4 lg:flex-row lg:items-center lg:justify-between">
                   <div class="space-y-2">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Server-Auswahl</p>
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Server-Auswahl</p>
                     <div class="relative inline-flex">
                       <button
                         id="guild-switch-button"
@@ -314,7 +314,6 @@
                         class="hidden absolute left-0 top-full z-20 mt-2 w-72 rounded-2xl border border-slate-800 bg-slate-950/95 p-2 shadow-xl shadow-slate-900/60 backdrop-blur-xl"
                       ></div>
                     </div>
-                    <p class="text-xs text-slate-500">Guild-spezifische Ansicht. Wechsel über die Auswahl oben.</p>
                   </div>
 
                   <div class="flex flex-wrap items-center gap-4">
@@ -364,197 +363,256 @@
                   </div>
                 </header>
 
-            <section class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4">
-              <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Statistiken & Monitoring</p>
-                  <h2 class="text-base font-semibold sm:text-lg">Aktivität & Modul-Nutzung</h2>
-                  <p class="mt-1 text-xs text-slate-400">
-                    Platzhalter-Grafiken für M.E.A.T. – sobald Live, ziehen wir echte Discord- und Sentinel-Daten.
-                  </p>
-                </div>
-                <div class="flex flex-col items-start gap-2 sm:items-end">
-                  <div class="flex items-center gap-2">
-                    <span class="whitespace-nowrap inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-1 text-[11px] font-medium text-emerald-300">
-                      <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                      Demo-Livefeed
-                    </span>
-                    <span class="whitespace-nowrap inline-flex items-center gap-1 rounded-full border border-slate-700/80 bg-slate-900/80 px-2 py-1 text-[11px] font-medium text-slate-300">
-                      7 Tage
-                    </span>
-                  </div>
-                  <p class="text-[11px] text-slate-500">
-                    Zuletzt aktualisiert: <span class="font-medium text-slate-200">—</span>
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Aktive User heute</p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-50">128</p>
-                  </div>
-                  <span class="whitespace-nowrap inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-[11px] text-emerald-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M5 15l5-5 4 4 5-9"></path>
-                    </svg>
-                    +12,4 %
-                  </span>
-                </div>
-                <p class="mt-2 text-[11px] text-slate-500">Im Vergleich zum Durchschnitt der letzten 7 Tage.</p>
-              </div>
-
-              <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Commands gesamt</p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-50">1.482</p>
-                  </div>
-                  <span class="whitespace-nowrap inline-flex items-center gap-1 rounded-full bg-slate-800/80 px-2 py-1 text-[11px] text-slate-300">
-                    7 Tage
-                  </span>
-                </div>
-                <p class="mt-2 text-[11px] text-slate-500">Globaler Meta-Counter über alle Module deines Servers.</p>
-              </div>
-
-              <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Aktive Module</p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-50">9<span class="text-base text-slate-500">/12</span></p>
-                  </div>
-                  <span class="whitespace-nowrap inline-flex items-center gap-1 rounded-full bg-indigo-500/10 px-2 py-1 text-[11px] text-indigo-300">
-                    Profil
-                  </span>
-                </div>
-                <p class="mt-2 text-[11px] text-slate-500">Module, die mindestens 1x in den letzten 7 Tagen genutzt wurden.</p>
-              </div>
-
-              <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Ø Reaktionszeit</p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-50">213<span class="text-base text-slate-400"> ms</span></p>
-                  </div>
-                  <span class="whitespace-nowrap inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-1 text-[11px] text-amber-300">
-                    Ping
-                  </span>
-                </div>
-                <p class="mt-2 text-[11px] text-slate-500">Gemessen über alle Commands der letzten Stunde (Demo).</p>
-              </div>
-            </div>
-
-            <div class="grid gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1.1fr)]">
-              <section class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 md:p-5">
-                <div class="flex items-start justify-between gap-4">
-                  <div>
-                    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Server-Aktivität</p>
-                    <h3 class="mt-1 text-sm font-semibold text-slate-50">Nachrichten & Commands (7 Tage)</h3>
-                    <p class="mt-1 text-[11px] text-slate-400">Zusammengefasste Demo-Werte für Messages & MEAT-Commands.</p>
-                  </div>
-                  <div class="flex flex-col items-end gap-1 text-[11px]">
-                    <div class="flex items-center gap-2">
-                      <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-emerald-300">
-                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-                        Messages
-                      </span>
-                      <span class="inline-flex items-center gap-1 rounded-full bg-sky-500/10 px-2 py-0.5 text-sky-300">
-                        <span class="h-1.5 w-1.5 rounded-full bg-sky-400"></span>
-                        Commands
-                      </span>
+                <div class="space-y-6">
+                  <section class="space-y-3">
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Dashboard</p>
+                    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                      <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
+                        <div class="flex items-start justify-between gap-3">
+                          <div>
+                            <h3 class="text-sm font-semibold text-slate-100">Übersicht</h3>
+                            <p class="mt-1 text-xs text-slate-400">Einstieg ins Control Center mit Status, Navigation und Guild-Switch.</p>
+                          </div>
+                          <span class="rounded-full border border-slate-800 bg-slate-900/80 p-2 text-slate-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M3 3v18h18" />
+                              <rect x="7" y="10" width="3" height="7" rx="1" />
+                              <rect x="12" y="7" width="3" height="10" rx="1" />
+                              <rect x="17" y="4" width="3" height="13" rx="1" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <p class="text-slate-500">Peaks: Mo & Do · 20–21 Uhr</p>
-                  </div>
-                </div>
+                  </section>
 
-                <div class="mt-4">
-                  <div class="h-64 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800/60 to-slate-900 shadow-inner shadow-slate-950/40"></div>
-                </div>
-
-                <div class="mt-4 grid gap-3 border-t border-slate-800/80 pt-4 text-[11px] sm:grid-cols-3">
-                  <div class="space-y-1">
-                    <p class="uppercase tracking-[0.16em] text-slate-500">Aktivste Tage</p>
-                    <p class="text-slate-100">Montag & Donnerstag</p>
-                  </div>
-                  <div class="space-y-1">
-                    <p class="uppercase tracking-[0.16em] text-slate-500">MEAT-Anteil</p>
-                    <p class="text-slate-100">37 % der Interaktionen</p>
-                  </div>
-                  <div class="space-y-1">
-                    <p class="uppercase tracking-[0.16em] text-slate-500">Nächster Schritt</p>
-                    <p class="text-slate-100">Anbindung an Sentinel & DB.</p>
-                  </div>
-                </div>
-              </section>
-
-              <section class="flex flex-col rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 md:p-5">
-                <div class="flex items-start justify-between gap-4">
-                  <div>
-                    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Modul-Nutzung</p>
-                    <h3 class="mt-1 text-sm font-semibold text-slate-50">Verteilung der MEAT-Module</h3>
-                    <p class="mt-1 text-[11px] text-slate-400">Welche Module aktuell am meisten Action sehen (Demo).</p>
-                  </div>
-                  <span class="whitespace-nowrap inline-flex items-center gap-1 rounded-full border border-slate-700/80 bg-slate-950/90 px-2 py-1 text-[10px] text-slate-300">
-                    Demo · 100%
-                  </span>
-                </div>
-
-                <div class="mt-4 flex flex-1 items-center justify-center">
-                  <div class="h-60 w-full rounded-full bg-gradient-to-br from-slate-900 via-slate-800/60 to-slate-900 shadow-inner shadow-slate-950/30"></div>
-                </div>
-
-                <div class="mt-4 grid gap-2 text-[11px] text-slate-300">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                      <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
-                      <span>Core Utility / Meta-Stats</span>
+                  <section class="space-y-3">
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Community & Events</p>
+                    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                      <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
+                        <div class="flex items-start justify-between gap-3">
+                          <div>
+                            <h3 class="text-sm font-semibold text-slate-100">Profil</h3>
+                            <p class="mt-1 text-xs text-slate-400">Dein Displayname, Avatar und Serverrolle im MEAT-Dashboard.</p>
+                          </div>
+                          <span class="rounded-full border border-slate-800 bg-slate-900/80 p-2 text-slate-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Z" />
+                              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
+                        <div class="flex items-start justify-between gap-3">
+                          <div>
+                            <h3 class="text-sm font-semibold text-slate-100">Events & Termine</h3>
+                            <p class="mt-1 text-xs text-slate-400">Planung und Übersicht geplanter Sessions. Live-Schaltung folgt.</p>
+                            <span class="mt-2 inline-flex rounded-full bg-slate-800/80 px-2 py-0.5 text-[10px] text-slate-400">WIP</span>
+                          </div>
+                          <span class="rounded-full border border-slate-800 bg-slate-900/80 p-2 text-slate-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M8 2v4" />
+                              <path d="M16 2v4" />
+                              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                              <path d="M3 10h18" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
+                        <div class="flex items-start justify-between gap-3">
+                          <div>
+                            <h3 class="text-sm font-semibold text-slate-100">Clip-Queue</h3>
+                            <p class="mt-1 text-xs text-slate-400">Short-Form-Clips sammeln, filtern und später bewerten.</p>
+                            <span class="mt-2 inline-flex rounded-full bg-slate-800/80 px-2 py-0.5 text-[10px] text-slate-400">WIP</span>
+                          </div>
+                          <span class="rounded-full border border-slate-800 bg-slate-900/80 p-2 text-slate-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M4 17v-2a4 4 0 0 1 4-4h8" />
+                              <path d="m14 9 5 3-5 3" />
+                              <path d="M12 13v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
+                        <div class="flex items-start justify-between gap-3">
+                          <div>
+                            <h3 class="text-sm font-semibold text-slate-100">Statistiken</h3>
+                            <p class="mt-1 text-xs text-slate-400">Auswertung von Commands, Nutzung und Trends – opt-in aware.</p>
+                            <span class="mt-2 inline-flex rounded-full bg-slate-800/80 px-2 py-0.5 text-[10px] text-slate-400">WIP</span>
+                          </div>
+                          <span class="rounded-full border border-slate-800 bg-slate-900/80 p-2 text-slate-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M3 3v18h18" />
+                              <rect x="7" y="10" width="3" height="7" rx="1" />
+                              <rect x="12" y="7" width="3" height="10" rx="1" />
+                              <rect x="17" y="4" width="3" height="13" rx="1" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <span class="text-slate-400">42 %</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                      <span class="h-2 w-2 rounded-full bg-sky-400"></span>
-                      <span>Games & League-Module</span>
+                  </section>
+
+                  <section class="space-y-3">
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">M.E.A.T.</p>
+                    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                      <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
+                        <div class="flex items-start justify-between gap-3">
+                          <div>
+                            <h3 class="text-sm font-semibold text-slate-100">Module & Funktionen</h3>
+                            <p class="mt-1 text-xs text-slate-400">Konfiguration der MEAT-Module, Rechte und Sichtbarkeit.</p>
+                            <span class="mt-2 inline-flex rounded-full bg-slate-800/80 px-2 py-0.5 text-[10px] text-slate-400">WIP</span>
+                          </div>
+                          <span class="rounded-full border border-slate-800 bg-slate-900/80 p-2 text-slate-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M10 6h4" />
+                              <path d="M12 4v2" />
+                              <rect x="4" y="6" width="16" height="14" rx="2" />
+                              <path d="M9 10h6" />
+                              <path d="M9 14h6" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <span class="text-slate-400">28 %</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                      <span class="h-2 w-2 rounded-full bg-fuchsia-400"></span>
-                      <span>ARK / Dino-NameGen</span>
+                  </section>
+
+                  <section class="space-y-3">
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Admin / Owner</p>
+                    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                      <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
+                        <div class="flex items-start justify-between gap-3">
+                          <div>
+                            <h3 class="text-sm font-semibold text-slate-100">Berechtigungen & Kanäle</h3>
+                            <p class="mt-1 text-xs text-slate-400">Rollen- und Kanalregeln für Commands und Module.</p>
+                            <span class="mt-2 inline-flex rounded-full bg-slate-800/80 px-2 py-0.5 text-[10px] text-slate-400">WIP</span>
+                          </div>
+                          <span class="rounded-full border border-slate-800 bg-slate-900/80 p-2 text-slate-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M14 17a2 2 0 1 0-4 0" />
+                              <path d="M21 12a9 9 0 1 1-9-9" />
+                              <path d="m3 3 2.64 2.64" />
+                              <path d="M12 7v5" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
+                        <div class="flex items-start justify-between gap-3">
+                          <div>
+                            <h3 class="text-sm font-semibold text-slate-100">Logs</h3>
+                            <p class="mt-1 text-xs text-slate-400">Zugriff auf Bot-Logs, Fehler und Audit-Spuren.</p>
+                            <span class="mt-2 inline-flex rounded-full bg-slate-800/80 px-2 py-0.5 text-[10px] text-slate-400">WIP</span>
+                          </div>
+                          <span class="rounded-full border border-slate-800 bg-slate-900/80 p-2 text-slate-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M3 3h18v4H3z" />
+                              <path d="M8 7v14" />
+                              <path d="M16 7v14" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <span class="text-slate-400">17 %</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                      <span class="h-2 w-2 rounded-full bg-amber-400"></span>
-                      <span>Feedback & Utility</span>
+                  </section>
+
+                  <section class="space-y-3">
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Sentinel M.E.A.T.</p>
+                    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                      <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
+                        <div class="flex items-start justify-between gap-3">
+                          <div>
+                            <h3 class="text-sm font-semibold text-slate-100">Monitoring & Status</h3>
+                            <p class="mt-1 text-xs text-slate-400">Health, Latenz und Ausfälle für den Bot im Blick behalten.</p>
+                            <span class="mt-2 inline-flex rounded-full bg-slate-800/80 px-2 py-0.5 text-[10px] text-slate-400">WIP</span>
+                          </div>
+                          <span class="rounded-full border border-slate-800 bg-slate-900/80 p-2 text-slate-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                              <circle cx="12" cy="12" r="3" />
+                              <path d="M12 2v2" />
+                              <path d="M12 20v2" />
+                              <path d="m4.93 4.93 1.41 1.41" />
+                              <path d="m17.66 17.66 1.41 1.41" />
+                              <path d="M2 12h2" />
+                              <path d="M20 12h2" />
+                              <path d="m6.34 17.66-1.41 1.41" />
+                              <path d="m19.07 4.93-1.41 1.41" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
+                        <div class="flex items-start justify-between gap-3">
+                          <div>
+                            <h3 class="text-sm font-semibold text-slate-100">Datenschutz & Sicherheit</h3>
+                            <p class="mt-1 text-xs text-slate-400">Opt-in, Logging-Grenzen und Sentinel-Policies steuern.</p>
+                            <span class="mt-2 inline-flex rounded-full bg-slate-800/80 px-2 py-0.5 text-[10px] text-slate-400">WIP</span>
+                          </div>
+                          <span class="rounded-full border border-slate-800 bg-slate-900/80 p-2 text-slate-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4Z" />
+                              <path d="M4 20c0-2 4-4 8-4s8 2 8 4" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <span class="text-slate-400">13 %</span>
-                  </div>
+                  </section>
+
+                  <section class="space-y-3">
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Integrationen & Info</p>
+                    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                      <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
+                        <div class="flex items-start justify-between gap-3">
+                          <div>
+                            <h3 class="text-sm font-semibold text-slate-100">Integrationen</h3>
+                            <p class="mt-1 text-xs text-slate-400">Verknüpfungen zu externen Diensten. Auth, Webhooks, mehr.</p>
+                            <span class="mt-2 inline-flex rounded-full bg-slate-800/80 px-2 py-0.5 text-[10px] text-slate-400">WIP</span>
+                          </div>
+                          <span class="rounded-full border border-slate-800 bg-slate-900/80 p-2 text-slate-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M20 13V7a2 2 0 0 0-2-2h-4" />
+                              <path d="M14 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2z" />
+                              <path d="M20 7 14 7" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 shadow-sm shadow-slate-950/60">
+                        <div class="flex items-start justify-between gap-3">
+                          <div>
+                            <h3 class="text-sm font-semibold text-slate-100">Hilfe & Info</h3>
+                            <p class="mt-1 text-xs text-slate-400">Support, Changelog und Hinweise für Admins und Mods.</p>
+                            <span class="mt-2 inline-flex rounded-full bg-slate-800/80 px-2 py-0.5 text-[10px] text-slate-400">WIP</span>
+                          </div>
+                          <span class="rounded-full border border-slate-800 bg-slate-900/80 p-2 text-slate-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                              <circle cx="12" cy="12" r="10" />
+                              <path d="M12 16v-4" />
+                              <path d="M12 8h.01" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
                 </div>
-              </section>
-            </div>
 
-            <footer class="mt-2 flex flex-col gap-2 border-t border-slate-800/80 pt-3 text-[11px] text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-              <p>M.E.A.T. · CONSTRUCT-MEAT · v0.0.7</p>
-              <p>UI: Tailwind · Worker-Routing via Cloudflare</p>
-            </footer>
-          </div>
-        </div>
-      </div>
-    </main>
-
+                <footer class="mt-2 flex flex-col gap-2 border-t border-slate-800/80 pt-3 text-[11px] text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+                  <p>M.E.A.T. · CONSTRUCT-MEAT · v0.0.7</p>
+                  <p>UI: Tailwind · Worker-Routing: Cloudflare · Bot-Hosting: Railway</p>
+                </footer>
+              </div>
     <!-- Guild selection modal -->
     <div id="guild-modal" class="fixed inset-0 z-20 hidden items-center justify-center bg-slate-950/70 backdrop-blur">
       <div class="w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900/95 p-6 shadow-xl shadow-slate-900/70">
         <div class="flex items-start justify-between gap-3">
           <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Server wählen</p>
-            <h3 class="text-lg font-semibold text-slate-100">Für welchen Server soll das Dashboard laden?</h3>
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Server wÃ¤hlen</p>
+            <h3 class="text-lg font-semibold text-slate-100">FÃ¼r welchen Server soll das Dashboard laden?</h3>
             <p class="text-[11px] text-slate-500 mt-1">Nur freigeschaltete Server werden angezeigt.</p>
           </div>
         </div>
@@ -565,3 +623,9 @@
     <script type="module" src="scripts/dashboard.js"></script>
   </body>
 </html>
+
+
+
+
+
+
