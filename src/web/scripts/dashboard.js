@@ -3,6 +3,7 @@ import { fetchGuildOverview } from './api.js';
 import { state, subscribe, setOverview, setUser } from './state.js';
 import { bootstrapLayout } from './layout.js';
 import { cacheDisplayName } from './state.js';
+import { renderProfile } from './profile.js';
 
 const dashboardContent = document.getElementById('dashboard-content');
 const currentGuildName = document.getElementById('current-guild-name');
