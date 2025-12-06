@@ -8,6 +8,7 @@
     "build": "tsc && node scripts/copy-texts.cjs",
     "start": "node dist/bot/index.js",
     "web:start": "serve dist/web -l 8080",
+    "web:deploy": "pnpm run web:build && pnpm run web:start",
     "register:dev": "tsx src/bot/registerCommands.ts",
     "clear:global": "tsx src/bot/clearGlobalCommands.ts",
     "prisma:migrate": "prisma migrate dev --name init",
