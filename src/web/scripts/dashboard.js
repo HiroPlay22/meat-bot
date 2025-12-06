@@ -174,6 +174,7 @@ async function loadGuildMemberData() {
     toggleRoleSkeleton(false);
     showDashboardSkeleton(false);
   } catch (error) {
+    console.error('loadGuildMemberData failed', error);
     updateUserRoleBadge(null);
     updateUserRoleTags([]);
     renderCalendar(calendarCurrentDate, calendarHighlights);

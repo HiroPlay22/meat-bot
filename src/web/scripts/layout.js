@@ -1,7 +1,8 @@
 // FILE: src/web/scripts/layout.js
-import { fetchGuilds, fetchMe, logout } from './api.js';
+import { fetchGuildOverview, fetchGuilds, fetchMe, logout } from './api.js';
 import {
   cacheGuilds,
+  cacheDisplayName,
   loadCachedGuilds,
   loadCachedDisplayName,
   loadCachedSelected,
@@ -20,9 +21,16 @@ const headerGuildTitle = document.getElementById('header-guild-title');
 const heroGuildTitle = document.getElementById('hero-guild-title');
 const navProfileLabel = document.getElementById('nav-profile-label');
 const pageContent = document.getElementById('page-content');
+const sidebar = document.querySelector('[data-sidebar]');
 
-if (pageContent) {
-  pageContent.classList.add('opacity-0', 'pointer-events-none', 'transition-opacity', 'duration-200');
+const chromeTargets = [pageContent, sidebar].filter(Boolean);
+chromeTargets.forEach((el) => el.classList.add('opacity-0', 'pointer-events-none', 'transition-opacity', 'duration-200'));
+
+function showChrome() {
+  chromeTargets.forEach((el) => {
+    el.classList.remove('opacity-0', 'pointer-events-none');
+    el.classList.add('opacity-100');
+  });
 }
 
 function setNavProfile(displayName) {
@@ -54,14 +62,28 @@ async function ensureGuildsLoaded() {
   refreshGuildSwitch();
 }
 
-function applyCachedDisplayName() {
+async function ensureDisplayNameFromGuild() {
   if (!state.user || !state.selectedGuildId) return;
+
   const cached = loadCachedDisplayName(state.user.id, state.selectedGuildId);
   if (cached) {
     const updated = { ...state.user, displayName: cached };
     setUser(updated);
     renderProfile(updated);
     setNavProfile(cached);
+    return;
+  }
+
+  try {
+    const overview = await fetchGuildOverview(state.selectedGuildId);
+    const displayName = overview?.member?.displayName || state.user.displayName || state.user.username;
+    const updated = { ...state.user, displayName };
+    setUser(updated);
+    renderProfile(updated);
+    setNavProfile(displayName);
+    cacheDisplayName(state.user.id, state.selectedGuildId, displayName);
+  } catch (err) {
+    // Anzeige bleibt wie bisher
   }
 }
 
@@ -115,23 +137,22 @@ export async function bootstrapLayout({ onGuildChanged } = {}) {
     const hasSelection = ensureSelectedGuild();
 
     const proceed = async () => {
-      applyCachedDisplayName();
+      await ensureDisplayNameFromGuild();
       updateGuildHeader();
       refreshGuildSwitch();
       if (onGuildChanged && state.selectedGuildId) {
         await onGuildChanged(state.selectedGuildId);
       }
-      if (pageContent) {
-        pageContent.classList.remove('opacity-0', 'pointer-events-none');
-        pageContent.classList.add('opacity-100');
-      }
+      showChrome();
     };
 
     if (!hasSelection) {
+      showChrome();
       openGuildSelectModal(async () => {
         await proceed();
       });
     } else {
+      showChrome();
       await proceed();
     }
 
