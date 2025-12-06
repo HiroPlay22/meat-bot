@@ -587,8 +587,20 @@ async function handleGuilds(req: IncomingMessage, res: ServerResponse) {
       200,
       enriched,
     );
-  } catch (error) {
-    logError('Fehler beim Laden der Guilds', { functionName: 'apiGuilds', extra: { error } });
+  } catch (error: any) {
+    logError('Fehler beim Laden der Guilds', {
+      functionName: 'apiGuilds',
+      extra: {
+        error: {
+          message: error?.message,
+          name: error?.name,
+          stack: error?.stack,
+          code: error?.code,
+          status: error?.status,
+        },
+        userId: session?.user?.id,
+      },
+    });
     return json(res, 500, { error: 'guilds_failed' });
   }
 }
