@@ -16,9 +16,7 @@ import { initProfile, renderProfile } from './profile.js';
 import { startStatusPolling } from './status.js';
 
 const sidebarReal = document.getElementById('sidebar-real');
-const sidebarSkeleton = document.getElementById('sidebar-skeleton');
 const dashboardContent = document.getElementById('dashboard-content');
-const dashboardSkeleton = document.getElementById('dashboard-skeleton');
 const currentGuildName = document.getElementById('current-guild-name');
 const currentGuildAvatar = document.getElementById('current-guild-avatar');
 const navProfileLabel = document.getElementById('nav-profile-label');
@@ -29,7 +27,6 @@ const profileCardTitle = document.getElementById('card-profile-title');
 const userRoleBadge = document.getElementById('user-role-badge');
 const userRoleTags = document.getElementById('user-role-tags');
 const roleContent = document.getElementById('role-content');
-const profileSkeleton = document.getElementById('profile-skeleton');
 const calendarMonthLabel = document.getElementById('calendar-month');
 const calendarGrid = document.getElementById('calendar-grid');
 const calendarPrevBtn = document.getElementById('calendar-prev');
@@ -39,13 +36,8 @@ const calendarNowBtn = document.getElementById('calendar-now');
 let calendarCurrentDate = new Date();
 let calendarHighlights = [];
 
-function showDashboardSkeleton(showSkeleton, includeSidebar = false) {
-  if (dashboardSkeleton) dashboardSkeleton.classList.toggle('hidden', !showSkeleton);
-  if (dashboardContent) dashboardContent.classList.toggle('hidden', showSkeleton);
-  if (includeSidebar) {
-    if (sidebarSkeleton) sidebarSkeleton.classList.toggle('hidden', !showSkeleton);
-    if (sidebarReal) sidebarReal.classList.toggle('hidden', showSkeleton);
-  }
+function showDashboardSkeleton() {
+  // Skeleton entfernt: nichts mehr zu togglen
 }
 
 function updateGuildHeader() {
@@ -124,10 +116,7 @@ function updateUserRoleTags(roles = []) {
   }
 }
 
-function toggleRoleSkeleton(isLoading) {
-  if (profileSkeleton) profileSkeleton.classList.toggle('hidden', !isLoading);
-  if (roleContent) roleContent.classList.toggle('hidden', isLoading);
-}
+function toggleRoleSkeleton() {}
 
 function setupDropdownExclusivity() {
   const guildMenu = document.getElementById('guild-switch-menu');
@@ -372,7 +361,7 @@ initGuildSwitch();
 initProfile();
 initLogoutFallback();
 startStatusPolling();
-showDashboardSkeleton(true, true);
+showDashboardSkeleton(true);
 setupDropdownExclusivity();
 renderCalendar(calendarCurrentDate, calendarHighlights);
 if (calendarPrevBtn) {
