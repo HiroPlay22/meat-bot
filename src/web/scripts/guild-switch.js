@@ -87,7 +87,14 @@ function renderMenu() {
 
 function toggleMenu() {
   if (!guildSwitchMenu) return;
-  guildSwitchMenu.classList.toggle('hidden');
+  const isHidden = guildSwitchMenu.classList.contains('hidden');
+  if (isHidden) {
+    guildSwitchMenu.classList.remove('hidden');
+    guildSwitchMenu.style.display = 'block';
+  } else {
+    guildSwitchMenu.classList.add('hidden');
+    guildSwitchMenu.style.display = 'none';
+  }
 }
 
 export function initGuildSwitch() {
