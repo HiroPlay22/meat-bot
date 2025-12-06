@@ -4,9 +4,10 @@
 
 {% block content %}
 <div class="flex flex-col gap-8">
-  {% set page_label = "Events" %}
-  {% set page_title = "Events & Termine" %}
-  {% include "templates/partials/page-header.njk" %}
+{% set page_label = "Events" %}
+{% set page_title = "Events & Termine" %}
+{% set page_static_title = true %}
+{% include "templates/partials/page-header.njk" %}
 
   <section class="grid gap-4">
     <div class="rounded-3xl border border-slate-800/80 bg-slate-900/80 p-6 shadow-lg shadow-slate-950/60 min-h-[320px]">
@@ -26,4 +27,5 @@
 
 {% block scripts %}
 {{ super() }}
+<script type="module" src="scripts/events.js"></script>
 {% endblock %}

@@ -2,7 +2,13 @@
   <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
     <div class="space-y-1">
       <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{{ page_label or 'Dashboard' }}</p>
-      <h1 class="text-xl font-bold text-slate-100" id="hero-guild-title">{{ page_title or 'Control Center' }}</h1>
+      <h1
+        class="text-xl font-bold text-slate-100"
+        id="hero-guild-title"
+        data-static-title="{{ page_static_title and 'true' or 'false' }}"
+      >
+        {{ page_title or 'Control Center' }}
+      </h1>
     </div>
     <div class="flex flex-wrap items-center gap-3">
       <div class="relative inline-flex">

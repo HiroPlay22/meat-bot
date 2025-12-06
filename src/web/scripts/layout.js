@@ -8,6 +8,7 @@ import {
   loadCachedSelected,
   resetState,
   setGuilds,
+  setOverview,
   setSelectedGuild,
   setUser,
   state,
@@ -77,6 +78,7 @@ async function ensureDisplayNameFromGuild() {
   try {
     const overview = await fetchGuildOverview(state.selectedGuildId);
     const displayName = overview?.member?.displayName || state.user.displayName || state.user.username;
+    setOverview(overview);
     const updated = { ...state.user, displayName };
     setUser(updated);
     renderProfile(updated);
@@ -170,6 +172,10 @@ export async function bootstrapLayout({ onGuildChanged } = {}) {
     if (onGuildChanged && state.selectedGuildId) {
       await onGuildChanged(state.selectedGuildId);
     }
+  });
+
+  subscribe('overviewUpdated', () => {
+    // reserved for future cross-page reactions
   });
 }
 

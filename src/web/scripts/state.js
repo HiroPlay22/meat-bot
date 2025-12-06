@@ -8,6 +8,7 @@ export const state = {
   user: null,
   guilds: [],
   selectedGuildId: null,
+  overview: null,
   status: 'online',
   language: localStorage.getItem('meat_lang') || 'de',
 };
@@ -57,11 +58,17 @@ export function setGuilds(guilds) {
 
 export function setSelectedGuild(guildId, { persist = true } = {}) {
   state.selectedGuildId = guildId;
+  state.overview = null;
   if (persist && state.user) {
     const keys = storageKeys(state.user.id);
     sessionStorage.setItem(keys.selected, guildId ?? '');
   }
   emit('guildChanged', guildId);
+}
+
+export function setOverview(overview) {
+  state.overview = overview || null;
+  emit('overviewUpdated', state.overview);
 }
 
 export function setStatus(status) {

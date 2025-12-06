@@ -1,6 +1,6 @@
 // FILE: src/web/scripts/dashboard.js
 import { fetchGuildOverview } from './api.js';
-import { state, subscribe } from './state.js';
+import { state, subscribe, setOverview } from './state.js';
 import { bootstrapLayout } from './layout.js';
 import { cacheDisplayName } from './state.js';
 
@@ -128,7 +128,8 @@ async function loadGuildMemberData() {
   showDashboardSkeleton(true);
   toggleRoleSkeleton(true);
   try {
-    const data = await fetchGuildOverview(state.selectedGuildId);
+    const data = state.overview || (await fetchGuildOverview(state.selectedGuildId));
+    if (!state.overview) setOverview(data);
     const displayName = data?.member?.displayName || state.user?.displayName || state.user?.username || 'User';
     applyUserDisplayName(displayName);
     if (state.user) {
@@ -291,6 +292,11 @@ if (calendarNowBtn) {
 }
 subscribe('guildChanged', () => {
   updateGuildHeader();
+  loadGuildMemberData();
+});
+
+subscribe('overviewUpdated', () => {
+  // Neu geladene Overview direkt rendern, ohne zweiten Fetch
   loadGuildMemberData();
 });
 
