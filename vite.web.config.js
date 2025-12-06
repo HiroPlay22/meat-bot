@@ -18,7 +18,7 @@ export default defineConfig({
   },
   plugins: [
     nunjucks({
-      templatesDir: path.resolve(__dirname, 'src/web/templates'),
+      searchPaths: [path.resolve(__dirname, 'src/web/templates')],
     }),
   ],
   server: {
