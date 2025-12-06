@@ -4,14 +4,9 @@
 
 {% block content %}
 <div class="flex flex-col gap-8">
-  <header class="flex flex-col gap-4 rounded-3xl border border-slate-800/80 bg-slate-900/70 p-4 shadow-sm shadow-slate-950/60 sm:p-5 mb-6">
-    <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-      <div class="space-y-1">
-        <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Events</p>
-        <h1 class="text-xl font-bold text-slate-100">Events & Termine</h1>
-      </div>
-    </div>
-  </header>
+  {% set page_label = "Events" %}
+  {% set page_title = "Events & Termine" %}
+  {% include "templates/partials/page-header.njk" %}
 
   <section class="grid gap-4">
     <div class="rounded-3xl border border-slate-800/80 bg-slate-900/80 p-6 shadow-lg shadow-slate-950/60 min-h-[320px]">
