@@ -699,7 +699,10 @@ async function handleGuildOverview(req: IncomingMessage, res: ServerResponse, gu
     const highestRole = memberRoles[0] || null;
     const displayName = member.nick || member.user.global_name || member.user.username;
     const consentStatus = consent?.status ?? 'NONE';
-    const includeBirthday = consentStatus === 'ALLOWED' && profile?.birthday ? [{ userId: session.user.id, birthday: profile.birthday }] : [];
+    const includeBirthday =
+      consentStatus === 'ALLOWED' && profile?.birthday
+        ? [{ userId: session.user.id, birthday: profile.birthday, displayName }]
+        : [];
 
     return json(res, 200, {
       guild: {

@@ -168,7 +168,12 @@ async function loadGuildMemberData() {
     const birthdayHighlights = Array.isArray(data?.birthdays)
       ? data.birthdays
           .filter((entry) => entry?.birthday)
-          .map((entry) => ({ date: entry.birthday, type: 'Geburtstag', color: '#f472b6' }))
+          .map((entry) => ({
+            date: entry.birthday,
+            type: 'Geburtstag',
+            label: entry.displayName ? `${entry.displayName} (Geburtstag)` : 'Geburtstag',
+            color: '#f472b6',
+          }))
       : [];
     const eventHighlights = Array.isArray(data?.events)
       ? data.events
@@ -229,28 +234,33 @@ function renderCalendar(date = new Date(), highlights = []) {
             year: dt.getFullYear(),
             color: h?.color || '#22d3ee',
             type: h?.type || 'event',
+            label: h?.label || h?.type || 'event',
           };
         })
         .filter(Boolean)
     : [];
 
   for (let d = 1; d <= daysInMonth; d += 1) {
+    const dayHighlights = normalizedHighlights.filter((h) => h.day === d && h.month === month && h.year === year);
+    const hasHighlight = dayHighlights.length > 0;
+    const primary = hasHighlight ? dayHighlights[0] : null;
+    const bgClass = hasHighlight ? '' : 'bg-slate-800/60 hover:bg-slate-800/80';
     const span = document.createElement('span');
     span.textContent = String(d);
-    const base = 'flex items-center justify-center py-2 rounded-xl transition text-slate-100';
-    const todayClass =
-      isSameMonth && today.getDate() === d
-        ? 'bg-gradient-to-br from-meat.primary/70 to-meat.accent/60 border border-meat.primary/60 shadow-meat-glow'
-        : 'bg-slate-800/60 hover:bg-slate-800/80';
-    const dayHighlights = normalizedHighlights.filter((h) => h.day === d && h.month === month && h.year === year);
-    span.className = `${base} ${todayClass}`;
-    if (dayHighlights.length) {
-      const dot = document.createElement('span');
-      dot.className = 'absolute top-1 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full';
-      dot.style.background = dayHighlights[0].color;
-      span.classList.add('relative');
-      span.appendChild(dot);
-      span.title = dayHighlights.map((h) => h.type).join(', ');
+    span.className = `group relative flex items-center justify-center py-2 rounded-xl transition text-slate-100 ${bgClass}`;
+    if (isSameMonth && today.getDate() === d) {
+      span.classList.add('ring', 'ring-meat.primary/40');
+    }
+    if (primary) {
+      span.style.background = primary.color;
+      span.style.color = '#0f172a';
+      span.style.border = '1px solid rgba(15,23,42,0.2)';
+      const tooltip = document.createElement('div');
+      tooltip.setAttribute('role', 'tooltip');
+      tooltip.className =
+        'pointer-events-none absolute z-10 -top-1/2 left-1/2 w-max -translate-x-1/2 -translate-y-full rounded-base bg-slate-900 text-white text-xs px-3 py-2 shadow-xl shadow-slate-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200';
+      tooltip.textContent = dayHighlights.map((h) => h.label || h.type).join(', ');
+      span.appendChild(tooltip);
     }
     calendarGrid.appendChild(span);
   }
