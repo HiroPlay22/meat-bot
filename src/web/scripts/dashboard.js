@@ -71,6 +71,47 @@ function applyUserDisplayName(displayName) {
   }
 }
 
+function renderOverviewData(data) {
+  if (!data) return;
+  const displayName = data?.member?.displayName || state.user?.displayName || state.user?.username || 'User';
+  applyUserDisplayName(displayName);
+  if (state.user) {
+    const updatedUser = { ...state.user, displayName };
+    setUser(updatedUser);
+    renderProfile(updatedUser);
+    cacheDisplayName(state.user.id, state.selectedGuildId, displayName);
+  }
+  const memberRoleIds = Array.isArray(data?.member?.roles) ? data.member.roles : [];
+  const rolesSorted = Array.isArray(data?.roles)
+    ? data.roles.filter((r) => memberRoleIds.includes(r.id)).sort((a, b) => (b.position ?? 0) - (a.position ?? 0))
+    : [];
+  const highest = data?.highestRoleResolved || rolesSorted[0] || null;
+  updateUserRoleBadge(highest || null);
+  const tagRoles = highest ? rolesSorted.filter((r) => r.id !== highest.id) : rolesSorted;
+  updateUserRoleTags(tagRoles);
+  const birthdayHighlights = Array.isArray(data?.birthdays)
+    ? data.birthdays
+        .filter((entry) => entry?.birthday)
+        .map((entry) => ({
+          date: entry.birthday,
+          type: 'Geburtstag',
+          label: entry.displayName ? `${entry.displayName} (Geburtstag)` : 'Geburtstag',
+          color: '#f472b6',
+        }))
+    : [];
+  const eventHighlights = Array.isArray(data?.events)
+    ? data.events
+        .filter((ev) => ev?.startTime)
+        .map((ev) => ({ date: ev.startTime, type: ev.name || 'Event', label: ev.name || 'Event', color: '#22d3ee' }))
+    : [];
+  const holidayHighlights = Array.isArray(data?.holidays)
+    ? data.holidays.map((h) => ({ date: h.date, type: h.name || 'Feiertag', label: h.name || 'Feiertag', color: '#94a3b8' }))
+    : [];
+  calendarHighlights = [...birthdayHighlights, ...eventHighlights, ...holidayHighlights];
+  calendarCurrentDate = new Date();
+  renderCalendar(calendarCurrentDate, calendarHighlights);
+}
+
 function updateUserRoleBadge(role) {
   if (!role) {
     setProfileAccent('');
@@ -136,55 +177,15 @@ async function loadGuildMemberData() {
   try {
     const data = state.overview || (await fetchGuildOverview(state.selectedGuildId));
     if (!state.overview) setOverview(data);
-    const displayName = data?.member?.displayName || state.user?.displayName || state.user?.username || 'User';
-    applyUserDisplayName(displayName);
-    if (state.user) {
-      const updatedUser = { ...state.user, displayName };
-      setUser(updatedUser);
-      renderProfile(updatedUser);
-      cacheDisplayName(state.user.id, state.selectedGuildId, displayName);
-    }
-    if (navProfileLabel) {
-      const possessive = /[sS]$/.test(displayName) ? `${displayName}' Profil` : `${displayName}'s Profil`;
-      navProfileLabel.textContent = possessive;
-    }
-    const memberRoleIds = Array.isArray(data?.member?.roles) ? data.member.roles : [];
-    const rolesSorted = Array.isArray(data?.roles)
-      ? data.roles.filter((r) => memberRoleIds.includes(r.id)).sort((a, b) => (b.position ?? 0) - (a.position ?? 0))
-      : [];
-    const highest = data?.highestRoleResolved || rolesSorted[0] || null;
-    updateUserRoleBadge(highest || null);
-    // Rolle im Badge nicht doppelt in Tags
-    const tagRoles = highest ? rolesSorted.filter((r) => r.id !== highest.id) : rolesSorted;
-    updateUserRoleTags(tagRoles);
-    const birthdayHighlights = Array.isArray(data?.birthdays)
-      ? data.birthdays
-          .filter((entry) => entry?.birthday)
-          .map((entry) => ({
-            date: entry.birthday,
-            type: 'Geburtstag',
-            label: entry.displayName ? `${entry.displayName} (Geburtstag)` : 'Geburtstag',
-            color: '#f472b6',
-          }))
-      : [];
-    const eventHighlights = Array.isArray(data?.events)
-      ? data.events
-          .filter((ev) => ev?.startTime)
-          .map((ev) => ({ date: ev.startTime, type: ev.name || 'Event', color: '#22d3ee' }))
-      : [];
-    const holidayHighlights = Array.isArray(data?.holidays)
-      ? data.holidays.map((h) => ({ date: h.date, type: h.name || 'Feiertag', color: '#94a3b8' }))
-      : [];
-    calendarHighlights = [...birthdayHighlights, ...eventHighlights, ...holidayHighlights];
-    calendarCurrentDate = new Date();
-    renderCalendar(calendarCurrentDate, calendarHighlights);
+    renderOverviewData(data);
     toggleRoleSkeleton(false);
     showDashboardSkeleton(false);
   } catch (error) {
     console.error('loadGuildMemberData failed', error);
-    updateUserRoleBadge(null);
-    updateUserRoleTags([]);
-    renderCalendar(calendarCurrentDate, calendarHighlights);
+    if (state.overview) {
+      // Fallback auf letzte erfolgreiche Daten, nichts löschen
+      renderOverviewData(state.overview);
+    }
     toggleRoleSkeleton(false);
     showDashboardSkeleton(false);
   }
@@ -242,18 +243,19 @@ function renderCalendar(date = new Date(), highlights = []) {
     const bgClass = hasHighlight ? '' : 'bg-slate-800/60 hover:bg-slate-800/80';
     const span = document.createElement('span');
     span.textContent = String(d);
-    span.className = `group relative flex items-center justify-center py-2 rounded-xl transition text-slate-100 cursor-default ${bgClass}`;
+    span.className = `relative flex items-center justify-center py-2 rounded-xl transition text-slate-100 cursor-default ${bgClass}`;
     if (isSameMonth && today.getDate() === d) {
       span.classList.add('ring', 'ring-meat.primary/40');
     }
     if (primary) {
+      span.classList.add('group');
       span.style.background = primary.color;
       span.style.color = '#0f172a';
       span.style.border = '1px solid rgba(15,23,42,0.2)';
       const tooltip = document.createElement('div');
       tooltip.setAttribute('role', 'tooltip');
       tooltip.className =
-        'pointer-events-none absolute z-20 -top-2 left-1/2 max-w-[260px] -translate-x-1/2 -translate-y-full rounded-base bg-slate-900/95 text-white text-xs px-3 py-2 shadow-xl shadow-slate-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-150 border border-slate-800/80 text-left';
+        'pointer-events-none absolute z-20 -top-2 left-1/2 max-w-[260px] -translate-x-1/2 -translate-y-full rounded-base bg-slate-950/95 text-slate-100 text-xs px-3 py-2 shadow-xl shadow-slate-900/70 opacity-0 group-hover:opacity-100 transition-opacity duration-150 border border-slate-800/80 text-left';
       dayHighlights.forEach((h) => {
         const row = document.createElement('div');
         row.className = 'flex items-center gap-2 py-0.5 whitespace-nowrap';
@@ -262,7 +264,7 @@ function renderCalendar(date = new Date(), highlights = []) {
         dot.style.background = h.color;
         const label = document.createElement('span');
         label.textContent = h.label || h.type;
-        label.style.color = h.color;
+        label.style.color = h.color || '#22d3ee';
         row.append(dot, label);
         tooltip.appendChild(row);
       });
