@@ -11,8 +11,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: path.resolve(__dirname, 'src/web/index.html'),
-        dashboard: path.resolve(__dirname, 'src/web/dashboard.njk'),
-        events: path.resolve(__dirname, 'src/web/events.njk'),
+        dashboard: path.resolve(__dirname, 'src/web/dashboard.html'),
+        events: path.resolve(__dirname, 'src/web/events.html'),
       },
     },
   },
