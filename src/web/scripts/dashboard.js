@@ -1,6 +1,6 @@
-// FILE: src/web/scripts/dashboard.js
+﻿// FILE: src/web/scripts/dashboard.js
 import { fetchGuildOverview } from './api.js';
-import { state, subscribe, setOverview, setUser } from './state.js';
+import { state, subscribe, setOverview, setUser, cacheOverview, loadCachedOverview } from './state.js';
 import { bootstrapLayout } from './layout.js';
 import { cacheDisplayName } from './state.js';
 import { renderProfile } from './profile.js';
@@ -85,9 +85,8 @@ function renderOverviewData(data) {
   const rolesSorted = Array.isArray(data?.roles)
     ? data.roles.filter((r) => memberRoleIds.includes(r.id)).sort((a, b) => (b.position ?? 0) - (a.position ?? 0))
     : [];
-  const highest = data?.highestRoleResolved || rolesSorted[0] || null;
-  updateUserRoleBadge(highest || null);
-  const tagRoles = highest ? rolesSorted.filter((r) => r.id !== highest.id) : rolesSorted;
+  const tagRoles = rolesSorted;
+  updateUserRoleBadge(null); // Badge ausblenden
   updateUserRoleTags(tagRoles);
   const birthdayHighlights = Array.isArray(data?.birthdays)
     ? data.birthdays
@@ -113,18 +112,10 @@ function renderOverviewData(data) {
 }
 
 function updateUserRoleBadge(role) {
-  if (!role) {
-    setProfileAccent('');
-    if (userRoleBadge) {
-      userRoleBadge.innerHTML = '<span class="inline-flex h-1.5 w-1.5 rounded-full bg-slate-500"></span>Rolle unbekannt';
-    }
-    return;
-  }
-  const color = role.color ? `#${role.color.toString(16).padStart(6, '0')}` : null;
-  const dotStyle = color ? `style="background:${color}"` : '';
-  setProfileAccent(color);
+  // Badge wird nicht mehr genutzt, nur ausblenden.
   if (userRoleBadge) {
-    userRoleBadge.innerHTML = `<span class="inline-flex h-1.5 w-1.5 rounded-full" ${dotStyle}></span>${role.name}`;
+    userRoleBadge.classList.add('hidden');
+    userRoleBadge.innerHTML = '';
   }
 }
 
@@ -175,22 +166,23 @@ async function loadGuildMemberData() {
   showDashboardSkeleton(true);
   toggleRoleSkeleton(true);
   try {
-    const data = state.overview || (await fetchGuildOverview(state.selectedGuildId));
+    const cachedOverview = loadCachedOverview(state.user?.id, state.selectedGuildId);
+    const data = state.overview || cachedOverview || (await fetchGuildOverview(state.selectedGuildId));
     if (!state.overview) setOverview(data);
+    cacheOverview(state.user?.id, state.selectedGuildId, data);
     renderOverviewData(data);
     toggleRoleSkeleton(false);
     showDashboardSkeleton(false);
   } catch (error) {
-    console.error('loadGuildMemberData failed', error);
-    if (state.overview) {
-      // Fallback auf letzte erfolgreiche Daten, nichts löschen
-      renderOverviewData(state.overview);
+    console.error("loadGuildMemberData failed", error);
+    const fallback = state.overview || loadCachedOverview(state.user?.id, state.selectedGuildId);
+    if (fallback) {
+      renderOverviewData(fallback);
     }
     toggleRoleSkeleton(false);
     showDashboardSkeleton(false);
   }
 }
-
 function renderCalendar(date = new Date(), highlights = []) {
   if (!calendarGrid) return;
   const current = new Date(date);
@@ -313,3 +305,4 @@ bootstrapLayout({
     await loadGuildMemberData();
   },
 });
+

@@ -3,8 +3,10 @@ import { fetchGuildOverview, fetchGuilds, fetchMe, logout } from './api.js';
 import {
   cacheGuilds,
   cacheDisplayName,
+  cacheOverview,
   loadCachedGuilds,
   loadCachedDisplayName,
+  loadCachedOverview,
   loadCachedSelected,
   resetState,
   setGuilds,
@@ -76,9 +78,11 @@ async function ensureDisplayNameFromGuild() {
   }
 
   try {
-    const overview = await fetchGuildOverview(state.selectedGuildId);
+    const cachedOverview = loadCachedOverview(state.user.id, state.selectedGuildId);
+    const overview = cachedOverview || (await fetchGuildOverview(state.selectedGuildId));
     const displayName = overview?.member?.displayName || state.user.displayName || state.user.username;
     setOverview(overview);
+    cacheOverview(state.user.id, state.selectedGuildId, overview);
     const updated = { ...state.user, displayName };
     setUser(updated);
     renderProfile(updated);

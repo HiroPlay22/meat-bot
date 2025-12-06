@@ -42,6 +42,7 @@ export function storageKeys(userId) {
     guilds: `meat_guilds_${userId}`,
     selected: `meat_selected_guild_${userId}`,
     displayNamePrefix: `meat_displayname_${userId}_`,
+    overviewPrefix: `meat_overview_${userId}_`,
   };
 }
 
@@ -125,4 +126,26 @@ export function loadCachedDisplayName(userId, guildId) {
   const keys = storageKeys(userId);
   const val = sessionStorage.getItem(`${keys.displayNamePrefix}${guildId}`);
   return val || null;
+}
+
+export function cacheOverview(userId, guildId, overview) {
+  if (!userId || !guildId) return;
+  const keys = storageKeys(userId);
+  try {
+    sessionStorage.setItem(`${keys.overviewPrefix}${guildId}`, JSON.stringify(overview ?? null));
+  } catch {
+    // ignore
+  }
+}
+
+export function loadCachedOverview(userId, guildId) {
+  if (!userId || !guildId) return null;
+  const keys = storageKeys(userId);
+  const raw = sessionStorage.getItem(`${keys.overviewPrefix}${guildId}`);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
 }
