@@ -49,14 +49,7 @@ async function ensureGuildsLoaded() {
 }
 
 function ensureSelectedGuild() {
-  if (!state.user || !state.guilds.length) return false;
-  const cached = loadCachedSelected(state.user.id);
-  if (cached && state.guilds.some((g) => g.id === cached)) {
-    setSelectedGuild(cached, { persist: false });
-    updateGuildHeader();
-    refreshGuildSwitch();
-    return true;
-  }
+  // Immer Modal erzwingen, bis eine Guild bewusst gewählt wird.
   return false;
 }
 
