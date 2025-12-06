@@ -70,7 +70,7 @@ function setProfileAccent(color) {
 function applyUserDisplayName(displayName) {
   const label = displayName || 'User';
   if (heroUserName) heroUserName.textContent = label;
-  if (profileCardTitle) profileCardTitle.textContent = `Profil @${label}`;
+  if (profileCardTitle) profileCardTitle.textContent = `@${label}`;
   const profileName = document.getElementById('profile-name');
   if (profileName) profileName.textContent = label;
 }
