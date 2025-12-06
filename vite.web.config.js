@@ -18,10 +18,14 @@ export default defineConfig({
   },
   plugins: [
     nunjucks({
-      searchPaths: [
-        path.resolve(__dirname, 'src/web'),
-        path.resolve(__dirname, 'src/web/templates'),
-      ],
+      templatesDir: path.resolve(__dirname, 'src/web'),
+      nunjucksConfigure: {
+        noCache: true,
+        searchPaths: [
+          path.resolve(__dirname, 'src/web'),
+          path.resolve(__dirname, 'src/web/templates'),
+        ],
+      },
     }),
   ],
   server: {
