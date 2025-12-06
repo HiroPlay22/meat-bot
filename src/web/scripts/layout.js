@@ -105,7 +105,7 @@ export async function bootstrapLayout({ onGuildChanged } = {}) {
     }
 
     if (window.location.pathname.endsWith('dashboard.html')) {
-      window.history.replaceState({}, '', '/dashboard');
+      window.history.replaceState({}, '', '/dashboard.html');
     }
   } catch (error) {
     resetState();
