@@ -134,3 +134,15 @@ model UserProfile {
   userId    String   @unique @db.VarChar(32)
   birthday  DateTime?
 }
+
+/// Feiertage (z.B. DE-weit oder je Bundesland)
+model Holiday {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// Datum des Feiertags (mit Jahr)
+  date      DateTime
+  name      String
+  region    String   @db.VarChar(4) // z.B. DE, BW, BY, BE ...
+}

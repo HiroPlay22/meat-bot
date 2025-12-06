@@ -406,8 +406,26 @@ async function fetchGuildInfo(guildId: string) {
     premium_progress_bar_enabled?: boolean;
     premium_subscription_count?: number;
     preferred_locale?: string;
-    verification_level?: number;
-  }>;
+  verification_level?: number;
+}>;
+}
+
+async function fetchGuildEvents(guildId: string) {
+  if (!env.botToken) throw new Error('Bot-Token fehlt');
+  const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/scheduled-events`, {
+    headers: { Authorization: `Bot ${env.botToken}` },
+  });
+  if (!res.ok) throw new Error(`Events-Request fehlgeschlagen: ${res.status}`);
+  return res.json() as Promise<
+    Array<{
+      id: string;
+      name: string;
+      scheduled_start_time: string;
+      scheduled_end_time?: string | null;
+      status?: number;
+      entity_type?: number;
+    }>
+  >;
 }
 
 const botPresenceCache = new Map<
@@ -639,7 +657,7 @@ async function handleGuildOverview(req: IncomingMessage, res: ServerResponse, gu
     const present = await checkBotPresence(guildId);
     if (!present) return json(res, 400, { error: 'bot_not_present' });
 
-    const [roles, member, guildInfo, consent, commandUsageTotal, profile] = await Promise.all([
+    const [roles, member, guildInfo, consent, commandUsageTotal, profile, events, holidays] = await Promise.all([
       fetchGuildRoles(guildId),
       fetchGuildMember(guildId, session.user.id),
       fetchGuildInfo(guildId),
@@ -651,6 +669,18 @@ async function handleGuildOverview(req: IncomingMessage, res: ServerResponse, gu
         where: { userId: session.user.id },
         select: { birthday: true },
       }),
+      fetchGuildEvents(guildId).catch(() => []),
+      (prisma as any).holiday
+        .findMany({
+          where: {
+            date: {
+              gte: new Date(new Date().getFullYear(), 0, 1),
+              lte: new Date(new Date().getFullYear(), 11, 31, 23, 59, 59),
+            },
+          },
+          select: { id: true, name: true, date: true, region: true },
+        })
+        .catch(() => []),
     ]);
 
     const memberRoles = roles.filter((r) => member.roles.includes(r.id)).sort((a, b) => (b.position ?? 0) - (a.position ?? 0));
@@ -681,6 +711,18 @@ async function handleGuildOverview(req: IncomingMessage, res: ServerResponse, gu
         : null,
       consentStatus,
       birthdays: includeBirthday,
+      events: Array.isArray(events)
+        ? events.map((e) => ({
+            id: e.id,
+            name: e.name,
+            startTime: e.scheduled_start_time,
+            endTime: e.scheduled_end_time ?? null,
+            status: e.status ?? null,
+          }))
+        : [],
+      holidays: Array.isArray(holidays)
+        ? holidays.map((h: any) => ({ id: h.id, name: h.name, date: h.date, region: h.region }))
+        : [],
       stats: {
         commandUsageTotal,
       },

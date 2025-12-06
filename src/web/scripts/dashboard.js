@@ -79,16 +79,19 @@ function applyUserDisplayName(displayName) {
 }
 
 function updateUserRoleBadge(role) {
-  if (!userRoleBadge) return;
   if (!role) {
-    userRoleBadge.innerHTML = '<span class="inline-flex h-1.5 w-1.5 rounded-full bg-slate-500"></span>Rolle unbekannt';
     setProfileAccent('');
+    if (userRoleBadge) {
+      userRoleBadge.innerHTML = '<span class="inline-flex h-1.5 w-1.5 rounded-full bg-slate-500"></span>Rolle unbekannt';
+    }
     return;
   }
   const color = role.color ? `#${role.color.toString(16).padStart(6, '0')}` : null;
   const dotStyle = color ? `style="background:${color}"` : '';
-  userRoleBadge.innerHTML = `<span class="inline-flex h-1.5 w-1.5 rounded-full" ${dotStyle}></span>${role.name}`;
   setProfileAccent(color);
+  if (userRoleBadge) {
+    userRoleBadge.innerHTML = `<span class="inline-flex h-1.5 w-1.5 rounded-full" ${dotStyle}></span>${role.name}`;
+  }
 }
 
 function updateUserRoleTags(roles = []) {
@@ -159,13 +162,23 @@ async function loadGuildMemberData() {
       : [];
     const highest = data?.highestRoleResolved || rolesSorted[0] || null;
     updateUserRoleBadge(highest || null);
-    updateUserRoleTags(rolesSorted);
+    // Rolle im Badge nicht doppelt in Tags
+    const tagRoles = highest ? rolesSorted.filter((r) => r.id !== highest.id) : rolesSorted;
+    updateUserRoleTags(tagRoles);
     const birthdayHighlights = Array.isArray(data?.birthdays)
       ? data.birthdays
           .filter((entry) => entry?.birthday)
           .map((entry) => ({ date: entry.birthday, type: 'Geburtstag', color: '#f472b6' }))
       : [];
-    renderCalendar(new Date(), birthdayHighlights);
+    const eventHighlights = Array.isArray(data?.events)
+      ? data.events
+          .filter((ev) => ev?.startTime)
+          .map((ev) => ({ date: ev.startTime, type: ev.name || 'Event', color: '#22d3ee' }))
+      : [];
+    const holidayHighlights = Array.isArray(data?.holidays)
+      ? data.holidays.map((h) => ({ date: h.date, type: h.name || 'Feiertag', color: '#94a3b8' }))
+      : [];
+    renderCalendar(new Date(), [...birthdayHighlights, ...eventHighlights, ...holidayHighlights]);
     toggleRoleSkeleton(false);
     showDashboardSkeleton(false);
   } catch (error) {
