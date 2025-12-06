@@ -30,17 +30,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-  document.querySelectorAll('[data-logout]').forEach((btn) => {
-    btn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      try {
-        await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-      } catch (err) {
-        // ignore
-      }
-      window.location.href = '/';
-    });
-  });
-</script>
+{{ super() }}
 {% endblock %}

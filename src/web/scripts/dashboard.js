@@ -1,25 +1,11 @@
 // FILE: src/web/scripts/dashboard.js
-import { fetchGuildOverview, fetchGuilds, fetchMe, logout } from './api.js';
-import {
-  cacheGuilds,
-  loadCachedGuilds,
-  loadCachedSelected,
-  resetState,
-  setGuilds,
-  setSelectedGuild,
-  setUser,
-  state,
-  subscribe,
-} from './state.js';
-import { initGuildSwitch, openGuildSelectModal, refreshGuildSwitch } from './guild-switch.js';
-import { initProfile, renderProfile } from './profile.js';
-import { startStatusPolling } from './status.js';
+import { fetchGuildOverview } from './api.js';
+import { state, subscribe } from './state.js';
+import { bootstrapLayout } from './layout.js';
 
-const sidebarReal = document.getElementById('sidebar-real');
 const dashboardContent = document.getElementById('dashboard-content');
 const currentGuildName = document.getElementById('current-guild-name');
 const currentGuildAvatar = document.getElementById('current-guild-avatar');
-const navProfileLabel = document.getElementById('nav-profile-label');
 const headerGuildTitle = document.getElementById('header-guild-title');
 const heroGuildTitle = document.getElementById('hero-guild-title');
 const heroUserName = document.getElementById('hero-user-name');
@@ -276,91 +262,6 @@ function renderCalendar(date = new Date(), highlights = []) {
   }
 }
 
-async function ensureGuildsLoaded() {
-  if (!state.user) return;
-  if (state.guilds.length) return;
-  const cached = loadCachedGuilds(state.user.id);
-  if (cached.length) {
-    setGuilds(cached);
-    refreshGuildSwitch();
-    return;
-  }
-  const guilds = await fetchGuilds();
-  setGuilds(guilds);
-  cacheGuilds(state.user.id, guilds);
-  refreshGuildSwitch();
-}
-
-function ensureSelectedGuild() {
-  if (!state.user || !state.guilds.length) return false;
-  const cached = loadCachedSelected(state.user.id);
-  if (cached && state.guilds.some((g) => g.id === cached)) {
-    setSelectedGuild(cached, { persist: false });
-    updateGuildHeader();
-    refreshGuildSwitch();
-    return true;
-  }
-  return false;
-}
-
-async function loadSession() {
-  try {
-    const me = await fetchMe();
-    const displayName = me?.displayName || me?.username || 'User';
-    setUser({ ...me, displayName });
-    renderProfile({ ...me, displayName });
-    applyUserDisplayName(displayName);
-    updateUserRoleBadge(null);
-
-    if (navProfileLabel) {
-      const possessive = /[sS]$/.test(displayName) ? `${displayName}' Profil` : `${displayName}'s Profil`;
-      navProfileLabel.textContent = possessive;
-    }
-
-    await ensureGuildsLoaded();
-
-    const hasSelection = ensureSelectedGuild();
-
-    if (!hasSelection) {
-      showDashboardSkeleton(true);
-      openGuildSelectModal(() => {
-        refreshGuildSwitch();
-        loadGuildMemberData();
-      });
-    } else {
-      showDashboardSkeleton(true);
-      refreshGuildSwitch();
-      await loadGuildMemberData();
-    }
-
-    // URL /dashboard
-    if (window.location.pathname.endsWith('dashboard.html')) {
-      window.history.replaceState({}, '', '/dashboard');
-    }
-  } catch (error) {
-    resetState();
-    await logout();
-    window.location.href = '/';
-  }
-}
-
-function initLogoutFallback() {
-  const logoutButtons = document.querySelectorAll('[data-logout]');
-  logoutButtons.forEach((btn) => {
-    btn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      resetState();
-      await logout();
-      window.location.href = '/';
-    });
-  });
-}
-
-initGuildSwitch();
-initProfile();
-initLogoutFallback();
-startStatusPolling();
-showDashboardSkeleton(true);
 setupDropdownExclusivity();
 renderCalendar(calendarCurrentDate, calendarHighlights);
 if (calendarPrevBtn) {
@@ -389,4 +290,9 @@ subscribe('guildChanged', () => {
   updateGuildHeader();
   loadGuildMemberData();
 });
-loadSession();
+
+bootstrapLayout({
+  onGuildChanged: async () => {
+    await loadGuildMemberData();
+  },
+});
