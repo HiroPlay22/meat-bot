@@ -63,10 +63,11 @@ function updateGuildHeader() {
 
 function setProfileAccent(color) {
   const root = document.documentElement;
-  const targetColor = color || '';
-  root.style.setProperty('--meat-user-accent', targetColor);
-  if (profileCardTitle) profileCardTitle.style.color = targetColor || '';
-  if (userRoleBadge) userRoleBadge.style.borderColor = targetColor || '';
+  const resolved = color && color !== '#000000' ? color : '';
+  const accent = resolved || '#22d3ee';
+  root.style.setProperty('--meat-user-accent', accent);
+  if (profileCardTitle) profileCardTitle.style.color = accent;
+  if (userRoleBadge) userRoleBadge.style.borderColor = accent;
 }
 
 function applyUserDisplayName(displayName) {
@@ -84,7 +85,7 @@ function updateUserRoleBadge(role) {
     setProfileAccent('');
     return;
   }
-  const color = role.color != null ? `#${role.color.toString(16).padStart(6, '0')}` : null;
+  const color = role.color ? `#${role.color.toString(16).padStart(6, '0')}` : null;
   const dotStyle = color ? `style="background:${color}"` : '';
   userRoleBadge.innerHTML = `<span class="inline-flex h-1.5 w-1.5 rounded-full" ${dotStyle}></span>${role.name}`;
   setProfileAccent(color);
@@ -97,7 +98,7 @@ function updateUserRoleTags(roles = []) {
 
   const top = roles.slice(0, 4);
   top.forEach((role) => {
-    const color = role.color != null ? `#${role.color.toString(16).padStart(6, '0')}` : null;
+    const color = role.color ? `#${role.color.toString(16).padStart(6, '0')}` : '#22d3ee';
     const tag = document.createElement('span');
     tag.className = 'inline-flex items-center gap-2 rounded-full bg-slate-900/80 px-2.5 py-1 text-[11px] text-slate-100 border border-slate-800';
     tag.innerHTML = `<span class="inline-flex h-1.5 w-1.5 rounded-full" style="background:${color ?? '#94a3b8'}"></span>${role.name}`;
@@ -290,14 +291,13 @@ async function loadSession() {
     if (!hasSelection) {
       showDashboardSkeleton(true);
       openGuildSelectModal(() => {
-        showDashboardSkeleton(false);
         refreshGuildSwitch();
         loadGuildMemberData();
       });
     } else {
-      showDashboardSkeleton(false);
+      showDashboardSkeleton(true);
       refreshGuildSwitch();
-      loadGuildMemberData();
+      await loadGuildMemberData();
     }
 
     // URL /dashboard
