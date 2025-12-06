@@ -1,0 +1,62 @@
+﻿<!doctype html>
+<html lang="de" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Events & Termine - M.E.A.T.</title>
+    <link rel="icon" href="assets/logo/meat_logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="h-full bg-slate-950 text-slate-100 antialiased">
+    <div class="pointer-events-none fixed inset-0 -z-10 bg-slate-950">
+      <div class="bg-radial-layer absolute inset-0"></div>
+      <div class="bg-grid-layer absolute inset-0"></div>
+    </div>
+
+    <main class="relative z-10 min-h-screen px-4 py-6">
+      <div class="mx-auto flex max-w-screen-lg flex-col gap-4">
+        <header class="flex items-center justify-between rounded-3xl border border-slate-800/80 bg-slate-900/70 px-5 py-4 shadow-sm shadow-slate-950/60">
+          <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/80 border border-slate-800/70 overflow-hidden">
+              <img src="assets/logo/meat_logo.png" alt="M.E.A.T. Logo" class="h-full w-full object-contain" />
+            </div>
+            <div>
+              <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Events & Termine</p>
+              <h1 class="text-xl font-bold text-slate-100">Eventboard</h1>
+            </div>
+          </div>
+          <a href="dashboard.html" class="inline-flex items-center gap-2 rounded-2xl border border-slate-800/70 bg-slate-900/80 px-3 py-2 text-sm font-semibold text-slate-100 hover:border-meat.primary/60 transition">
+            Zurueck zum Dashboard
+          </a>
+        </header>
+
+        <section class="rounded-3xl border border-slate-800/80 bg-slate-900/80 p-6 shadow-lg shadow-slate-950/60">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Roadmap</p>
+              <h2 class="text-lg font-bold text-slate-100">Events & Termine - in Vorbereitung</h2>
+              <p class="text-sm text-slate-400 mt-1">Hier folgt die detaillierte Eventplanung mit Kalender, Anmelde-Flow und Discord-Sync.</p>
+            </div>
+            <span class="rounded-full bg-slate-800/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-meat.soft">WIP</span>
+          </div>
+          <div class="mt-4 grid gap-3 sm:grid-cols-2">
+            <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 text-sm text-slate-300">
+              <p class="text-[10px] uppercase tracking-[0.14em] text-slate-500">Geplant</p>
+              <p class="mt-1 font-semibold text-slate-100">Kalender + Tooltips</p>
+              <p class="mt-1 text-slate-400">Discord-Scheduled-Events landen im Kalender; Tooltips zeigen Namen, Zeiten und Status.</p>
+            </div>
+            <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 text-sm text-slate-300">
+              <p class="text-[10px] uppercase tracking-[0.14em] text-slate-500">In Arbeit</p>
+              <p class="mt-1 font-semibold text-slate-100">Anmelde-Flow</p>
+              <p class="mt-1 text-slate-400">An- und Abmeldungen mit Discord-Rollen, Reminder und ggf. Warteliste.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
