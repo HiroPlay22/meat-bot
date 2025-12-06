@@ -1,6 +1,6 @@
 // FILE: src/web/scripts/dashboard.js
 import { fetchGuildOverview } from './api.js';
-import { state, subscribe, setOverview } from './state.js';
+import { state, subscribe, setOverview, setUser } from './state.js';
 import { bootstrapLayout } from './layout.js';
 import { cacheDisplayName } from './state.js';
 
