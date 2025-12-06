@@ -2,6 +2,7 @@
 import { fetchGuildOverview } from './api.js';
 import { state, subscribe } from './state.js';
 import { bootstrapLayout } from './layout.js';
+import { cacheDisplayName } from './state.js';
 
 const dashboardContent = document.getElementById('dashboard-content');
 const currentGuildName = document.getElementById('current-guild-name');
@@ -134,6 +135,7 @@ async function loadGuildMemberData() {
       const updatedUser = { ...state.user, displayName };
       setUser(updatedUser);
       renderProfile(updatedUser);
+      cacheDisplayName(state.user.id, state.selectedGuildId, displayName);
     }
     if (navProfileLabel) {
       const possessive = /[sS]$/.test(displayName) ? `${displayName}' Profil` : `${displayName}'s Profil`;

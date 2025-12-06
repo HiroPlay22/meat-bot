@@ -3,6 +3,7 @@ import { fetchGuilds, fetchMe, logout } from './api.js';
 import {
   cacheGuilds,
   loadCachedGuilds,
+  loadCachedDisplayName,
   loadCachedSelected,
   resetState,
   setGuilds,
@@ -18,6 +19,11 @@ import { startStatusPolling } from './status.js';
 const headerGuildTitle = document.getElementById('header-guild-title');
 const heroGuildTitle = document.getElementById('hero-guild-title');
 const navProfileLabel = document.getElementById('nav-profile-label');
+const pageContent = document.getElementById('page-content');
+
+if (pageContent) {
+  pageContent.classList.add('opacity-0', 'pointer-events-none', 'transition-opacity', 'duration-200');
+}
 
 function setNavProfile(displayName) {
   if (navProfileLabel) {
@@ -46,6 +52,17 @@ async function ensureGuildsLoaded() {
   setGuilds(guilds);
   cacheGuilds(state.user.id, guilds);
   refreshGuildSwitch();
+}
+
+function applyCachedDisplayName() {
+  if (!state.user || !state.selectedGuildId) return;
+  const cached = loadCachedDisplayName(state.user.id, state.selectedGuildId);
+  if (cached) {
+    const updated = { ...state.user, displayName: cached };
+    setUser(updated);
+    renderProfile(updated);
+    setNavProfile(cached);
+  }
 }
 
 function ensureSelectedGuild() {
@@ -98,10 +115,15 @@ export async function bootstrapLayout({ onGuildChanged } = {}) {
     const hasSelection = ensureSelectedGuild();
 
     const proceed = async () => {
+      applyCachedDisplayName();
       updateGuildHeader();
       refreshGuildSwitch();
       if (onGuildChanged && state.selectedGuildId) {
         await onGuildChanged(state.selectedGuildId);
+      }
+      if (pageContent) {
+        pageContent.classList.remove('opacity-0', 'pointer-events-none');
+        pageContent.classList.add('opacity-100');
       }
     };
 

@@ -40,6 +40,7 @@ export function storageKeys(userId) {
   return {
     guilds: `meat_guilds_${userId}`,
     selected: `meat_selected_guild_${userId}`,
+    displayNamePrefix: `meat_displayname_${userId}_`,
   };
 }
 
@@ -103,5 +104,18 @@ export function cacheGuilds(userId, guilds) {
 export function loadCachedSelected(userId) {
   const keys = storageKeys(userId);
   const val = sessionStorage.getItem(keys.selected);
+  return val || null;
+}
+
+export function cacheDisplayName(userId, guildId, displayName) {
+  if (!userId || !guildId) return;
+  const keys = storageKeys(userId);
+  sessionStorage.setItem(`${keys.displayNamePrefix}${guildId}`, displayName ?? '');
+}
+
+export function loadCachedDisplayName(userId, guildId) {
+  if (!userId || !guildId) return null;
+  const keys = storageKeys(userId);
+  const val = sessionStorage.getItem(`${keys.displayNamePrefix}${guildId}`);
   return val || null;
 }
