@@ -1,5 +1,5 @@
 // FILE: src/web/scripts/dashboard.js
-import { fetchGuilds, fetchGuildMember, fetchMe, logout } from './api.js';
+import { fetchGuildOverview, fetchGuilds, fetchMe, logout } from './api.js';
 import {
   cacheGuilds,
   loadCachedGuilds,
@@ -135,7 +135,7 @@ async function loadGuildMemberData() {
   if (!state.selectedGuildId) return;
   toggleRoleSkeleton(true);
   try {
-    const data = await fetchGuildMember(state.selectedGuildId);
+    const data = await fetchGuildOverview(state.selectedGuildId);
     const displayName = data?.member?.displayName || state.user?.displayName || state.user?.username || 'User';
     applyUserDisplayName(displayName);
     const rolesSorted = Array.isArray(data?.roles)

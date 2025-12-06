@@ -23,6 +23,22 @@ export async function fetchGuildMember(guildId) {
   return doFetch(`/api/guilds/${guildId}/me`);
 }
 
+export async function fetchGuildOverview(guildId) {
+  return doFetch(`/api/guilds/${guildId}/overview`);
+}
+
+export async function fetchConsent(guildId) {
+  return doFetch(`/api/guilds/${guildId}/consent`);
+}
+
+export async function updateConsent(guildId, status, version) {
+  return doFetch(`/api/guilds/${guildId}/consent`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status, version }),
+  });
+}
+
 export async function fetchStatus() {
   return doFetch('/api/status');
 }

@@ -4,6 +4,7 @@ import http, { type IncomingMessage, type ServerResponse } from 'node:http';
 import crypto from 'node:crypto';
 import { URL } from 'node:url';
 import { logError, logInfo, logWarn } from '../general/logging/logger.js';
+import { prisma } from '../general/db/prismaClient.js';
 
 type RateLimitEntry = {
   count: number;
@@ -155,6 +156,28 @@ function json(res: ServerResponse, status: number, body: unknown) {
       : {}),
   });
   res.end(JSON.stringify(body));
+}
+
+async function parseBody(req: IncomingMessage) {
+  return new Promise<any>((resolve, reject) => {
+    let data = '';
+    req.on('data', (chunk) => {
+      data += chunk;
+      if (data.length > 1024 * 64) {
+        reject(new Error('Request body too large'));
+        req.destroy();
+      }
+    });
+    req.on('end', () => {
+      if (!data) return resolve({});
+      try {
+        resolve(JSON.parse(data));
+      } catch (error) {
+        reject(error);
+      }
+    });
+    req.on('error', reject);
+  });
 }
 
 async function isRateLimited(req: IncomingMessage) {
@@ -368,6 +391,25 @@ async function fetchGuildMember(guildId: string, userId: string) {
   }>;
 }
 
+async function fetchGuildInfo(guildId: string) {
+  if (!env.botToken) throw new Error('Bot-Token fehlt');
+  const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}?with_counts=true`, {
+    headers: { Authorization: `Bot ${env.botToken}` },
+  });
+  if (!res.ok) throw new Error(`Guild-Request fehlgeschlagen: ${res.status}`);
+  return res.json() as Promise<{
+    id: string;
+    name: string;
+    icon?: string | null;
+    approximate_member_count?: number;
+    features?: string[];
+    premium_progress_bar_enabled?: boolean;
+    premium_subscription_count?: number;
+    preferred_locale?: string;
+    verification_level?: number;
+  }>;
+}
+
 const botPresenceCache = new Map<
   string,
   {
@@ -547,7 +589,7 @@ async function handleGuildMember(req: IncomingMessage, res: ServerResponse, guil
     const [roles, member, guildInfo] = await Promise.all([
       fetchGuildRoles(guildId),
       fetchGuildMember(guildId, session.user.id),
-      fetch(`https://discord.com/api/v10/guilds/${guildId}`, { headers: { Authorization: `Bot ${env.botToken}` } }).then((r) => r.json()),
+      fetchGuildInfo(guildId),
     ]);
 
     const memberRoles = roles.filter((r) => member.roles.includes(r.id));
@@ -583,6 +625,98 @@ async function handleGuildMember(req: IncomingMessage, res: ServerResponse, guil
     logError('Fehler beim Laden von Guild-Member', { functionName: 'apiGuildMember', extra: { error, guildId } });
     return json(res, 500, { error: 'guild_member_failed' });
   }
+}
+
+async function handleGuildOverview(req: IncomingMessage, res: ServerResponse, guildId: string) {
+  const sessionId = getSession(req);
+  if (!sessionId) return json(res, 401, { error: 'unauthorized' });
+  const session = await loadSession(sessionId);
+  if (!session) return json(res, 401, { error: 'unauthorized' });
+
+  if (!isGuildAllowed(guildId)) return json(res, 403, { error: 'forbidden' });
+
+  try {
+    const present = await checkBotPresence(guildId);
+    if (!present) return json(res, 400, { error: 'bot_not_present' });
+
+    const [roles, member, guildInfo, consent, commandUsageTotal] = await Promise.all([
+      fetchGuildRoles(guildId),
+      fetchGuildMember(guildId, session.user.id),
+      fetchGuildInfo(guildId),
+      (prisma as any).userTrackingConsent.findUnique({
+        where: { guildId_userId: { guildId, userId: session.user.id } },
+      }),
+      (prisma as any).commandUsage.count({ where: { guildId } }).catch(() => null),
+    ]);
+
+    const memberRoles = roles.filter((r) => member.roles.includes(r.id)).sort((a, b) => (b.position ?? 0) - (a.position ?? 0));
+    const highestRole = memberRoles[0] || null;
+    const displayName = member.nick || member.user.global_name || member.user.username;
+
+    return json(res, 200, {
+      guild: {
+        id: guildId,
+        name: guildInfo?.name,
+        icon: guildInfo?.icon ? `https://cdn.discordapp.com/icons/${guildId}/${guildInfo.icon}.png` : null,
+        memberCount: guildInfo?.approximate_member_count ?? null,
+        features: guildInfo?.features ?? [],
+      },
+      member: {
+        id: member.user.id,
+        displayName,
+        avatar: member.user.avatar
+          ? `https://cdn.discordapp.com/avatars/${member.user.id}/${member.user.avatar}.png`
+          : null,
+        roles: member.roles,
+      },
+      roles: roles.map((r) => ({ id: r.id, name: r.name, color: r.color, position: r.position })),
+      highestRoleResolved: highestRole
+        ? { id: highestRole.id, name: highestRole.name, color: highestRole.color, position: highestRole.position }
+        : null,
+      consentStatus: consent?.status ?? 'NONE',
+      stats: {
+        commandUsageTotal,
+      },
+    });
+  } catch (error) {
+    logError('Fehler bei Guild Overview', { functionName: 'apiGuildOverview', extra: { error, guildId } });
+    return json(res, 500, { error: 'guild_overview_failed' });
+  }
+}
+
+async function handleConsent(req: IncomingMessage, res: ServerResponse, guildId: string) {
+  const sessionId = getSession(req);
+  if (!sessionId) return json(res, 401, { error: 'unauthorized' });
+  const session = await loadSession(sessionId);
+  if (!session) return json(res, 401, { error: 'unauthorized' });
+  if (!isGuildAllowed(guildId)) return json(res, 403, { error: 'forbidden' });
+
+  if (req.method === 'GET') {
+    const consent = await (prisma as any).userTrackingConsent.findUnique({
+      where: { guildId_userId: { guildId, userId: session.user.id } },
+    });
+    return json(res, 200, { status: consent?.status ?? 'NONE', version: consent?.version ?? null });
+  }
+
+  if (req.method === 'POST') {
+    try {
+      const body = await parseBody(req);
+      const status = body?.status as string;
+      const version = typeof body?.version === 'string' ? body.version : null;
+      if (!['NONE', 'ALLOWED', 'DENIED'].includes(status)) return json(res, 400, { error: 'invalid_status' });
+      const result = await (prisma as any).userTrackingConsent.upsert({
+        where: { guildId_userId: { guildId, userId: session.user.id } },
+        update: { status, version: version ?? undefined },
+        create: { guildId, userId: session.user.id, status, version },
+      });
+      return json(res, 200, { status: result.status, version: result.version });
+    } catch (error) {
+      logError('Consent speichern fehlgeschlagen', { functionName: 'apiConsent', extra: { error, guildId } });
+      return json(res, 500, { error: 'consent_failed' });
+    }
+  }
+
+  return json(res, 405, { error: 'method_not_allowed' });
 }
 
 function handleOptions(res: ServerResponse) {
@@ -668,6 +802,20 @@ export function startAuthServer() {
     if (guildMeMatch && req.method === 'GET') {
       applySecurityHeaders(res);
       await handleGuildMember(req, res, guildMeMatch[1]);
+      return;
+    }
+
+    const guildOverviewMatch = path.match(/^\/api\/guilds\/([^/]+)\/overview$/);
+    if (guildOverviewMatch && req.method === 'GET') {
+      applySecurityHeaders(res);
+      await handleGuildOverview(req, res, guildOverviewMatch[1]);
+      return;
+    }
+
+    const guildConsentMatch = path.match(/^\/api\/guilds\/([^/]+)\/consent$/);
+    if (guildConsentMatch && (req.method === 'GET' || req.method === 'POST')) {
+      applySecurityHeaders(res);
+      await handleConsent(req, res, guildConsentMatch[1]);
       return;
     }
 
