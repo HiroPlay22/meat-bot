@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="de" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ title or 'M.E.A.T. Control Center' }}</title>
+    <link rel="icon" href="assets/logo/meat_logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+            colors: {
+              meat: {
+                primary: '#6366f1',
+                accent: '#a855f7',
+                soft: '#22d3ee',
+                dark: '#020617',
+                pulse: '#ec0b60',
+              },
+            },
+            boxShadow: {
+              'meat-glow': '0 0 60px rgba(129,140,248,0.35), 0 0 120px rgba(168,85,247,0.25)',
+            },
+            borderRadius: { '3xl': '1.75rem' },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="styles.css" />
+    {% block head %}{% endblock %}
+  </head>
+  <body class="h-full bg-slate-950 text-slate-100 antialiased">
+    <div class="pointer-events-none fixed inset-0 -z-10 bg-slate-950">
+      <div class="bg-radial-layer absolute inset-0"></div>
+      <div class="bg-grid-layer absolute inset-0"></div>
+    </div>
+    <main class="relative z-10 min-h-screen px-3 py-4 sm:px-4 sm:py-6 lg:px-6 fade-in">
+      <div class="mx-auto flex max-w-screen-2xl flex-col gap-4">
+        <header class="flex flex-wrap items-center justify-between gap-3">
+          {% include "partials/header.njk" %}
+        </header>
+
+        <section>
+          <div class="relative flex gap-4 lg:flex-row">
+            <aside data-sidebar class="flex h-full w-72 flex-shrink-0 flex-col justify-between rounded-3xl border border-slate-800/80 bg-slate-950/90 px-4 py-6 shadow-lg shadow-slate-950/70 backdrop-blur-xl">
+              {% include "partials/sidebar.njk" %}
+            </aside>
+            <div id="page-content" class="flex-1">
+              {% block content %}{% endblock %}
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

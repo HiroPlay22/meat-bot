@@ -1,0 +1,46 @@
+{% extends "templates/layout.njk" %}
+{% set title = "Events & Termine - M.E.A.T." %}
+{% set sidebar_active = "events" %}
+
+{% block content %}
+<div class="flex flex-col gap-8">
+  <header class="flex flex-col gap-4 rounded-3xl border border-slate-800/80 bg-slate-900/70 p-4 shadow-sm shadow-slate-950/60 sm:p-5 mb-6">
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <div class="space-y-1">
+        <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Events</p>
+        <h1 class="text-xl font-bold text-slate-100">Events & Termine</h1>
+      </div>
+    </div>
+  </header>
+
+  <section class="grid gap-4">
+    <div class="rounded-3xl border border-slate-800/80 bg-slate-900/80 p-6 shadow-lg shadow-slate-950/60 min-h-[320px]">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Coming Soon</p>
+          <h3 class="text-xl font-semibold text-slate-100">Eventboard</h3>
+          <p class="text-sm text-slate-400">Hier entstehen Kalender, Anmelde-Flow und Serien-Events.</p>
+        </div>
+        <span class="rounded-full bg-slate-800/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-meat.soft whitespace-nowrap">WIP</span>
+      </div>
+      <div class="mt-6 h-48 rounded-2xl border border-slate-800/70 bg-slate-900/70"></div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.querySelectorAll('[data-logout]').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+      } catch (err) {
+        // ignore
+      }
+      window.location.href = '/';
+    });
+  });
+</script>
+{% endblock %}
