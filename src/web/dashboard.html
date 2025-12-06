@@ -1,4 +1,4 @@
-{% extends "layout.njk" %}
+{% extends "templates/layout.njk" %}
 {% set title = "M.E.A.T. Control Center" %}
 {% set sidebar_active = "dashboard" %}
 
@@ -75,7 +75,7 @@
       </div>
     </div>
   </header>
-  {% include "partials/dashboard-cards.njk" %}
+  {% include "templates/partials/dashboard-cards.njk" %}
 </div>
 {% endblock %}
 
