@@ -342,8 +342,14 @@ async function fetchGuilds(accessToken: string) {
   const res = await fetch('https://discord.com/api/users/@me/guilds', {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
-  if (!res.ok) throw new Error('Guild-Request fehlgeschlagen');
-  return res.json() as Promise<
+  const raw = await res.text();
+  if (!res.ok) {
+    const err: any = new Error(`Guild-Request fehlgeschlagen: ${res.status}`);
+    err.status = res.status;
+    err.body = raw?.slice(0, 500);
+    throw err;
+  }
+  return JSON.parse(raw) as Promise<
     Array<{
       id: string;
       name: string;
