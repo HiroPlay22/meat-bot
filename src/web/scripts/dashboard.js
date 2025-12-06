@@ -247,7 +247,7 @@ function renderCalendar(date = new Date(), highlights = []) {
     const bgClass = hasHighlight ? '' : 'bg-slate-800/60 hover:bg-slate-800/80';
     const span = document.createElement('span');
     span.textContent = String(d);
-    span.className = `group relative flex items-center justify-center py-2 rounded-xl transition text-slate-100 ${bgClass}`;
+    span.className = `group relative flex items-center justify-center py-2 rounded-xl transition text-slate-100 cursor-default ${bgClass}`;
     if (isSameMonth && today.getDate() === d) {
       span.classList.add('ring', 'ring-meat.primary/40');
     }
