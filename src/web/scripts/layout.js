@@ -54,17 +54,21 @@ function updateGuildHeader() {
 
 async function ensureGuildsLoaded() {
   if (!state.user) return;
-  if (state.guilds.length) return;
-  const cached = loadCachedGuilds(state.user.id);
-  if (cached.length) {
-    setGuilds(cached);
-    refreshGuildSwitch();
-    return;
+  if (!state.guilds.length) {
+    const cached = loadCachedGuilds(state.user.id);
+    if (cached.length) {
+      setGuilds(cached);
+      refreshGuildSwitch();
+    }
   }
-  const guilds = await fetchGuilds();
-  setGuilds(guilds);
-  cacheGuilds(state.user.id, guilds);
-  refreshGuildSwitch();
+  try {
+    const guilds = await fetchGuilds();
+    setGuilds(guilds);
+    cacheGuilds(state.user.id, guilds);
+    refreshGuildSwitch();
+  } catch (err) {
+    // Wenn Fetch fehlschlägt, bleiben ggf. gecachte Daten aktiv
+  }
 }
 
 async function ensureDisplayNameFromGuild() {
