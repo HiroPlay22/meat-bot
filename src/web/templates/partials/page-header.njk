@@ -15,7 +15,7 @@
         <button
           id="guild-switch-button"
           type="button"
-          class="relative z-30 flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-2 text-sm font-semibold text-slate-100 hover:border-rose-500 transition"
+          class="relative z-30 flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-2 text-sm font-semibold text-slate-100 hover:border-rose-500 transition pointer-events-auto"
         >
           <span id="current-guild-avatar" class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-slate-900 border border-slate-800"></span>
           <span id="current-guild-name" class="text-base">Keine Guild gewaehlt</span>
@@ -25,7 +25,7 @@
         </button>
         <div
           id="guild-switch-menu"
-          class="hidden absolute left-0 top-full z-50 mt-2 w-72 rounded-2xl border border-slate-800 bg-slate-950/95 p-2 shadow-xl shadow-slate-900/60 backdrop-blur-xl"
+          class="hidden absolute left-0 top-full z-50 mt-2 w-72 rounded-2xl border border-slate-800 bg-slate-950/95 p-2 shadow-xl shadow-slate-900/60 backdrop-blur-xl pointer-events-auto"
         ></div>
       </div>
 
@@ -33,7 +33,7 @@
         <button
           id="profile-button"
           type="button"
-          class="relative z-30 flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 hover:border-rose-500 transition"
+          class="relative z-30 flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 hover:border-rose-500 transition pointer-events-auto"
         >
           <span id="profile-avatar" class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-slate-100">U</span>
           <img id="profile-avatar-img" class="hidden h-9 w-9 rounded-full object-cover" alt="Profil" />
@@ -44,7 +44,7 @@
         </button>
         <div
           id="profile-dropdown"
-          class="hidden absolute right-0 z-50 mt-2 w-56 rounded-2xl border border-slate-800 bg-slate-950/95 p-2 text-sm text-slate-100 shadow-xl shadow-slate-900/60 backdrop-blur-xl"
+          class="hidden absolute right-0 z-50 mt-2 w-56 rounded-2xl border border-slate-800 bg-slate-950/95 p-2 text-sm text-slate-100 shadow-xl shadow-slate-900/60 backdrop-blur-xl pointer-events-auto"
         >
           <p class="px-3 py-2 text-[11px] text-slate-400">Sprache</p>
           <div class="flex flex-col gap-1 px-1">

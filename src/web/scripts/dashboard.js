@@ -106,7 +106,17 @@ function renderOverviewData(data) {
   const holidayHighlights = Array.isArray(data?.holidays)
     ? data.holidays.map((h) => ({ date: h.date, type: h.name || 'Feiertag', label: h.name || 'Feiertag', color: '#94a3b8' }))
     : [];
-  calendarHighlights = [...birthdayHighlights, ...eventHighlights, ...holidayHighlights];
+
+  // Duplikate je Tag/Label vermeiden
+  const seen = new Set();
+  const merged = [...birthdayHighlights, ...eventHighlights, ...holidayHighlights].filter((h) => {
+    const key = `${new Date(h.date).toDateString()}::${h.label || h.type}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  calendarHighlights = merged;
   calendarCurrentDate = new Date();
   renderCalendar(calendarCurrentDate, calendarHighlights);
 }
@@ -125,6 +135,13 @@ function updateUserRoleTags(roles = []) {
   if (!roles.length) return;
 
   const top = roles.slice(0, 4);
+  const primary = top[0];
+  if (primary) {
+    const color = primary.color ? `#${primary.color.toString(16).padStart(6, '0')}` : '';
+    setProfileAccent(color);
+  } else {
+    setProfileAccent('');
+  }
   top.forEach((role) => {
     const color = role.color ? `#${role.color.toString(16).padStart(6, '0')}` : '#22d3ee';
     const tag = document.createElement('span');
@@ -240,14 +257,14 @@ function renderCalendar(date = new Date(), highlights = []) {
       span.classList.add('ring', 'ring-meat.primary/40');
     }
     if (primary) {
-      span.classList.add('group');
+      span.classList.add('highlighted-day');
       span.style.background = primary.color;
       span.style.color = '#0f172a';
       span.style.border = '1px solid rgba(15,23,42,0.2)';
       const tooltip = document.createElement('div');
       tooltip.setAttribute('role', 'tooltip');
       tooltip.className =
-        'pointer-events-none absolute z-20 -top-2 left-1/2 max-w-[260px] -translate-x-1/2 -translate-y-full rounded-base bg-slate-950/95 text-slate-100 text-xs px-3 py-2 shadow-xl shadow-slate-900/70 opacity-0 group-hover:opacity-100 transition-opacity duration-150 border border-slate-800/80 text-left';
+        'pointer-events-none absolute z-20 -top-2 left-1/2 max-w-[260px] -translate-x-1/2 -translate-y-full rounded-base bg-slate-950/95 text-slate-100 text-xs px-3 py-2 shadow-xl shadow-slate-900/70 opacity-0 transition-opacity duration-150 border border-slate-800/80 text-left';
       dayHighlights.forEach((h) => {
         const row = document.createElement('div');
         row.className = 'flex items-center gap-2 py-0.5 whitespace-nowrap';
@@ -261,6 +278,13 @@ function renderCalendar(date = new Date(), highlights = []) {
         tooltip.appendChild(row);
       });
       span.appendChild(tooltip);
+
+      span.addEventListener('mouseenter', () => {
+        tooltip.style.opacity = '1';
+      });
+      span.addEventListener('mouseleave', () => {
+        tooltip.style.opacity = '0';
+      });
     }
     calendarGrid.appendChild(span);
   }
