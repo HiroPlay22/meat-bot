@@ -30,6 +30,8 @@ const userRoleBadge = document.getElementById('user-role-badge');
 const userRoleTags = document.getElementById('user-role-tags');
 const roleContent = document.getElementById('role-content');
 const profileSkeleton = document.getElementById('profile-skeleton');
+const calendarMonthLabel = document.getElementById('calendar-month');
+const calendarGrid = document.getElementById('calendar-grid');
 
 function showDashboardSkeleton(showSkeleton) {
   if (dashboardSkeleton) dashboardSkeleton.classList.toggle('hidden', !showSkeleton);
@@ -158,6 +160,47 @@ async function loadGuildMemberData() {
   }
 }
 
+function renderCalendar(date = new Date()) {
+  if (!calendarGrid) return;
+  const current = new Date(date);
+  current.setDate(1);
+  const year = current.getFullYear();
+  const month = current.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const monthLabel = current.toLocaleString('de-DE', { month: 'long', year: 'numeric' });
+  if (calendarMonthLabel) {
+    const label = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
+    calendarMonthLabel.textContent = label;
+  }
+
+  calendarGrid.innerHTML = '';
+  // Monday-start offset: getDay 0=Sun -> 6, else day-1
+  const firstDay = current.getDay();
+  const offset = firstDay === 0 ? 6 : firstDay - 1;
+  for (let i = 0; i < offset; i += 1) {
+    const span = document.createElement('span');
+    span.className = 'py-2 text-slate-700';
+    span.textContent = '';
+    calendarGrid.appendChild(span);
+  }
+
+  const today = new Date();
+  const isSameMonth = today.getFullYear() === year && today.getMonth() === month;
+
+  for (let d = 1; d <= daysInMonth; d += 1) {
+    const span = document.createElement('span');
+    span.textContent = String(d);
+    const base = 'flex items-center justify-center py-2 rounded-xl transition text-slate-100';
+    const todayClass =
+      isSameMonth && today.getDate() === d
+        ? 'bg-gradient-to-br from-meat.primary/70 to-meat.accent/60 border border-meat.primary/60 shadow-meat-glow'
+        : 'bg-slate-800/60 hover:bg-slate-800/80';
+    span.className = `${base} ${todayClass}`;
+    calendarGrid.appendChild(span);
+  }
+}
+
 async function ensureGuildsLoaded() {
   if (!state.user) return;
   if (state.guilds.length) return;
@@ -245,6 +288,7 @@ initLogoutFallback();
 startStatusPolling();
 showDashboardSkeleton(true);
 setupDropdownExclusivity();
+renderCalendar();
 subscribe('guildChanged', () => {
   updateGuildHeader();
   loadGuildMemberData();

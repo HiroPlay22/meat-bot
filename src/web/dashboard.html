@@ -302,7 +302,6 @@
                     <div class="space-y-1">
                       <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Dashboard</p>
                       <h1 class="text-xl font-bold text-slate-100" id="hero-guild-title">Control Center</h1>
-                      <p class="text-sm text-slate-400">Angemeldet als <span id="hero-user-name" class="font-semibold text-slate-100">User</span></p>
                     </div>
                     <div class="flex flex-wrap items-center gap-3">
                       <div class="relative inline-flex">
@@ -371,7 +370,7 @@
                 </header>
                 <div class="space-y-6">
                   <section class="grid gap-3 sm:grid-cols-1 xl:grid-cols-3">
-                    <article class="group rounded-3xl border border-slate-800/90 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-5 shadow-lg shadow-slate-950/50 transition hover:-translate-y-0.5 hover:border-meat.primary/70">
+                    <div class="group rounded-3xl border border-slate-800/90 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-5 shadow-lg shadow-slate-950/50 transition hover:-translate-y-0.5 hover:border-meat.primary/70">
                       <div class="flex items-start justify-between">
                         <div class="space-y-2">
                           <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Profil</p>
@@ -402,9 +401,9 @@
                           </svg>
                         </span>
                       </div>
-                    </article>
+                    </div>
 
-                    <article class="group rounded-3xl border border-slate-800/90 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-5 shadow-lg shadow-slate-950/50 transition hover:-translate-y-0.5 hover:border-meat.primary/70">
+                    <div class="group rounded-3xl border border-slate-800/90 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-5 shadow-lg shadow-slate-950/50 transition hover:-translate-y-0.5 hover:border-meat.primary/70">
                       <div class="flex items-start justify-between">
                         <div class="space-y-2">
                           <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Events & Termine</p>
@@ -420,83 +419,24 @@
                           </svg>
                         </span>
                       </div>
-                      <div class="mt-4 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
-                        <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4">
-                          <div class="flex items-center justify-between text-sm text-slate-200">
-                            <div class="flex items-center gap-2">
-                              <span class="text-base font-semibold">März 2025</span>
-                            </div>
-                            <div class="flex items-center gap-2 text-slate-500">
-                              <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-800/70">&#8249;</span>
-                              <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-800/70">&#8250;</span>
-                            </div>
+                      <div class="mt-4 rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4">
+                        <div class="flex items-center justify-between text-sm text-slate-200">
+                          <div class="flex items-center gap-2">
+                            <span class="text-base font-semibold" id="calendar-month">Kalender</span>
                           </div>
-                          <div class="mt-3 grid grid-cols-7 gap-2 text-center text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
-                            <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
-                          </div>
-                          <div class="mt-2 grid grid-cols-7 gap-2 text-sm">
-                            <span class="py-2 text-slate-600">24</span>
-                            <span class="py-2 text-slate-600">25</span>
-                            <span class="py-2 text-slate-600">26</span>
-                            <span class="py-2 text-slate-600">27</span>
-                            <span class="py-2 text-slate-600">28</span>
-                            <span class="py-2 text-slate-600">1</span>
-                            <span class="py-2 text-slate-600">2</span>
-                            <span class="py-2 text-slate-50 rounded-xl bg-slate-800/60">3</span>
-                            <span class="py-2 text-slate-50 rounded-xl bg-slate-800/60">4</span>
-                            <span class="py-2 text-slate-50 rounded-xl bg-slate-800/60">5</span>
-                            <span class="py-2 text-slate-50 rounded-xl bg-slate-800/60">6</span>
-                            <span class="relative py-2 text-slate-50 rounded-xl bg-slate-900/80 border border-meat.primary/60">
-                              7
-                              <span class="absolute left-1/2 top-1 translate-x-[-50%] inline-flex h-1.5 w-1.5 rounded-full bg-meat.primary"></span>
-                            </span>
-                            <span class="py-2 text-slate-50 rounded-xl bg-slate-800/60">8</span>
-                            <span class="relative py-2 text-slate-50 rounded-xl bg-slate-800/60">
-                              9
-                              <span class="absolute left-1/2 top-1 translate-x-[-50%] inline-flex h-1.5 w-1.5 rounded-full bg-amber-400"></span>
-                            </span>
-                            <span class="py-2 text-slate-50 rounded-xl bg-slate-800/60">10</span>
-                            <span class="py-2 text-slate-50 rounded-xl bg-slate-800/60">11</span>
-                            <span class="py-2 text-slate-50 rounded-xl bg-slate-800/60">12</span>
-                            <span class="py-2 text-slate-50 rounded-xl bg-slate-800/60">13</span>
-                            <span class="relative py-2 text-slate-50 rounded-xl bg-slate-900/80 border border-emerald-400/70">
-                              14
-                              <span class="absolute left-1/2 top-1 translate-x-[-50%] inline-flex h-1.5 w-1.5 rounded-full bg-emerald-300"></span>
-                            </span>
-                            <span class="py-2 text-slate-50 rounded-xl bg-slate-800/60">15</span>
-                            <span class="py-2 text-slate-50 rounded-xl bg-slate-800/60">16</span>
+                          <div class="flex items-center gap-2 text-slate-500">
+                            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-800/70">&#8249;</span>
+                            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-800/70">&#8250;</span>
                           </div>
                         </div>
-                        <div class="space-y-3">
-                          <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-3">
-                            <div class="flex items-center justify-between text-sm text-slate-200">
-                              <span>7. März • 19:30</span>
-                              <span class="rounded-full bg-meat.primary/20 px-2 py-0.5 text-[11px] text-meat.primary">Live</span>
-                            </div>
-                            <p class="mt-1 text-sm font-semibold text-slate-100">Community Night</p>
-                            <p class="text-[12px] text-slate-400">Games & Voice • Kanal #events</p>
-                          </div>
-                          <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-3">
-                            <div class="flex items-center justify-between text-sm text-slate-200">
-                              <span>9. März • 18:00</span>
-                              <span class="rounded-full bg-amber-400/20 px-2 py-0.5 text-[11px] text-amber-300">Reminder</span>
-                            </div>
-                            <p class="mt-1 text-sm font-semibold text-slate-100">Clip-Review</p>
-                            <p class="text-[12px] text-slate-400">Shorts sichten • Kanal #clips</p>
-                          </div>
-                          <div class="rounded-2xl border border-slate-800/80 bg-slate-900/80 p-3">
-                            <div class="flex items-center justify-between text-sm text-slate-200">
-                              <span>14. März • 20:00</span>
-                              <span class="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[11px] text-emerald-300">Geplant</span>
-                            </div>
-                            <p class="mt-1 text-sm font-semibold text-slate-100">Release Watch</p>
-                            <p class="text-[12px] text-slate-400">Neue Features & Bot-Update</p>
-                          </div>
+                        <div class="mt-3 grid grid-cols-7 gap-2 text-center text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                          <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
                         </div>
+                        <div id="calendar-grid" class="mt-2 grid grid-cols-7 gap-2 text-sm text-center"></div>
                       </div>
-                    </article>
+                    </div>
 
-                    <article class="group rounded-3xl border border-slate-800/90 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-5 shadow-lg shadow-slate-950/50 transition hover:-translate-y-0.5 hover:border-meat.primary/70">
+                    <div class="group rounded-3xl border border-slate-800/90 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-5 shadow-lg shadow-slate-950/50 transition hover:-translate-y-0.5 hover:border-meat.primary/70">
                       <div class="flex items-start justify-between">
                         <div class="space-y-2">
                           <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Clip-Queue</p>
@@ -515,7 +455,7 @@
                         <span class="inline-flex h-1.5 w-1.5 rounded-full bg-amber-300"></span>
                         WIP
                       </div>
-                    </article>
+                    </div>
                   </section>
 
                   <section class="grid gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(0,1.05fr)]">
