@@ -604,6 +604,11 @@ async function handleGuilds(req: IncomingMessage, res: ServerResponse) {
   const session = await loadSession(sessionId);
   if (!session) return json(res, 401, { error: 'unauthorized' });
 
+  const cachedGuilds = await loadCachedGuilds(session.user.id);
+  if (cachedGuilds) {
+    return json(res, 200, cachedGuilds);
+  }
+
   try {
     const guilds = await fetchGuilds(session.accessToken);
     const filtered = filterGuilds(guilds);
@@ -624,26 +629,31 @@ async function handleGuilds(req: IncomingMessage, res: ServerResponse) {
         };
       }),
     );
-    return json(
-      res,
-      200,
-      enriched,
-    );
+    await saveCachedGuilds(session.user.id, enriched);
+    return json(res, 200, enriched);
   } catch (error: any) {
-    logError('Fehler beim Laden der Guilds', {
-      functionName: 'apiGuilds',
-      extra: {
-        error: {
-          message: error?.message,
-          name: error?.name,
-          stack: error?.stack,
-          code: error?.code,
-          status: error?.status,
-        },
-        userId: session?.user?.id,
+    const fallback = await loadCachedGuilds(session.user.id);
+    const extra = {
+      error: {
+        message: error?.message,
+        name: error?.name,
+        stack: error?.stack,
+        code: error?.code,
+        status: error?.status,
+        body: error?.body,
       },
-    });
-    return json(res, 500, { error: 'guilds_failed' });
+      userId: session?.user?.id,
+    };
+    if (error?.status === 429 && fallback) {
+      logWarn('Guilds Rate-Limit, liefere Cache', { functionName: 'apiGuilds', extra });
+      return json(res, 200, fallback);
+    }
+    if (fallback) {
+      logWarn('Guilds Fehler, liefere Cache', { functionName: 'apiGuilds', extra });
+      return json(res, 200, fallback);
+    }
+    logError('Fehler beim Laden der Guilds', { functionName: 'apiGuilds', extra });
+    return json(res, error?.status === 429 ? 429 : 500, { error: 'guilds_failed' });
   }
 }
 
