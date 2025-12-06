@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import nunjucks from 'vite-plugin-nunjucks';
 import path from 'node:path';
+import nunjucksLib from 'nunjucks';
 
 export default defineConfig({
   root: path.resolve(__dirname, 'src/web'),
@@ -19,13 +20,13 @@ export default defineConfig({
   plugins: [
     nunjucks({
       templatesDir: path.resolve(__dirname, 'src/web'),
-      nunjucksConfigure: {
-        noCache: true,
-        searchPaths: [
+      nunjucksEnvironment: new nunjucksLib.Environment(
+        new nunjucksLib.FileSystemLoader([
           path.resolve(__dirname, 'src/web'),
           path.resolve(__dirname, 'src/web/templates'),
-        ],
-      },
+        ]),
+        { noCache: true },
+      ),
     }),
   ],
   server: {
