@@ -22,6 +22,7 @@ import { startStatusPolling } from './status.js';
 
 const headerGuildTitle = document.getElementById('header-guild-title');
 const heroGuildTitle = document.getElementById('hero-guild-title');
+const heroBaseTitle = heroGuildTitle?.dataset?.heroBase || heroGuildTitle?.textContent?.trim() || 'Dashboard';
 const navProfileLabel = document.getElementById('nav-profile-label');
 const pageContent = document.getElementById('page-content');
 const sidebar = document.querySelector('[data-sidebar]');
@@ -45,7 +46,8 @@ function setNavProfile(displayName) {
 
 function updateGuildHeader() {
   const guild = state.guilds.find((g) => g.id === state.selectedGuildId);
-  const title = guild?.name ? `${guild.name} Control Center` : 'Control Center';
+  const base = heroBaseTitle || 'Dashboard';
+  const title = guild?.name ? `${guild.name} ${base}` : base;
   if (headerGuildTitle) headerGuildTitle.textContent = title;
   if (heroGuildTitle) heroGuildTitle.textContent = title;
 }
