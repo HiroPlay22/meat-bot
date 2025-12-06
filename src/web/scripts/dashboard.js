@@ -15,6 +15,7 @@ const profileCardTitle = document.getElementById('card-profile-title');
 const userRoleBadge = document.getElementById('user-role-badge');
 const userRoleTags = document.getElementById('user-role-tags');
 const roleContent = document.getElementById('role-content');
+const navProfileLabel = document.getElementById('nav-profile-label');
 const calendarMonthLabel = document.getElementById('calendar-month');
 const calendarGrid = document.getElementById('calendar-grid');
 const calendarPrevBtn = document.getElementById('calendar-prev');
@@ -64,6 +65,10 @@ function applyUserDisplayName(displayName) {
   if (profileCardTitle) profileCardTitle.textContent = label;
   const profileName = document.getElementById('profile-name');
   if (profileName) profileName.textContent = label;
+  if (navProfileLabel) {
+    const possessive = /[sS]$/.test(label) ? `${label}' Profil` : `${label}'s Profil`;
+    navProfileLabel.textContent = possessive;
+  }
 }
 
 function updateUserRoleBadge(role) {
