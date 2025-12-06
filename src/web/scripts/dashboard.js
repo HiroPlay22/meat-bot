@@ -71,6 +71,8 @@ function applyUserDisplayName(displayName) {
   const label = displayName || 'User';
   if (heroUserName) heroUserName.textContent = label;
   if (profileCardTitle) profileCardTitle.textContent = `Profil @${label}`;
+  const profileName = document.getElementById('profile-name');
+  if (profileName) profileName.textContent = label;
 }
 
 function updateUserRoleBadge(role) {
@@ -139,8 +141,9 @@ async function loadGuildMemberData() {
     const data = await fetchGuildOverview(state.selectedGuildId);
     const displayName = data?.member?.displayName || state.user?.displayName || state.user?.username || 'User';
     applyUserDisplayName(displayName);
+    const memberRoleIds = Array.isArray(data?.member?.roles) ? data.member.roles : [];
     const rolesSorted = Array.isArray(data?.roles)
-      ? [...data.roles].sort((a, b) => (b.position ?? 0) - (a.position ?? 0))
+      ? data.roles.filter((r) => memberRoleIds.includes(r.id)).sort((a, b) => (b.position ?? 0) - (a.position ?? 0))
       : [];
     const highest = data?.highestRoleResolved || rolesSorted[0] || null;
     updateUserRoleBadge(highest || null);
