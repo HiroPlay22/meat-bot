@@ -428,23 +428,6 @@ async function fetchGuildEvents(guildId: string) {
   >;
 }
 
-function computeEasterSunday(year: number) {
-  const a = year % 19;
-  const b = Math.floor(year / 100);
-  const c = year % 100;
-  const d = Math.floor(b / 4);
-  const e = b % 4;
-  const f = Math.floor((b + 8) / 25);
-  const g = Math.floor((b - f + 1) / 3);
-  const h = (19 * a + b - d - g + 15) % 30;
-  const i = Math.floor(c / 4);
-  const k = c % 4;
-  const l = (32 + 2 * e + 2 * i - h - k) % 7;
-  const m = Math.floor((a + 11 * h + 22 * l) / 451);
-  const month = Math.floor((h + l - 7 * m + 114) / 31);
-  const day = ((h + l - 7 * m + 114) % 31) + 1;
-  return new Date(Date.UTC(year, month - 1, day));
-}
 
 const botPresenceCache = new Map<
   string,
@@ -690,7 +673,7 @@ async function handleGuildOverview(req: IncomingMessage, res: ServerResponse, gu
       fetchGuildEvents(guildId).catch(() => []),
       (prisma as any).holiday
         .findMany({
-          select: { id: true, name: true, month: true, day: true, region: true, easterOffset: true },
+          select: { id: true, name: true, date: true, region: true },
         })
         .catch(() => []),
     ]);
@@ -736,21 +719,9 @@ async function handleGuildOverview(req: IncomingMessage, res: ServerResponse, gu
           }))
         : [],
       holidays: Array.isArray(holidays)
-        ? holidays.map((h: any) => {
-            const year = new Date().getFullYear();
-            let date = null;
-            if (typeof h.month === 'number' && typeof h.day === 'number') {
-              date = new Date(Date.UTC(year, h.month - 1, h.day));
-            } else if (typeof h.easterOffset === 'number') {
-              const easter = computeEasterSunday(year);
-              const dt = new Date(easter);
-              dt.setUTCDate(dt.getUTCDate() + h.easterOffset);
-              date = dt;
-            }
-            return date
-              ? { id: h.id, name: h.name, date, region: h.region }
-              : null;
-          }).filter(Boolean)
+        ? holidays
+            .filter((h: any) => h?.date)
+            .map((h: any) => ({ id: h.id, name: h.name, date: h.date, region: h.region }))
         : [],
       stats: {
         commandUsageTotal,

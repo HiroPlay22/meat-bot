@@ -135,15 +135,13 @@ model UserProfile {
   birthday  DateTime?
 }
 
-/// Feiertags-Definitionen (monat/tag oder relativ zu Ostersonntag)
 model Holiday {
-  id           String   @id @default(cuid())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  name         String
-  region       String   @db.VarChar(4) // z.B. DE, BW, BY ...
-  month        Int?
-  day          Int?
-  easterOffset Int? // offset in Tagen relativ zu Ostersonntag (z.B. -2 = Karfreitag, +1 = Ostermontag)
+  /// Datum des Feiertags (fix oder pro Jahr eingetragen)
+  date      DateTime
+  name      String
+  region    String   @db.VarChar(4) // z.B. DE, BW, BY, BE ...
 }
