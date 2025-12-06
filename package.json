@@ -7,7 +7,7 @@
     "dev": "tsx src/bot/index.ts",
     "build": "tsc && node scripts/copy-texts.cjs",
     "start": "node dist/bot/index.js",
-    "web:start": "serve src/web -l 8080",
+    "web:start": "serve dist/web -l 8080",
     "register:dev": "tsx src/bot/registerCommands.ts",
     "clear:global": "tsx src/bot/clearGlobalCommands.ts",
     "prisma:migrate": "prisma migrate dev --name init",
