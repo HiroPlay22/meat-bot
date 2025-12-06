@@ -49,7 +49,23 @@ async function ensureGuildsLoaded() {
 }
 
 function ensureSelectedGuild() {
-  // Immer Modal erzwingen, bis eine Guild bewusst gewählt wird.
+  if (!state.user || !state.guilds.length) return false;
+
+  if (state.selectedGuildId && state.guilds.some((g) => g.id === state.selectedGuildId)) {
+    return true;
+  }
+
+  const cached = loadCachedSelected(state.user.id);
+  if (cached && state.guilds.some((g) => g.id === cached)) {
+    setSelectedGuild(cached, { persist: false });
+    return true;
+  }
+
+  if (state.guilds.length === 1) {
+    setSelectedGuild(state.guilds[0].id);
+    return true;
+  }
+
   return false;
 }
 
@@ -120,3 +136,4 @@ if (!window.location.pathname.includes('dashboard')) {
     // handled in bootstrap
   });
 }
+
