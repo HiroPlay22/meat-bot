@@ -124,3 +124,13 @@ model UserActivityDaily {
 
   @@unique([date, guildId, userId], name: "date_guild_user")
 }
+
+/// Profildaten je User (global, nicht guild-spezifisch)
+model UserProfile {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    String   @unique @db.VarChar(32)
+  birthday  DateTime?
+}

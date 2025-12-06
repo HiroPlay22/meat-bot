@@ -72,7 +72,7 @@ function setProfileAccent(color) {
 function applyUserDisplayName(displayName) {
   const label = displayName || 'User';
   if (heroUserName) heroUserName.textContent = label;
-  if (profileCardTitle) profileCardTitle.textContent = `@${label}`;
+  if (profileCardTitle) profileCardTitle.textContent = label;
   const profileName = document.getElementById('profile-name');
   if (profileName) profileName.textContent = label;
 }
@@ -86,7 +86,7 @@ function updateUserRoleBadge(role) {
   }
   const color = role.color != null ? `#${role.color.toString(16).padStart(6, '0')}` : null;
   const dotStyle = color ? `style="background:${color}"` : '';
-    userRoleBadge.innerHTML = `<span class="inline-flex h-1.5 w-1.5 rounded-full" ${dotStyle}></span>${role.name}`;
+  userRoleBadge.innerHTML = `<span class="inline-flex h-1.5 w-1.5 rounded-full" ${dotStyle}></span>${role.name}`;
   setProfileAccent(color);
 }
 
@@ -143,6 +143,15 @@ async function loadGuildMemberData() {
     const data = await fetchGuildOverview(state.selectedGuildId);
     const displayName = data?.member?.displayName || state.user?.displayName || state.user?.username || 'User';
     applyUserDisplayName(displayName);
+    if (state.user) {
+      const updatedUser = { ...state.user, displayName };
+      setUser(updatedUser);
+      renderProfile(updatedUser);
+    }
+    if (navProfileLabel) {
+      const possessive = /[sS]$/.test(displayName) ? `${displayName}' Profil` : `${displayName}'s Profil`;
+      navProfileLabel.textContent = possessive;
+    }
     const memberRoleIds = Array.isArray(data?.member?.roles) ? data.member.roles : [];
     const rolesSorted = Array.isArray(data?.roles)
       ? data.roles.filter((r) => memberRoleIds.includes(r.id)).sort((a, b) => (b.position ?? 0) - (a.position ?? 0))
@@ -150,17 +159,24 @@ async function loadGuildMemberData() {
     const highest = data?.highestRoleResolved || rolesSorted[0] || null;
     updateUserRoleBadge(highest || null);
     updateUserRoleTags(rolesSorted);
+    const birthdayHighlights = Array.isArray(data?.birthdays)
+      ? data.birthdays
+          .filter((entry) => entry?.birthday)
+          .map((entry) => ({ date: entry.birthday, type: 'Geburtstag', color: '#f472b6' }))
+      : [];
+    renderCalendar(new Date(), birthdayHighlights);
     toggleRoleSkeleton(false);
     showDashboardSkeleton(false);
   } catch (error) {
     updateUserRoleBadge(null);
     updateUserRoleTags([]);
+    renderCalendar(new Date(), []);
     toggleRoleSkeleton(false);
     showDashboardSkeleton(false);
   }
 }
 
-function renderCalendar(date = new Date()) {
+function renderCalendar(date = new Date(), highlights = []) {
   if (!calendarGrid) return;
   const current = new Date(date);
   current.setDate(1);
@@ -188,6 +204,22 @@ function renderCalendar(date = new Date()) {
   const today = new Date();
   const isSameMonth = today.getFullYear() === year && today.getMonth() === month;
 
+  const normalizedHighlights = Array.isArray(highlights)
+    ? highlights
+        .map((h) => {
+          const dt = h?.date ? new Date(h.date) : null;
+          if (!dt || Number.isNaN(dt.getTime())) return null;
+          return {
+            day: dt.getDate(),
+            month: dt.getMonth(),
+            year: dt.getFullYear(),
+            color: h?.color || '#22d3ee',
+            type: h?.type || 'event',
+          };
+        })
+        .filter(Boolean)
+    : [];
+
   for (let d = 1; d <= daysInMonth; d += 1) {
     const span = document.createElement('span');
     span.textContent = String(d);
@@ -196,7 +228,16 @@ function renderCalendar(date = new Date()) {
       isSameMonth && today.getDate() === d
         ? 'bg-gradient-to-br from-meat.primary/70 to-meat.accent/60 border border-meat.primary/60 shadow-meat-glow'
         : 'bg-slate-800/60 hover:bg-slate-800/80';
+    const dayHighlights = normalizedHighlights.filter((h) => h.day === d && h.month === month && h.year === year);
     span.className = `${base} ${todayClass}`;
+    if (dayHighlights.length) {
+      const dot = document.createElement('span');
+      dot.className = 'absolute top-1 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full';
+      dot.style.background = dayHighlights[0].color;
+      span.classList.add('relative');
+      span.appendChild(dot);
+      span.title = dayHighlights.map((h) => h.type).join(', ');
+    }
     calendarGrid.appendChild(span);
   }
 }

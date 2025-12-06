@@ -39,6 +39,18 @@ export async function updateConsent(guildId, status, version) {
   });
 }
 
+export async function fetchUserProfile() {
+  return doFetch('/api/users/me/profile');
+}
+
+export async function updateUserProfile(data) {
+  return doFetch('/api/users/me/profile', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+}
+
 export async function fetchStatus() {
   return doFetch('/api/status');
 }

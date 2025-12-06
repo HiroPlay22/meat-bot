@@ -639,7 +639,7 @@ async function handleGuildOverview(req: IncomingMessage, res: ServerResponse, gu
     const present = await checkBotPresence(guildId);
     if (!present) return json(res, 400, { error: 'bot_not_present' });
 
-    const [roles, member, guildInfo, consent, commandUsageTotal] = await Promise.all([
+    const [roles, member, guildInfo, consent, commandUsageTotal, profile] = await Promise.all([
       fetchGuildRoles(guildId),
       fetchGuildMember(guildId, session.user.id),
       fetchGuildInfo(guildId),
@@ -647,11 +647,17 @@ async function handleGuildOverview(req: IncomingMessage, res: ServerResponse, gu
         where: { guildId_userId: { guildId, userId: session.user.id } },
       }),
       (prisma as any).commandUsage.count({ where: { guildId } }).catch(() => null),
+      (prisma as any).userProfile.findUnique({
+        where: { userId: session.user.id },
+        select: { birthday: true },
+      }),
     ]);
 
     const memberRoles = roles.filter((r) => member.roles.includes(r.id)).sort((a, b) => (b.position ?? 0) - (a.position ?? 0));
     const highestRole = memberRoles[0] || null;
     const displayName = member.nick || member.user.global_name || member.user.username;
+    const consentStatus = consent?.status ?? 'NONE';
+    const includeBirthday = consentStatus === 'ALLOWED' && profile?.birthday ? [{ userId: session.user.id, birthday: profile.birthday }] : [];
 
     return json(res, 200, {
       guild: {
@@ -673,7 +679,8 @@ async function handleGuildOverview(req: IncomingMessage, res: ServerResponse, gu
       highestRoleResolved: highestRole
         ? { id: highestRole.id, name: highestRole.name, color: highestRole.color, position: highestRole.position }
         : null,
-      consentStatus: consent?.status ?? 'NONE',
+      consentStatus,
+      birthdays: includeBirthday,
       stats: {
         commandUsageTotal,
       },
@@ -713,6 +720,45 @@ async function handleConsent(req: IncomingMessage, res: ServerResponse, guildId:
     } catch (error) {
       logError('Consent speichern fehlgeschlagen', { functionName: 'apiConsent', extra: { error, guildId } });
       return json(res, 500, { error: 'consent_failed' });
+    }
+  }
+
+  return json(res, 405, { error: 'method_not_allowed' });
+}
+
+async function handleUserProfile(req: IncomingMessage, res: ServerResponse) {
+  const sessionId = getSession(req);
+  if (!sessionId) return json(res, 401, { error: 'unauthorized' });
+  const session = await loadSession(sessionId);
+  if (!session) return json(res, 401, { error: 'unauthorized' });
+
+  if (req.method === 'GET') {
+    const profile = await (prisma as any).userProfile.findUnique({
+      where: { userId: session.user.id },
+      select: { birthday: true },
+    });
+    return json(res, 200, { birthday: profile?.birthday ?? null });
+  }
+
+  if (req.method === 'POST') {
+    try {
+      const body = await parseBody(req);
+      const birthdayStr = body?.birthday;
+      let birthday: Date | null = null;
+      if (birthdayStr) {
+        const parsed = new Date(birthdayStr);
+        if (Number.isNaN(parsed.getTime())) return json(res, 400, { error: 'invalid_birthday' });
+        birthday = parsed;
+      }
+      await (prisma as any).userProfile.upsert({
+        where: { userId: session.user.id },
+        update: { birthday },
+        create: { userId: session.user.id, birthday },
+      });
+      return json(res, 200, { birthday });
+    } catch (error) {
+      logError('Profil speichern fehlgeschlagen', { functionName: 'apiProfile', extra: { error } });
+      return json(res, 500, { error: 'profile_failed' });
     }
   }
 
@@ -816,6 +862,12 @@ export function startAuthServer() {
     if (guildConsentMatch && (req.method === 'GET' || req.method === 'POST')) {
       applySecurityHeaders(res);
       await handleConsent(req, res, guildConsentMatch[1]);
+      return;
+    }
+
+    if (path === '/api/users/me/profile' && (req.method === 'GET' || req.method === 'POST')) {
+      applySecurityHeaders(res);
+      await handleUserProfile(req, res);
       return;
     }
 
