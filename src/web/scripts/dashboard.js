@@ -32,6 +32,12 @@ const roleContent = document.getElementById('role-content');
 const profileSkeleton = document.getElementById('profile-skeleton');
 const calendarMonthLabel = document.getElementById('calendar-month');
 const calendarGrid = document.getElementById('calendar-grid');
+const calendarPrevBtn = document.getElementById('calendar-prev');
+const calendarNextBtn = document.getElementById('calendar-next');
+const calendarNowBtn = document.getElementById('calendar-now');
+
+let calendarCurrentDate = new Date();
+let calendarHighlights = [];
 
 function showDashboardSkeleton(showSkeleton) {
   if (dashboardSkeleton) dashboardSkeleton.classList.toggle('hidden', !showSkeleton);
@@ -183,13 +189,16 @@ async function loadGuildMemberData() {
     const holidayHighlights = Array.isArray(data?.holidays)
       ? data.holidays.map((h) => ({ date: h.date, type: h.name || 'Feiertag', color: '#94a3b8' }))
       : [];
-    renderCalendar(new Date(), [...birthdayHighlights, ...eventHighlights, ...holidayHighlights]);
+    calendarHighlights = [...birthdayHighlights, ...eventHighlights, ...holidayHighlights];
+    calendarCurrentDate = new Date();
+    renderCalendar(calendarCurrentDate, calendarHighlights);
     toggleRoleSkeleton(false);
     showDashboardSkeleton(false);
   } catch (error) {
     updateUserRoleBadge(null);
     updateUserRoleTags([]);
-    renderCalendar(new Date(), []);
+    calendarHighlights = [];
+    renderCalendar(calendarCurrentDate, calendarHighlights);
     toggleRoleSkeleton(false);
     showDashboardSkeleton(false);
   }
@@ -352,7 +361,29 @@ initLogoutFallback();
 startStatusPolling();
 showDashboardSkeleton(true);
 setupDropdownExclusivity();
-renderCalendar();
+renderCalendar(calendarCurrentDate, calendarHighlights);
+if (calendarPrevBtn) {
+  calendarPrevBtn.addEventListener('click', () => {
+    const next = new Date(calendarCurrentDate);
+    next.setMonth(next.getMonth() - 1);
+    calendarCurrentDate = next;
+    renderCalendar(calendarCurrentDate, calendarHighlights);
+  });
+}
+if (calendarNextBtn) {
+  calendarNextBtn.addEventListener('click', () => {
+    const next = new Date(calendarCurrentDate);
+    next.setMonth(next.getMonth() + 1);
+    calendarCurrentDate = next;
+    renderCalendar(calendarCurrentDate, calendarHighlights);
+  });
+}
+if (calendarNowBtn) {
+  calendarNowBtn.addEventListener('click', () => {
+    calendarCurrentDate = new Date();
+    renderCalendar(calendarCurrentDate, calendarHighlights);
+  });
+}
 subscribe('guildChanged', () => {
   updateGuildHeader();
   loadGuildMemberData();
