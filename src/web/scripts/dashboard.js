@@ -133,6 +133,7 @@ function setupDropdownExclusivity() {
 
 async function loadGuildMemberData() {
   if (!state.selectedGuildId) return;
+  showDashboardSkeleton(true);
   toggleRoleSkeleton(true);
   try {
     const data = await fetchGuildOverview(state.selectedGuildId);
@@ -145,10 +146,12 @@ async function loadGuildMemberData() {
     updateUserRoleBadge(highest || null);
     updateUserRoleTags(rolesSorted);
     toggleRoleSkeleton(false);
+    showDashboardSkeleton(false);
   } catch (error) {
     updateUserRoleBadge(null);
     updateUserRoleTags([]);
     toggleRoleSkeleton(false);
+    showDashboardSkeleton(false);
   }
 }
 
