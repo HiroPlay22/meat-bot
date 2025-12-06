@@ -188,7 +188,6 @@ async function loadGuildMemberData() {
   } catch (error) {
     updateUserRoleBadge(null);
     updateUserRoleTags([]);
-    calendarHighlights = [];
     renderCalendar(calendarCurrentDate, calendarHighlights);
     toggleRoleSkeleton(false);
     showDashboardSkeleton(false);
