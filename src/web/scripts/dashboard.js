@@ -10,6 +10,7 @@ const currentGuildName = document.getElementById('current-guild-name');
 const currentGuildAvatar = document.getElementById('current-guild-avatar');
 const headerGuildTitle = document.getElementById('header-guild-title');
 const heroGuildTitle = document.getElementById('hero-guild-title');
+const heroBaseTitle = heroGuildTitle?.dataset?.heroBase || heroGuildTitle?.textContent?.trim() || 'Control Center';
 const heroUserName = document.getElementById('hero-user-name');
 const profileCardTitle = document.getElementById('card-profile-title');
 const userRoleBadge = document.getElementById('user-role-badge');
@@ -36,12 +37,12 @@ function updateGuildHeader() {
     currentGuildName.textContent = 'Keine Guild gewaehlt';
     currentGuildAvatar.innerHTML = '';
     if (headerGuildTitle) headerGuildTitle.textContent = 'Control Center';
-    if (heroGuildTitle) heroGuildTitle.textContent = 'Control Center';
+    if (heroGuildTitle) heroGuildTitle.textContent = heroBaseTitle || 'Control Center';
     return;
   }
   currentGuildName.textContent = guild.name;
-  if (headerGuildTitle) headerGuildTitle.textContent = `${guild.name} Control Center`;
-  if (heroGuildTitle) heroGuildTitle.textContent = `${guild.name} Control Center`;
+  if (headerGuildTitle) headerGuildTitle.textContent = `${guild.name} ${heroBaseTitle || 'Control Center'}`;
+  if (heroGuildTitle) heroGuildTitle.textContent = `${guild.name} ${heroBaseTitle || 'Control Center'}`;
   if (guild.icon) {
     currentGuildAvatar.innerHTML = `<img src="${guild.icon}" alt="${guild.name}" class="h-7 w-7 rounded-full object-cover" />`;
   } else {
@@ -110,7 +111,8 @@ function renderOverviewData(data) {
   // Duplikate je Tag/Label vermeiden
   const seen = new Set();
   const merged = [...birthdayHighlights, ...eventHighlights, ...holidayHighlights].filter((h) => {
-    const key = `${new Date(h.date).toDateString()}::${h.label || h.type}`;
+    const dt = new Date(h.date);
+    const key = `${dt.getFullYear()}-${dt.getMonth()}-${dt.getDate()}::${h.label || h.type}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -265,6 +267,7 @@ function renderCalendar(date = new Date(), highlights = []) {
       tooltip.setAttribute('role', 'tooltip');
       tooltip.className =
         'pointer-events-none absolute z-20 -top-2 left-1/2 max-w-[260px] -translate-x-1/2 -translate-y-full rounded-base bg-slate-950/95 text-slate-100 text-xs px-3 py-2 shadow-xl shadow-slate-900/70 opacity-0 transition-opacity duration-150 border border-slate-800/80 text-left';
+      tooltip.style.display = 'none';
       dayHighlights.forEach((h) => {
         const row = document.createElement('div');
         row.className = 'flex items-center gap-2 py-0.5 whitespace-nowrap';
@@ -280,9 +283,11 @@ function renderCalendar(date = new Date(), highlights = []) {
       span.appendChild(tooltip);
 
       span.addEventListener('mouseenter', () => {
+        tooltip.style.display = 'block';
         tooltip.style.opacity = '1';
       });
       span.addEventListener('mouseleave', () => {
+        tooltip.style.display = 'none';
         tooltip.style.opacity = '0';
       });
     }
