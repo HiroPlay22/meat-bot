@@ -39,11 +39,13 @@ const calendarNowBtn = document.getElementById('calendar-now');
 let calendarCurrentDate = new Date();
 let calendarHighlights = [];
 
-function showDashboardSkeleton(showSkeleton) {
+function showDashboardSkeleton(showSkeleton, includeSidebar = false) {
   if (dashboardSkeleton) dashboardSkeleton.classList.toggle('hidden', !showSkeleton);
   if (dashboardContent) dashboardContent.classList.toggle('hidden', showSkeleton);
-  if (sidebarSkeleton) sidebarSkeleton.classList.toggle('hidden', !showSkeleton);
-  if (sidebarReal) sidebarReal.classList.toggle('hidden', showSkeleton);
+  if (includeSidebar) {
+    if (sidebarSkeleton) sidebarSkeleton.classList.toggle('hidden', !showSkeleton);
+    if (sidebarReal) sidebarReal.classList.toggle('hidden', showSkeleton);
+  }
 }
 
 function updateGuildHeader() {
@@ -370,7 +372,7 @@ initGuildSwitch();
 initProfile();
 initLogoutFallback();
 startStatusPolling();
-showDashboardSkeleton(true);
+showDashboardSkeleton(true, true);
 setupDropdownExclusivity();
 renderCalendar(calendarCurrentDate, calendarHighlights);
 if (calendarPrevBtn) {
