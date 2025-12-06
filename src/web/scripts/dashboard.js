@@ -267,8 +267,19 @@ function renderCalendar(date = new Date(), highlights = []) {
       const tooltip = document.createElement('div');
       tooltip.setAttribute('role', 'tooltip');
       tooltip.className =
-        'pointer-events-none absolute z-10 -top-1/2 left-1/2 w-max -translate-x-1/2 -translate-y-full rounded-base bg-slate-900 text-white text-xs px-3 py-2 shadow-xl shadow-slate-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200';
-      tooltip.textContent = dayHighlights.map((h) => h.label || h.type).join(', ');
+        'pointer-events-none absolute z-20 -top-2 left-1/2 max-w-[260px] -translate-x-1/2 -translate-y-full rounded-base bg-slate-900/95 text-white text-xs px-3 py-2 shadow-xl shadow-slate-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-150 border border-slate-800/80 text-left';
+      dayHighlights.forEach((h) => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-2 py-0.5 whitespace-nowrap';
+        const dot = document.createElement('span');
+        dot.className = 'inline-flex h-2 w-2 rounded-full';
+        dot.style.background = h.color;
+        const label = document.createElement('span');
+        label.textContent = h.label || h.type;
+        label.style.color = h.color;
+        row.append(dot, label);
+        tooltip.appendChild(row);
+      });
       span.appendChild(tooltip);
     }
     calendarGrid.appendChild(span);
