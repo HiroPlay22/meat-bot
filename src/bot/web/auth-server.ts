@@ -32,6 +32,8 @@ const stateStore = new Map<string, OAuthState>();
 const sessionStore = new Map<string, SessionData>();
 const rateLimits = new Map<string, RateLimitEntry>();
 const serverStartedAt = Date.now();
+const guildsCache = new Map<string, { data: any; cachedAt: number }>();
+const GUILDS_CACHE_TTL_MS = 5 * 60 * 1000; // 5 Minuten Cache pro User
 
 const env = {
   clientId: process.env.DISCORD_CLIENT_ID ?? '',
@@ -269,6 +271,40 @@ async function deleteSession(sessionId: string) {
     await redis.del(`meat:auth:session:${sessionId}`);
   }
   sessionStore.delete(sessionId);
+}
+
+async function saveCachedGuilds(userId: string, data: any) {
+  const payload = JSON.stringify({ data, cachedAt: Date.now() });
+  const redis = await getRedisClient();
+  if (redis) {
+    await redis.setEx(`meat:auth:guilds:${userId}`, Math.floor(GUILDS_CACHE_TTL_MS / 1000), payload);
+  } else {
+    guildsCache.set(userId, { data, cachedAt: Date.now() });
+  }
+}
+
+async function loadCachedGuilds(userId: string) {
+  const now = Date.now();
+  const redis = await getRedisClient();
+  if (redis) {
+    const raw = await redis.get(`meat:auth:guilds:${userId}`);
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw) as { data: any; cachedAt: number };
+        if (parsed?.cachedAt && now - parsed.cachedAt < GUILDS_CACHE_TTL_MS) {
+          return parsed.data;
+        }
+      } catch {
+        // ignore parse errors
+      }
+    }
+  } else {
+    const cached = guildsCache.get(userId);
+    if (cached && now - cached.cachedAt < GUILDS_CACHE_TTL_MS) {
+      return cached.data;
+    }
+  }
+  return null;
 }
 
 async function handleLogin(res: ServerResponse) {
@@ -940,3 +976,4 @@ export function startAuthServer() {
     logInfo(`Auth-Server läuft auf Port ${port}`, { functionName: 'authServer' });
   });
 }
+
